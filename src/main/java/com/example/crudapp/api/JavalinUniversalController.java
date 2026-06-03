@@ -74,7 +74,9 @@ public class JavalinUniversalController {
             metadata.getService().findById(id)
         );
         
-        result.ifPresentOrElse(ctx::json, () -> ctx.status(404));
+        result.ifPresentOrElse(ctx::json, () -> {
+            throw new com.example.crudapp.api.errors.ResourceNotFoundException("Resource '" + resource + "' with ID " + id + " not found");
+        });
     }
 
     public void create(Context ctx) {
@@ -133,7 +135,7 @@ public class JavalinUniversalController {
     private ResourceMetadata getMetadataOrThrow(String resource) {
         ResourceMetadata metadata = crudManager.getMetadata(resource);
         if (metadata == null) {
-            throw new RuntimeException("Resource not found: " + resource);
+            throw new com.example.crudapp.api.errors.ResourceNotFoundException("Resource not found: " + resource);
         }
         return metadata;
     }
@@ -141,7 +143,7 @@ public class JavalinUniversalController {
     private void validate(Object dto) {
         Set<ConstraintViolation<Object>> violations = validator.validate(dto);
         if (!violations.isEmpty()) {
-            throw new RuntimeException("Validation failed: " + violations);
+            throw new com.example.crudapp.api.errors.ValidationException(violations);
         }
     }
 

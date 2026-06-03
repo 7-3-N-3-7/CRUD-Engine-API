@@ -63,6 +63,96 @@ public class CrudAppIntegrationTest {
     }
 
     @Test
+    public void testRequestTracingCorrelationId() throws Exception {
+        int port = javalinServer.getPort();
+        HttpClient client = HttpClient.newHttpClient();
+
+        // Send request with custom correlation ID
+        String customId = "my-custom-correlation-12345";
+        HttpRequest requestWithId = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/metadata"))
+                .header("X-Request-ID", customId)
+                .GET()
+                .build();
+        HttpResponse<String> responseWithId = client.send(requestWithId, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseWithId.statusCode());
+        assertEquals(customId, responseWithId.headers().firstValue("X-Request-ID").orElse(""));
+
+        // Send request without correlation ID (should generate one)
+        HttpRequest requestNoId = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/metadata"))
+                .GET()
+                .build();
+        HttpResponse<String> responseNoId = client.send(requestNoId, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseNoId.statusCode());
+        String generatedId = responseNoId.headers().firstValue("X-Request-ID").orElse("");
+        assertTrue(generatedId != null && !generatedId.isBlank());
+    }
+
+    @Test
+    public void testUnifiedExceptionMapping() throws Exception {
+        int port = javalinServer.getPort();
+        HttpClient client = HttpClient.newHttpClient();
+        String testToken = generateToken("admin-user", List.of("ADMIN"));
+
+        // 1. Test validation error (empty product payload)
+        String invalidProductJson = "{\"name\":\"\",\"description\":\"\",\"price\":-10.00}";
+        HttpRequest invalidPost = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .header("Authorization", "Bearer " + testToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(invalidProductJson))
+                .build();
+        HttpResponse<String> invalidResponse = client.send(invalidPost, HttpResponse.BodyHandlers.ofString());
+        assertEquals(400, invalidResponse.statusCode());
+        String body = invalidResponse.body();
+        assertTrue(body.contains("\"status\":400"));
+        assertTrue(body.contains("\"error\":\"Bad Request\""));
+        assertTrue(body.contains("\"message\":\"Validation failed\""));
+        assertTrue(body.contains("\"requestId\":"));
+        assertTrue(body.contains("\"details\":{"));
+
+        // 2. Test resource missing (access non-existent product)
+        HttpRequest getNonExistent = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/products/999999"))
+                .header("Authorization", "Bearer " + testToken)
+                .GET()
+                .build();
+        HttpResponse<String> missingResponse = client.send(getNonExistent, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, missingResponse.statusCode());
+        String missingBody = missingResponse.body();
+        assertTrue(missingBody.contains("\"status\":404"));
+        assertTrue(missingBody.contains("\"error\":\"Not Found\""));
+        assertTrue(missingBody.contains("\"message\":\"Resource 'products' with ID 999999 not found\""));
+        assertTrue(missingBody.contains("\"requestId\":"));
+    }
+
+    @Test
+    public void testHealthCheckProbes() throws Exception {
+        int port = javalinServer.getPort();
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 1. Get liveness probe
+        HttpRequest requestLiveness = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/health/liveness"))
+                .GET()
+                .build();
+        HttpResponse<String> responseLiveness = client.send(requestLiveness, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseLiveness.statusCode());
+        assertEquals("UP", responseLiveness.body());
+
+        // 2. Get readiness probe
+        HttpRequest requestReadiness = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/health/readiness"))
+                .GET()
+                .build();
+        HttpResponse<String> responseReadiness = client.send(requestReadiness, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseReadiness.statusCode());
+        assertTrue(responseReadiness.body().contains("\"status\":\"UP\""));
+        assertTrue(responseReadiness.body().contains("\"database\":\"UP\""));
+    }
+
+    @Test
     public void testMetadataEndpoint() throws Exception {
         int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();

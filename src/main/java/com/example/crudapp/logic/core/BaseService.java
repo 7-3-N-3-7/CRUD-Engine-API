@@ -33,11 +33,12 @@ public abstract class BaseService<T extends BaseEntity> {
 
     public T update(Long id, T entity) {
         if (!getRepository().existsById(id)) {
-            throw new RuntimeException("Entity not found");
+            throw new com.example.crudapp.api.errors.ResourceNotFoundException("Entity not found with id: " + id);
         }
         entity.setId(id);
         return getRepository().save(entity);
     }
+
 
     public static class Page<T> {
         private final List<T> content;
