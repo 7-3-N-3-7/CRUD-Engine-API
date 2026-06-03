@@ -4,7 +4,9 @@ import com.example.crudapp.data.core.BaseEntity;
 import com.example.crudapp.logic.DynamicCrudManager;
 import com.example.crudapp.logic.ResourceMetadata;
 import com.example.crudapp.logic.core.BaseService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.DeserializationFeature;
 import io.javalin.http.Context;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -26,14 +28,16 @@ import java.util.stream.Collectors;
 public class JavalinUniversalController {
     private static final Logger log = LoggerFactory.getLogger(JavalinUniversalController.class);
     private final DynamicCrudManager crudManager;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final Validator validator;
     private final TransactionTemplate transactionTemplate;
 
     public JavalinUniversalController(DynamicCrudManager crudManager, PlatformTransactionManager transactionManager) {
         this.crudManager = crudManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
-        this.objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
     }

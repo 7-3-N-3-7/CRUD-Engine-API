@@ -4,8 +4,9 @@ import com.example.crudapp.data.core.BaseEntity;
 import com.example.crudapp.infrastructure.annotations.CrudResource;
 import com.example.crudapp.infrastructure.annotations.Parent;
 import com.example.crudapp.infrastructure.mapping.MappingCache;
+import tools.jackson.databind.ObjectMapper;
 import com.example.crudapp.infrastructure.mapping.MappingCache.RecordMapping;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.lang.reflect.Field;
 import java.util.Map;

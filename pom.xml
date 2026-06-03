@@ -13,7 +13,7 @@
 		<java.version>25</java.version>
 		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot.version>3.5.0</spring-boot.version>
+		<spring-boot.version>4.0.6</spring-boot.version>
 		<javalin.version>7.2.2</javalin.version>
 		<junit-jupiter.version>6.1.0</junit-jupiter.version>
 	</properties>
@@ -35,6 +35,11 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-json</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
 
 
 
@@ -48,9 +53,9 @@
 
 		<!-- JSON Handling (included in web starter, but keeping for direct use) -->
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
+			<groupId>tools.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.16.1</version>
+			<version>3.1.3</version>
 		</dependency>
 
 		<!-- Javalin (REST API) -->
@@ -64,25 +69,25 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.24.0</version>
+			<version>5.0.3</version>
 		</dependency>
 
 		<!-- Security (JWT for legacy compatibility if needed) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.12.5</version>
+			<version>0.13.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.12.5</version>
+			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.12.5</version>
+			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
 

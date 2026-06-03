@@ -18,6 +18,8 @@ import jakarta.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.time.Instant;
 
+import tools.jackson.databind.ObjectMapper;
+
 @Component
 public class JavalinServer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(JavalinServer.class);
@@ -26,6 +28,7 @@ public class JavalinServer implements CommandLineRunner {
     private final PlatformTransactionManager transactionManager;
     private final JwtInterceptor jwtInterceptor;
     private final DataSource dataSource;
+    private final ObjectMapper objectMapper;
     
     @Value("${server.port:8080}")
     private int port;
@@ -35,11 +38,13 @@ public class JavalinServer implements CommandLineRunner {
     public JavalinServer(DynamicCrudManager crudManager, 
                          PlatformTransactionManager transactionManager, 
                          JwtInterceptor jwtInterceptor,
-                         DataSource dataSource) {
+                         DataSource dataSource,
+                         ObjectMapper objectMapper) {
         this.crudManager = crudManager;
         this.transactionManager = transactionManager;
         this.jwtInterceptor = jwtInterceptor;
         this.dataSource = dataSource;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class JavalinServer implements CommandLineRunner {
         HealthController healthController = new HealthController(dataSource);
 
         app = Javalin.create(config -> {
+            config.jsonMapper(new Jackson3Mapper(objectMapper));
             config.jetty.modifyServer(server -> {
                 server.setStopTimeout(15000); // 15 seconds grace period for active requests
             });

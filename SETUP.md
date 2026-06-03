@@ -289,11 +289,11 @@ You can deploy PostgreSQL natively on the VPS or inside a Docker container. Here
     exit
     ```
 4.  *(Optional)* **Enable External Connections:**
-    If your app runs on a separate server, edit `/etc/postgresql/15/main/postgresql.conf` (replace `15` with your active PostgreSQL version) and set:
+    If your app runs on a separate server, edit `/etc/postgresql/18/main/postgresql.conf` (replace `18` with your active PostgreSQL version) and set:
     ```ini
     listen_addresses = '*'
     ```
-    Then, edit `/etc/postgresql/15/main/pg_hba.conf` to whitelist specific IPs:
+    Then, edit `/etc/postgresql/18/main/pg_hba.conf` to whitelist specific IPs:
     ```text
     host    cruddb          dbuser          YOUR_APP_SERVER_IP/32    scram-sha-256
     ```

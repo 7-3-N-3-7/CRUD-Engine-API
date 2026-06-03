@@ -3,7 +3,8 @@ package com.example.crudapp.infrastructure.security;
 import com.example.crudapp.infrastructure.annotations.CrudResource;
 import com.example.crudapp.logic.DynamicCrudManager;
 import com.example.crudapp.logic.ResourceMetadata;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.jsonwebtoken.Claims;
