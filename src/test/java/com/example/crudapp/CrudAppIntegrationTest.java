@@ -103,6 +103,84 @@ public class CrudAppIntegrationTest {
     }
 
     @Test
+    public void testAuditingMultiTenancyAndDynamicAttributes() throws Exception {
+        int port = javalinServer.getPort();
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 1. Create a token for tenant 'tenant-a'
+        Map<String, Object> realmAccess = Map.of("roles", List.of("ADMIN"));
+        String tokenA = io.jsonwebtoken.Jwts.builder()
+                .subject("user-a")
+                .claim("preferred_username", "user-a")
+                .claim("tenant", "tenant-a")
+                .claim("realm_access", realmAccess)
+                .signWith(keyPair.getPrivate(), io.jsonwebtoken.Jwts.SIG.RS256)
+                .compact();
+
+        // 2. Post product with dynamic attributes under tenant-a
+        String productJson = "{" +
+                "\"name\":\"Tenant A Product\"," +
+                "\"description\":\"Dynamic attributes test\"," +
+                "\"price\":50.00," +
+                "\"attributes\":{\"color\":\"blue\",\"size\":\"large\"}" +
+                "}";
+
+        HttpRequest postRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .header("Authorization", "Bearer " + tokenA)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(productJson))
+                .build();
+
+        HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, postResponse.statusCode());
+        String body = postResponse.body();
+        
+        // Assert auditing, version, tenant_id, and attributes are present in response JSON
+        assertTrue(body.contains("\"createdBy\":\"user-a\""));
+        assertTrue(body.contains("\"tenantId\":\"tenant-a\""));
+        assertTrue(body.contains("\"version\":0"));
+        assertTrue(body.contains("\"attributes\":{"));
+        assertTrue(body.contains("\"color\":\"blue\""));
+        assertTrue(body.contains("\"size\":\"large\""));
+
+        // Extract ID of created product to verify isolation
+        int idIdx = body.indexOf("\"id\":");
+        int endIdx = body.indexOf(",", idIdx);
+        if (endIdx == -1) endIdx = body.indexOf("}", idIdx);
+        String idStr = body.substring(idIdx + 5, endIdx).trim();
+        Long productId = Long.parseLong(idStr);
+
+        // 3. Create a token for tenant 'tenant-b'
+        String tokenB = io.jsonwebtoken.Jwts.builder()
+                .subject("user-b")
+                .claim("preferred_username", "user-b")
+                .claim("tenant", "tenant-b")
+                .claim("realm_access", realmAccess)
+                .signWith(keyPair.getPrivate(), io.jsonwebtoken.Jwts.SIG.RS256)
+                .compact();
+
+        // 4. Fetch products list with tenant-b token -> should NOT return tenant-a product
+        HttpRequest getRequestB = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .header("Authorization", "Bearer " + tokenB)
+                .GET()
+                .build();
+        HttpResponse<String> getResponseB = client.send(getRequestB, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, getResponseB.statusCode());
+        assertTrue(!getResponseB.body().contains("Tenant A Product"));
+
+        // 5. Fetch the product directly by ID with tenant-b token -> should return 404 Not Found (filtered by tenant)
+        HttpRequest getSingleRequestB = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/products/" + productId))
+                .header("Authorization", "Bearer " + tokenB)
+                .GET()
+                .build();
+        HttpResponse<String> getSingleResponseB = client.send(getSingleRequestB, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, getSingleResponseB.statusCode());
+    }
+
+    @Test
     public void testProductsEndpointAuthorized() throws Exception {
         int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();

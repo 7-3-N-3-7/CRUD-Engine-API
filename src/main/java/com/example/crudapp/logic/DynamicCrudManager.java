@@ -101,6 +101,16 @@ public class DynamicCrudManager {
         log.info("🚀 Registering dynamic resource: [{}] at path [/api/{}]", entityClass.getSimpleName(), path);
 
         Class<?> dtoClass = annotation.dto();
+        
+        // Assert bidirectional mapping consistency
+        if (!dtoClass.isAnnotationPresent(com.example.crudapp.infrastructure.annotations.EntityMapping.class)) {
+            throw new IllegalStateException("DTO Record " + dtoClass.getSimpleName() + " is missing @EntityMapping annotation!");
+        }
+        Class<?> mappedEntity = dtoClass.getAnnotation(com.example.crudapp.infrastructure.annotations.EntityMapping.class).entity();
+        if (!mappedEntity.equals(entityClass)) {
+            throw new IllegalStateException("Bidirectional mapping mismatch: DTO Record " + dtoClass.getSimpleName() + " is mapped to " + mappedEntity.getSimpleName() + " but registered on " + entityClass.getSimpleName());
+        }
+
         Class<? extends BaseService> serviceClass = annotation.service();
 
         GenericRepository<T> repository = new GenericRepository<>(entityClass, entityManager);

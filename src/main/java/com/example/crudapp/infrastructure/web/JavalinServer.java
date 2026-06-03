@@ -47,6 +47,12 @@ public class JavalinServer implements CommandLineRunner {
                 // Secure routes
                 io.javalin.apibuilder.ApiBuilder.before("/api/{resource}*", jwtInterceptor);
                 
+                // Clear ThreadLocals after each request (prevents leaks in Jetty thread pool)
+                io.javalin.apibuilder.ApiBuilder.after("/api/{resource}*", ctx -> {
+                    com.example.crudapp.infrastructure.security.TenantContext.clear();
+                    org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                });
+                
                 io.javalin.apibuilder.ApiBuilder.get("/api/{resource}", controller::getAll);
                 io.javalin.apibuilder.ApiBuilder.post("/api/{resource}", controller::create);
                 io.javalin.apibuilder.ApiBuilder.get("/api/{resource}/{id}", controller::getById);

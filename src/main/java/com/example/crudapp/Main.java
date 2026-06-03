@@ -8,7 +8,10 @@ import org.springframework.boot.WebApplicationType;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
 @SpringBootApplication
+@EnableJpaAuditing
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 

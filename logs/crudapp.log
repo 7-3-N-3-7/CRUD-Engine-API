@@ -2604,3 +2604,428 @@ Caused by: io.jsonwebtoken.security.InvalidKeyException: MAC verification keys m
 2026-06-03 21:44:32 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-06-03 21:44:32 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2026-06-03 21:44:32 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  c.e.c.i.web.JavalinServer - Stopping Javalin server...
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  io.javalin.Javalin - Stopping Javalin ...
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server - Stopped oejs.Server@547aa7f4{STOPPING}[12.1.8,sto=0]
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  o.e.jetty.server.AbstractConnector - Stopped oejs.ServerConnector@71a509c{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  o.e.j.e.s.ServletContextHandler - Stopped oeje10s.ServletContextHandler@59456e1{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@7a8dbbf1{STOPPED}}
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  io.javalin.Javalin - Javalin has stopped
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-03 21:58:15 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - Starting Generic CRUD Application (Spring Boot)...
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - --------------------------------------------------
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - 🔑 TEST JWT TOKEN (for Postman/Browser extension):
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.zVMnd2RVVkjfD8Fhbd_VWyrsqdL3-xxrLQGT9kJaJSiNCa_Lbu0rwaIKSdGN5IKd
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - --------------------------------------------------
+2026-06-03 21:58:32 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - Starting Main using Java 21.0.11 with PID 18560 (C:\Users\vase_\Desktop\Crud_application\target\classes started by vase_ in C:\Users\vase_\Desktop\Crud_application)
+2026-06-03 21:58:32 [main] DEBUG com.example.crudapp.Main - Running with Spring Boot v3.2.4, Spring v6.1.5
+2026-06-03 21:58:32 [main] INFO  com.example.crudapp.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-03 21:58:33 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-03 21:58:33 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21 ms. Found 0 JPA repository interfaces.
+2026-06-03 21:58:34 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-03 21:58:34 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@91da29b
+2026-06-03 21:58:34 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-03 21:58:34 [main] INFO  liquibase.database - Set default schema name to public
+2026-06-03 21:58:35 [main] INFO  liquibase.changelog - Reading from public.databasechangelog
+2026-06-03 21:58:35 [main] INFO  liquibase.changelog - Reading from public.databasechangelog
+2026-06-03 21:58:35 [main] INFO  liquibase.util - UPDATE SUMMARY
+2026-06-03 21:58:35 [main] INFO  liquibase.util - Run:                          0
+2026-06-03 21:58:35 [main] INFO  liquibase.util - Previously run:               2
+2026-06-03 21:58:35 [main] INFO  liquibase.util - Filtered out:                 0
+2026-06-03 21:58:35 [main] INFO  liquibase.util - -------------------------------
+2026-06-03 21:58:35 [main] INFO  liquibase.util - Total change sets:            2
+2026-06-03 21:58:35 [main] INFO  liquibase.util - Update summary generated
+2026-06-03 21:58:35 [main] INFO  liquibase.lockservice - Successfully released change log lock
+2026-06-03 21:58:35 [main] INFO  liquibase.command - Command execution complete
+2026-06-03 21:58:35 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-03 21:58:35 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-06-03 21:58:35 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-03 21:58:36 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-03 21:58:36 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-03 21:58:38 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-03 21:58:38 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-03 21:58:38 [main] INFO  c.e.crudapp.logic.DynamicCrudManager - Registered interceptor ProductInterceptor for entity Product
+2026-06-03 21:58:38 [main] INFO  c.e.crudapp.logic.DynamicCrudManager - 🚀 Registering dynamic resource: [Product] at path [/api/products]
+2026-06-03 21:58:38 [main] INFO  com.example.crudapp.Main - Started Main in 6.077 seconds (process running for 7.27)
+2026-06-03 21:58:38 [main] INFO  c.e.c.i.web.JavalinServer - Starting Javalin server on port 8080...
+2026-06-03 21:58:39 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-03 21:58:39 [main] INFO  org.eclipse.jetty.server.Server - jetty-12.1.8; built: 2026-04-01T01:09:18.991Z; git: c9cdc9aaa434a3665b8a53b4d1cc3684992da649; jvm 21.0.11+10-LTS
+2026-06-03 21:58:39 [main] INFO  o.e.j.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-03 21:58:39 [main] INFO  o.e.j.server.handler.ContextHandler - Started oeje10s.ServletContextHandler@7a925ac4{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@3b09582d{STARTED}}
+2026-06-03 21:58:39 [main] INFO  o.e.j.e.s.ServletContextHandler - Started oeje10s.ServletContextHandler@7a925ac4{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@3b09582d{STARTED}}
+2026-06-03 21:58:39 [main] INFO  o.e.jetty.server.AbstractConnector - Started oejs.ServerConnector@17db90a7{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-03 21:58:39 [main] INFO  org.eclipse.jetty.server.Server - Started oejs.Server@44872224{STARTING}[12.1.8,sto=0] @165ms
+2026-06-03 21:58:39 [main] INFO  io.javalin.Javalin - 
+       __                  ___          _____
+      / /___ __   ______ _/ (_)___     /__  /
+ __  / / __ `/ | / / __ `/ / / __ \      / /
+/ /_/ / /_/ /| |/ / /_/ / / / / / /     / /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/     /_/
+
+       https://javalin.io/documentation
+
+2026-06-03 21:58:39 [main] INFO  io.javalin.Javalin - Javalin started in 587ms \o/
+2026-06-03 21:58:39 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-03 21:58:39 [main] INFO  io.javalin.Javalin - You are running Javalin 7.2.2 (released May 14, 2026).
+2026-06-03 21:58:39 [main] INFO  c.e.c.i.web.JavalinServer - 🚀 Javalin server started successfully on port 8080
+2026-06-03 22:01:52 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.crudapp.CrudAppIntegrationTest]: CrudAppIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-06-03 22:01:53 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.crudapp.Main for test class com.example.crudapp.CrudAppIntegrationTest
+2026-06-03 22:01:54 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2026-06-03 22:01:54 [main] INFO  c.e.crudapp.CrudAppIntegrationTest - Starting CrudAppIntegrationTest using Java 21.0.11 with PID 71716 (started by vase_ in C:\Users\vase_\Desktop\Crud_application)
+2026-06-03 22:01:54 [main] DEBUG c.e.crudapp.CrudAppIntegrationTest - Running with Spring Boot v3.2.4, Spring v6.1.5
+2026-06-03 22:01:54 [main] INFO  c.e.crudapp.CrudAppIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-06-03 22:01:55 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-03 22:01:55 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 24 ms. Found 0 JPA repository interfaces.
+2026-06-03 22:01:56 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-03 22:01:56 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2edb2f8b
+2026-06-03 22:01:56 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-03 22:01:57 [main] INFO  liquibase.database - Set default schema name to public
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - Reading from public.databasechangelog
+2026-06-03 22:01:58 [main] INFO  liquibase.lockservice - Successfully acquired change log lock
+2026-06-03 22:01:58 [main] INFO  liquibase.command - Using deploymentId: 0516918264
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - Reading from public.databasechangelog
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - Columns version(bigint),created_by(varchar(255)),created_date(timestamp),last_modified_by(varchar(255)),last_modified_date(timestamp),tenant_id(varchar(255)) added to baseentity
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - ChangeSet db/changelog/db.changelog-master.xml::3::team ran successfully in 104ms
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - Table entity_attributes created
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - Primary key added to entity_attributes (entity_id, attribute_key)
+2026-06-03 22:01:58 [main] INFO  liquibase.changelog - ChangeSet db/changelog/db.changelog-master.xml::4::team ran successfully in 117ms
+2026-06-03 22:01:58 [main] INFO  liquibase.util - UPDATE SUMMARY
+2026-06-03 22:01:58 [main] INFO  liquibase.util - Run:                          2
+2026-06-03 22:01:58 [main] INFO  liquibase.util - Previously run:               2
+2026-06-03 22:01:58 [main] INFO  liquibase.util - Filtered out:                 0
+2026-06-03 22:01:58 [main] INFO  liquibase.util - -------------------------------
+2026-06-03 22:01:58 [main] INFO  liquibase.util - Total change sets:            4
+2026-06-03 22:01:58 [main] INFO  liquibase.util - Update summary generated
+2026-06-03 22:01:58 [main] INFO  liquibase.command - Update command completed successfully.
+2026-06-03 22:01:58 [main] INFO  liquibase.lockservice - Successfully released change log lock
+2026-06-03 22:01:58 [main] INFO  liquibase.command - Command execution complete
+2026-06-03 22:01:58 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-03 22:01:58 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-06-03 22:01:59 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-03 22:01:59 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-03 22:01:59 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-03 22:02:01 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-03 22:02:01 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-03 22:02:01 [main] INFO  c.e.crudapp.logic.DynamicCrudManager - Registered interceptor ProductInterceptor for entity Product
+2026-06-03 22:02:01 [main] INFO  c.e.crudapp.logic.DynamicCrudManager - 🚀 Registering dynamic resource: [Product] at path [/api/products]
+2026-06-03 22:02:01 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 0c39f821-20e1-44be-a668-66a3f03b462b
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-06-03 22:02:02 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@67afba96, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7505ef47, org.springframework.security.web.context.SecurityContextHolderFilter@1927c2c6, org.springframework.security.web.header.HeaderWriterFilter@365ad794, org.springframework.security.web.csrf.CsrfFilter@19e552a3, org.springframework.security.web.authentication.logout.LogoutFilter@38388639, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@189f5ed8, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@1a0b51e7, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@2a6f3ac7, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@724945, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@320bfc61, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3266c7cf, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@68fe866b, org.springframework.security.web.access.ExceptionTranslationFilter@6a4d72bd, org.springframework.security.web.access.intercept.AuthorizationFilter@2f6bb6d8]
+2026-06-03 22:02:02 [main] INFO  c.e.crudapp.CrudAppIntegrationTest - Started CrudAppIntegrationTest in 8.43 seconds (process running for 11.164)
+2026-06-03 22:02:02 [main] INFO  c.e.c.i.web.JavalinServer - Starting Javalin server on port 0...
+2026-06-03 22:02:02 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-03 22:02:02 [main] INFO  org.eclipse.jetty.server.Server - jetty-12.1.8; built: 2026-04-01T01:09:18.991Z; git: c9cdc9aaa434a3665b8a53b4d1cc3684992da649; jvm 21.0.11+10-LTS
+2026-06-03 22:02:02 [main] INFO  o.e.j.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-03 22:02:02 [main] INFO  o.e.j.server.handler.ContextHandler - Started oeje10s.ServletContextHandler@33fa6a8b{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@513f8279{STARTED}}
+2026-06-03 22:02:02 [main] INFO  o.e.j.e.s.ServletContextHandler - Started oeje10s.ServletContextHandler@33fa6a8b{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@513f8279{STARTED}}
+2026-06-03 22:02:03 [main] INFO  o.e.jetty.server.AbstractConnector - Started oejs.ServerConnector@fe739e7{HTTP/1.1, (http/1.1)}{0.0.0.0:63954}
+2026-06-03 22:02:03 [main] INFO  org.eclipse.jetty.server.Server - Started oejs.Server@2c513e9f{STARTING}[12.1.8,sto=0] @178ms
+2026-06-03 22:02:03 [main] INFO  io.javalin.Javalin - 
+       __                  ___          _____
+      / /___ __   ______ _/ (_)___     /__  /
+ __  / / __ `/ | / / __ `/ / / __ \      / /
+/ /_/ / /_/ /| |/ / /_/ / / / / / /     / /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/     /_/
+
+       https://javalin.io/documentation
+
+2026-06-03 22:02:03 [main] INFO  io.javalin.Javalin - Javalin started in 624ms \o/
+2026-06-03 22:02:03 [main] INFO  io.javalin.Javalin - Listening on http://localhost:63954/
+2026-06-03 22:02:03 [main] INFO  io.javalin.Javalin - You are running Javalin 7.2.2 (released May 14, 2026).
+2026-06-03 22:02:03 [main] INFO  c.e.c.i.web.JavalinServer - 🚀 Javalin server started successfully on port 0
+2026-06-03 22:02:04 [JettyServerThreadPool-71] ERROR c.e.c.i.security.JwtInterceptor - Token verification failed
+io.jsonwebtoken.UnsupportedJwtException: The parsed JWT indicates it was signed with the 'HS384' signature algorithm, but the provided sun.security.rsa.RSAPublicKeyImpl key may not be used to verify HS384 signatures.  Because the specified key reflects a specific and expected algorithm, and the JWT does not reflect this algorithm, it is likely that the JWT was not expected and therefore should not be trusted.  Another possibility is that the parser was provided the incorrect signature verification key, but this cannot be assumed for security reasons.
+	at io.jsonwebtoken.impl.DefaultJwtParser.verifySignature(DefaultJwtParser.java:353)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:577)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:362)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:94)
+	at io.jsonwebtoken.impl.io.AbstractParser.parse(AbstractParser.java:36)
+	at io.jsonwebtoken.impl.io.AbstractParser.parse(AbstractParser.java:29)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parseSignedClaims(DefaultJwtParser.java:821)
+	at com.example.crudapp.infrastructure.security.JwtInterceptor.handle(JwtInterceptor.java:81)
+	at io.javalin.router.ParsedEndpoint.handleWithPathParams$javalin(ParsedEndpoint.kt:21)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.BEFORE$lambda$0$0$0(DefaultTasks.kt:18)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:108)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:72)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:58)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:38)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:614)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:49)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:614)
+	at org.eclipse.jetty.ee10.servlet.ServletHolder.handle(ServletHolder.java:754)
+	at org.eclipse.jetty.ee10.servlet.ServletHandler$ChainEnd.doFilter(ServletHandler.java:1622)
+	at org.eclipse.jetty.ee10.servlet.ServletHandler$MappedServlet.handle(ServletHandler.java:1556)
+	at org.eclipse.jetty.ee10.servlet.ServletChannel.dispatch(ServletChannel.java:871)
+	at org.eclipse.jetty.ee10.servlet.ServletChannel.handle(ServletChannel.java:449)
+	at org.eclipse.jetty.ee10.servlet.ServletHandler.handle(ServletHandler.java:469)
+	at org.eclipse.jetty.ee10.servlet.SessionHandler.handle(SessionHandler.java:719)
+	at org.eclipse.jetty.server.handler.ContextHandler.handle(ContextHandler.java:1226)
+	at org.eclipse.jetty.server.Handler$Wrapper.handle(Handler.java:794)
+	at org.eclipse.jetty.server.handler.EventsHandler.handle(EventsHandler.java:81)
+	at org.eclipse.jetty.server.Server.handle(Server.java:197)
+	at org.eclipse.jetty.server.internal.HttpChannelState$HandlerInvoker.run(HttpChannelState.java:788)
+	at org.eclipse.jetty.server.internal.HttpConnection.onFillable(HttpConnection.java:420)
+	at org.eclipse.jetty.server.internal.HttpConnection$FillableCallback.succeeded(HttpConnection.java:1809)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:105)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:54)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.runTask(AdaptiveExecutionStrategy.java:492)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.epcRunTask(AdaptiveExecutionStrategy.java:428)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.consumeTask(AdaptiveExecutionStrategy.java:401)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.tryProduce(AdaptiveExecutionStrategy.java:255)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.produce(AdaptiveExecutionStrategy.java:196)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:1009)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1240)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1194)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.jsonwebtoken.security.InvalidKeyException: MAC verification keys must be SecretKey instances.  Specified key is of type sun.security.rsa.RSAPublicKeyImpl
+	at io.jsonwebtoken.impl.security.DefaultMacAlgorithm.validateKey(DefaultMacAlgorithm.java:161)
+	at io.jsonwebtoken.impl.security.AbstractSecureDigestAlgorithm.verify(AbstractSecureDigestAlgorithm.java:67)
+	at io.jsonwebtoken.impl.security.AbstractSecureDigestAlgorithm.verify(AbstractSecureDigestAlgorithm.java:29)
+	at io.jsonwebtoken.impl.DefaultJwtParser.verifySignature(DefaultJwtParser.java:337)
+	... 42 common frames omitted
+2026-06-03 22:02:05 [JettyServerThreadPool-92] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-03 22:02:05 [JettyServerThreadPool-92] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-03 22:02:05 [JettyServerThreadPool-92] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        entity_attributes
+        (entity_id, attribute_key, attribute_value) 
+    values
+        (?, ?, ?)
+2026-06-03 22:02:05 [JettyServerThreadPool-92] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        entity_attributes
+        (entity_id, attribute_key, attribute_value) 
+    values
+        (?, ?, ?)
+2026-06-03 22:02:05 [JettyServerThreadPool-73] DEBUG org.hibernate.SQL - 
+    select
+        p1_0.id,
+        p1_1.id,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=? 
+    offset
+        ? rows 
+    fetch
+        first ? rows only
+2026-06-03 22:02:06 [JettyServerThreadPool-73] DEBUG org.hibernate.SQL - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-92] DEBUG org.hibernate.SQL - 
+    select
+        p1_0.id,
+        p1_1.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_0.id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-72] DEBUG c.e.c.api.JavalinUniversalController - 🔍 Fetching global metadata
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        p1_0.id,
+        p1_1.id,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=? 
+    offset
+        ? rows 
+    fetch
+        first ? rows only
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value 
+    from
+        entity_attributes a1_0 
+    where
+        a1_0.entity_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-75] DEBUG org.hibernate.SQL - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-03 22:02:06 [JettyServerThreadPool-74] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-03 22:02:06 [JettyServerThreadPool-74] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  c.e.c.i.web.JavalinServer - Stopping Javalin server...
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  io.javalin.Javalin - Stopping Javalin ...
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server - Stopped oejs.Server@2c513e9f{STOPPING}[12.1.8,sto=0]
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  o.e.jetty.server.AbstractConnector - Stopped oejs.ServerConnector@fe739e7{HTTP/1.1, (http/1.1)}{0.0.0.0:0}
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  o.e.j.e.s.ServletContextHandler - Stopped oeje10s.ServletContextHandler@33fa6a8b{ROOT,/,b=null,a=AVAILABLE,h=oeje10s.SessionHandler@513f8279{STOPPED}}
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  io.javalin.Javalin - Javalin has stopped
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-03 22:02:06 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

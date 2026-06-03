@@ -39,4 +39,37 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="3" author="team">
+        <addColumn tableName="baseentity">
+            <column name="version" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(255)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="tenant_id" type="varchar(255)" defaultValue="default">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="4" author="team">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="entity_attributes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="entity_attributes">
+            <column name="entity_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_attributes_baseentity" referencedTableName="baseentity" referencedColumnNames="id"/>
+            </column>
+            <column name="attribute_key" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribute_value" type="varchar(2000)"/>
+        </createTable>
+        <addPrimaryKey tableName="entity_attributes" columnNames="entity_id, attribute_key" constraintName="pk_entity_attributes"/>
+    </changeSet>
+
 </databaseChangeLog>

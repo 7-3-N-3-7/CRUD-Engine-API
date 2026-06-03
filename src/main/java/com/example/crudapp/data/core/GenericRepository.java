@@ -1,10 +1,9 @@
 package com.example.crudapp.data.core;
 
+import com.example.crudapp.infrastructure.security.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,33 +31,59 @@ public class GenericRepository<T extends BaseEntity> {
         this.entityClass = entityClass;
     }
 
+    private String getActiveTenantId() {
+        String id = TenantContext.getTenantId();
+        return (id != null) ? id : "default";
+    }
+
     public List<T> findAll() {
-        return entityManager.createQuery("FROM " + entityClass.getSimpleName(), entityClass).getResultList();
+        String tenantId = getActiveTenantId();
+        return entityManager.createQuery(
+                "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e.tenantId = :tenantId", entityClass)
+                .setParameter("tenantId", tenantId)
+                .getResultList();
     }
 
     public List<T> findAll(int offset, int limit) {
-        TypedQuery<T> query = entityManager.createQuery("FROM " + entityClass.getSimpleName(), entityClass);
+        String tenantId = getActiveTenantId();
+        TypedQuery<T> query = entityManager.createQuery(
+                "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e.tenantId = :tenantId", entityClass)
+                .setParameter("tenantId", tenantId);
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
     }
 
     public Optional<T> findById(Long id) {
-        return Optional.ofNullable(entityManager.find(entityClass, id));
+        String tenantId = getActiveTenantId();
+        T entity = entityManager.find(entityClass, id);
+        if (entity != null && tenantId.equals(entity.getTenantId())) {
+            return Optional.of(entity);
+        }
+        return Optional.empty();
     }
 
     public T save(T entity) {
+        String tenantId = getActiveTenantId();
+        
         if (entity.getId() == null) {
+            entity.setTenantId(tenantId);
             entityManager.persist(entity);
             return entity;
         } else {
+            T existing = entityManager.find(entityClass, entity.getId());
+            if (existing != null && !tenantId.equals(existing.getTenantId())) {
+                throw new SecurityException("Unauthorized access to entity under different tenant");
+            }
+            entity.setTenantId(tenantId);
             return entityManager.merge(entity);
         }
     }
 
     public void deleteById(Long id) {
+        String tenantId = getActiveTenantId();
         T entity = entityManager.find(entityClass, id);
-        if (entity != null) {
+        if (entity != null && tenantId.equals(entity.getTenantId())) {
             entityManager.remove(entity);
         }
     }
@@ -68,9 +93,10 @@ public class GenericRepository<T extends BaseEntity> {
     }
 
     public long count() {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-        cq.select(cb.count(cq.from(entityClass)));
-        return entityManager.createQuery(cq).getSingleResult();
+        String tenantId = getActiveTenantId();
+        return entityManager.createQuery(
+                "SELECT COUNT(e) FROM " + entityClass.getSimpleName() + " e WHERE e.tenantId = :tenantId", Long.class)
+                .setParameter("tenantId", tenantId)
+                .getSingleResult();
     }
 }

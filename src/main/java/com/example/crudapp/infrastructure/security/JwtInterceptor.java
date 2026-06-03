@@ -14,6 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -93,6 +98,28 @@ public class JwtInterceptor implements Handler {
                     }
                 }
             }
+
+            // Extract tenant ID and set TenantContext
+            String tenant = claims.get("tenant", String.class);
+            if (tenant == null) {
+                String iss = claims.getIssuer();
+                if (iss != null && iss.contains("/realms/")) {
+                    tenant = iss.substring(iss.lastIndexOf("/realms/") + 8);
+                }
+            }
+            if (tenant == null) {
+                tenant = "default";
+            }
+            TenantContext.setTenantId(tenant);
+
+            // Populate Spring SecurityContext
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            for (String role : userRoles) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+            SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(username, null, authorities)
+            );
 
             // Identify resource for route
             String resource = getResourceName(ctx);
