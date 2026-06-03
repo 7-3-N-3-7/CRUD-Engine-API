@@ -67,10 +67,16 @@
 
 		<!-- Database Migration -->
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-liquibase</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>5.0.3</version>
 		</dependency>
+
 
 		<!-- Security (JWT for legacy compatibility if needed) -->
 		<dependency>
