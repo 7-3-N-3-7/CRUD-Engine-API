@@ -50,7 +50,7 @@ public class JwtInterceptor implements Handler {
     @Override
     public void handle(Context ctx) throws Exception {
         // Skip metadata public endpoint
-        if (ctx.path().equals("/api/v2/metadata")) {
+        if (ctx.path().equals("/api/metadata")) {
             return;
         }
 
@@ -140,8 +140,8 @@ public class JwtInterceptor implements Handler {
         }
         if (resource == null || resource.isEmpty()) {
             String path = ctx.path();
-            if (path.startsWith("/api/v2/")) {
-                String remaining = path.substring(8);
+            if (path.startsWith("/api/")) {
+                String remaining = path.substring(5);
                 int slashIdx = remaining.indexOf('/');
                 if (slashIdx != -1) {
                     resource = remaining.substring(0, slashIdx);

@@ -40,18 +40,18 @@ public class JavalinServer implements CommandLineRunner {
         app = Javalin.create(config -> {
             config.routes.apiBuilder(() -> {
                 // Public routes
-                io.javalin.apibuilder.ApiBuilder.get("/api/v2/metadata", controller::getMetadata);
+                io.javalin.apibuilder.ApiBuilder.get("/api/metadata", controller::getMetadata);
                 io.javalin.apibuilder.ApiBuilder.get("/swagger-ui", controller::getSwaggerUi);
                 io.javalin.apibuilder.ApiBuilder.get("/api-docs", controller::getOpenApiJson);
                 
                 // Secure routes
-                io.javalin.apibuilder.ApiBuilder.before("/api/v2/{resource}*", jwtInterceptor);
+                io.javalin.apibuilder.ApiBuilder.before("/api/{resource}*", jwtInterceptor);
                 
-                io.javalin.apibuilder.ApiBuilder.get("/api/v2/{resource}", controller::getAll);
-                io.javalin.apibuilder.ApiBuilder.post("/api/v2/{resource}", controller::create);
-                io.javalin.apibuilder.ApiBuilder.get("/api/v2/{resource}/{id}", controller::getById);
-                io.javalin.apibuilder.ApiBuilder.put("/api/v2/{resource}/{id}", controller::update);
-                io.javalin.apibuilder.ApiBuilder.delete("/api/v2/{resource}/{id}", controller::delete);
+                io.javalin.apibuilder.ApiBuilder.get("/api/{resource}", controller::getAll);
+                io.javalin.apibuilder.ApiBuilder.post("/api/{resource}", controller::create);
+                io.javalin.apibuilder.ApiBuilder.get("/api/{resource}/{id}", controller::getById);
+                io.javalin.apibuilder.ApiBuilder.put("/api/{resource}/{id}", controller::update);
+                io.javalin.apibuilder.ApiBuilder.delete("/api/{resource}/{id}", controller::delete);
             });
         }).start(port);
 

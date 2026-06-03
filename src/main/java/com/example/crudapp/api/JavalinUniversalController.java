@@ -253,7 +253,7 @@ public class JavalinUniversalController {
             }
             schemas.put(schemaName, schema);
 
-            String resourcePath = "/api/v2/" + path;
+            String resourcePath = "/api/" + path;
             Map<String, Object> pathOperations = new LinkedHashMap<>();
 
             Map<String, Object> getOp = new LinkedHashMap<>();

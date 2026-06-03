@@ -98,7 +98,7 @@ Incoming HTTP request -> Header: Authorization: Bearer <JWT>
       Checks authorization matching @CrudResource(roles = ...)
 ```
 
-*   **Public vs. Private Routes**: The `/api/v2/metadata` endpoint is public. Dynamic endpoints like `/api/v2/products` are secured and require authentication.
+*   **Public vs. Private Routes**: The `/api/metadata` endpoint is public. Dynamic endpoints like `/api/products` are secured and require authentication.
 *   **JWKS (JSON Web Key Sets)**: The `JwtInterceptor` fetches Keycloak's public certificates on demand from the certificate URI and caches them dynamically to prevent network latency.
 *   **Role-Based Access Control (RBAC)**: Allowed roles are specified on the entity class (e.g. `@CrudResource(roles={"ADMIN", "USER"})`). The interceptor automatically validates that the JWT contains a matching role.
 *   **Mock Verification for Tests**: To keep tests fast and independent of the Keycloak container, tests generate a local RSA keypair, register the public key using `@DynamicPropertySource`, and sign test tokens dynamically.
@@ -144,9 +144,9 @@ mvn spring-boot:run
 The server will boot up and start Javalin on port `8080`.
 
 ### Step 4: Interact with the APIs
-*   **Public Metadata**: `GET http://localhost:8080/api/v2/metadata`
+*   **Public Metadata**: `GET http://localhost:8080/api/metadata`
 *   **Swagger API Docs**: `http://localhost:8080/swagger-ui.html`
-*   **Secure API Endpoint**: `GET http://localhost:8080/api/v2/products`
+*   **Secure API Endpoint**: `GET http://localhost:8080/api/products`
     *(Requires a Bearer JWT Token in the headers acquired from Keycloak!)*
 
 ---

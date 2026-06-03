@@ -67,7 +67,7 @@ public class CrudAppIntegrationTest {
         int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/metadata"))
+                .uri(URI.create("http://localhost:" + port + "/api/metadata"))
                 .GET()
                 .build();
 
@@ -99,7 +99,7 @@ public class CrudAppIntegrationTest {
         HttpResponse<String> responseDocs = client.send(requestDocs, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, responseDocs.statusCode());
         assertTrue(responseDocs.body().contains("Generic CRUD Engine API"));
-        assertTrue(responseDocs.body().contains("/api/v2/products"));
+        assertTrue(responseDocs.body().contains("/api/products"));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CrudAppIntegrationTest {
 
         // 1. Get products list (should return 200 OK)
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -122,7 +122,7 @@ public class CrudAppIntegrationTest {
         // 2. Post a new product (should return 201 Created)
         String productJson = "{\"name\":\"Sample Product\",\"description\":\"A sample description\",\"price\":99.99}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(productJson))
@@ -142,7 +142,7 @@ public class CrudAppIntegrationTest {
         String guestToken = generateToken("guest-user", List.of("GUEST"));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + guestToken)
                 .GET()
                 .build();
@@ -159,7 +159,7 @@ public class CrudAppIntegrationTest {
 
         // 1. Call without Authorization Header
         HttpRequest requestNoAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .GET()
                 .build();
 
@@ -173,7 +173,7 @@ public class CrudAppIntegrationTest {
                 .compact();
 
         HttpRequest requestBadAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v2/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + badToken)
                 .GET()
                 .build();

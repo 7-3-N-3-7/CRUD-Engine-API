@@ -98,7 +98,7 @@ public class DynamicCrudManager {
     private <T extends BaseEntity> void doRegister(Class<T> entityClass) {
         CrudResource annotation = entityClass.getAnnotation(CrudResource.class);
         String path = annotation.path();
-        log.info("🚀 Registering dynamic resource: [{}] at path [/api/v2/{}]", entityClass.getSimpleName(), path);
+        log.info("🚀 Registering dynamic resource: [{}] at path [/api/{}]", entityClass.getSimpleName(), path);
 
         Class<?> dtoClass = annotation.dto();
         Class<? extends BaseService> serviceClass = annotation.service();
