@@ -255,7 +255,7 @@ Client -> HTTP Headers -> TracingFilter (Generates Request-ID)
 
 ## 7. Hostinger Deployment (VPS & Database Setup)
 
-Because the application runs Java (JDK 21/25), Keycloak, and PostgreSQL as persistent daemon processes, **Hostinger Shared Web Hosting plans cannot run this stack**. You must purchase a **Hostinger VPS Plan** (running Linux distributions like **Ubuntu 22.04 LTS / 24.04 LTS**).
+Because the application runs Java (JDK 25), Keycloak, and PostgreSQL as persistent daemon processes, **Hostinger Shared Web Hosting plans cannot run this stack**. You must purchase a **Hostinger VPS Plan** (running Linux distributions like **Ubuntu 22.04 LTS / 24.04 LTS**).
 
 Below are the instructions to set up the database and deploy both backend options (Uber-JAR vs. Docker Compose) on a Hostinger VPS.
 
@@ -310,9 +310,14 @@ Choose one of the two standard deployment approaches:
 
 #### Option A: Native Deployment (Uber-JAR + systemd)
 
-1.  **Install Java Runtime (JRE 21 or 25) on your VPS:**
+1.  **Install Java Runtime (JRE 25) on your VPS:**
+    Download and extract the Eclipse Temurin JRE 25 binary:
     ```bash
-    sudo apt install openjdk-21-jre-headless -y
+    wget https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25%2B9/OpenJDK25U-jre_x64_linux_hotspot_25_9.tar.gz
+    tar -xvf OpenJDK25U-jre_x64_linux_hotspot_25_9.tar.gz
+    sudo mkdir -p /usr/lib/jvm
+    sudo mv jdk-25* /usr/lib/jvm/java-25-openjdk
+    sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-25-openjdk/bin/java 1
     ```
 2.  **Package the Application locally:**
     Build the fat-jar containing all dependencies:
