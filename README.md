@@ -1,7 +1,7 @@
 # Generic Spring Boot & Javalin CRUD Engine (v2.0)
 
 [![Java CI with Maven](https://github.com/73N37/Crud_application/actions/workflows/ci.yml/badge.svg)](https://github.com/73N37/Crud_application/actions/workflows/ci.yml)
-[![Java Version](https://img.shields.io/badge/Java-21-orange.svg)](https://jdk.java.net/21/)
+[![Java Version](https://img.shields.io/badge/Java-25-orange.svg)](https://jdk.java.net/25/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.4-green.svg)](https://spring.io/projects/spring-boot)
 [![Javalin](https://img.shields.io/badge/Javalin-7.2.2-blue.svg)](https://javalin.io/)
 [![Keycloak](https://img.shields.io/badge/Keycloak-24.0.2-red.svg)](https://www.keycloak.org/)
@@ -117,7 +117,7 @@ Instead of letting Hibernate auto-generate the database schema (`ddl-auto=update
 ## 🚀 Getting Started: How to Run Locally
 
 ### Prerequisites
-*   **Java 21 JDK** (e.g., Temurin)
+*   **Java 25 JDK** (e.g., Temurin)
 *   **Maven 3.8+**
 *   **Docker & Docker Compose**
 
