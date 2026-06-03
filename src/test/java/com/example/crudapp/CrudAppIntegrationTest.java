@@ -78,6 +78,31 @@ public class CrudAppIntegrationTest {
     }
 
     @Test
+    public void testSwaggerAndApiDocsEndpoints() throws Exception {
+        int port = javalinServer.getPort();
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 1. Get Swagger-UI html
+        HttpRequest requestSwagger = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/swagger-ui"))
+                .GET()
+                .build();
+        HttpResponse<String> responseSwagger = client.send(requestSwagger, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseSwagger.statusCode());
+        assertTrue(responseSwagger.body().contains("Swagger UI - Generic CRUD Engine"));
+
+        // 2. Get OpenAPI JSON
+        HttpRequest requestDocs = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api-docs"))
+                .GET()
+                .build();
+        HttpResponse<String> responseDocs = client.send(requestDocs, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseDocs.statusCode());
+        assertTrue(responseDocs.body().contains("Generic CRUD Engine API"));
+        assertTrue(responseDocs.body().contains("/api/v2/products"));
+    }
+
+    @Test
     public void testProductsEndpointAuthorized() throws Exception {
         int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();

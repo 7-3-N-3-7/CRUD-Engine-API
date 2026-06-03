@@ -41,6 +41,8 @@ public class JavalinServer implements CommandLineRunner {
             config.routes.apiBuilder(() -> {
                 // Public routes
                 io.javalin.apibuilder.ApiBuilder.get("/api/v2/metadata", controller::getMetadata);
+                io.javalin.apibuilder.ApiBuilder.get("/swagger-ui", controller::getSwaggerUi);
+                io.javalin.apibuilder.ApiBuilder.get("/api-docs", controller::getOpenApiJson);
                 
                 // Secure routes
                 io.javalin.apibuilder.ApiBuilder.before("/api/v2/{resource}*", jwtInterceptor);
