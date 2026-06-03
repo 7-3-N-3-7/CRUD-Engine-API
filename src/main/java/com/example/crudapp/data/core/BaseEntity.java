@@ -28,10 +28,12 @@ public abstract class BaseEntity {
     @Parent
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private BaseEntity parent;
 
     @Children
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<BaseEntity> children = new ArrayList<>();
 
     public Long getId() { return id; }
@@ -44,6 +46,7 @@ public abstract class BaseEntity {
     /**
      * Helper to get the grandparent of this entity.
      */
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public Optional<BaseEntity> getGrandparent() {
         return Optional.ofNullable(parent).map(BaseEntity::getParent);
     }
@@ -51,6 +54,7 @@ public abstract class BaseEntity {
     /**
      * Helper to get all grandchildren of this entity.
      */
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public List<BaseEntity> getGrandchildren() {
         return children.stream()
                 .flatMap(child -> child.getChildren().stream())

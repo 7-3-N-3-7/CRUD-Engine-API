@@ -10,11 +10,12 @@
 	<description>Generic CRUD application - Spring Boot</description>
 	
 	<properties>
-		<java.version>25</java.version>
-		<maven.compiler.release>25</maven.compiler.release>
+		<java.version>21</java.version>
+		<maven.compiler.release>21</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>3.2.4</spring-boot.version>
-		<javalin.version>6.3.0</javalin.version>
+		<javalin.version>7.2.2</javalin.version>
+		<junit-jupiter.version>6.1.0</junit-jupiter.version>
 		<springdoc.version>2.5.0</springdoc.version>
 	</properties>
 
@@ -62,7 +63,14 @@
 		<dependency>
 			<groupId>io.javalin</groupId>
 			<artifactId>javalin-bundle</artifactId>
-			<version>6.3.0</version>
+			<version>${javalin.version}</version>
+		</dependency>
+
+		<!-- Database Migration -->
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>4.24.0</version>
 		</dependency>
 
 		<!-- Security (JWT for legacy compatibility if needed) -->
@@ -89,6 +97,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<version>${spring-boot.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

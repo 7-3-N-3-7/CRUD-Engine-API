@@ -33,7 +33,24 @@ public class DynamicCrudManager {
     private EntityManager entityManager;
 
     @Value("${crud.scan.package:com.example.crudapp.data}")
-    private String scanPackage;
+    private String scanPackage = "com.example.crudapp.data";
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setSpringInterceptors(List<CrudInterceptor<?>> springInterceptors) {
+        if (springInterceptors != null) {
+            for (CrudInterceptor<?> interceptor : springInterceptors) {
+                Class<?>[] types = org.springframework.core.GenericTypeResolver.resolveTypeArguments(
+                        interceptor.getClass(),
+                        CrudInterceptor.class
+                );
+                if (types != null && types.length > 0) {
+                    Class<?> entityClass = types[0];
+                    registerInterceptor(entityClass, interceptor);
+                    log.info("Registered interceptor {} for entity {}", interceptor.getClass().getSimpleName(), entityClass.getSimpleName());
+                }
+            }
+        }
+    }
 
     @PostConstruct
     public void init() {
