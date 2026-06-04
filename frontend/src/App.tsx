@@ -115,6 +115,35 @@ const ARCH_NODES = [
 
 function App() {
   const [backendUrl, setBackendUrl] = useState('http://localhost:8080');
+
+  // Detect deployed backend URL on mount
+  useEffect(() => {
+    const detectUrl = async () => {
+      // 1. Check query parameter first for manual overrides
+      const params = new URLSearchParams(window.location.search);
+      const queryUrl = params.get('backendUrl');
+      if (queryUrl) {
+        console.log("Detected backendUrl from query parameter:", queryUrl);
+        setBackendUrl(queryUrl);
+        return;
+      }
+
+      // 2. Fetch deployed configuration
+      try {
+        const response = await fetch('./backend-url.json');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.url) {
+            console.log("Detected backendUrl from backend-url.json:", data.url);
+            setBackendUrl(data.url);
+          }
+        }
+      } catch (e) {
+        console.log("No deployed backend-url.json found, using default:", backendUrl);
+      }
+    };
+    detectUrl();
+  }, []);
   const [username, setUsername] = useState('admin-user');
   const [tenantId, setTenantId] = useState('tenant-a');
   const [selectedRole, setSelectedRole] = useState<'ADMIN' | 'GUEST' | 'NONE'>('ADMIN');
@@ -195,7 +224,11 @@ function App() {
   // Load API Metadata from Spring Boot
   const fetchMetadata = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/metadata`);
+      const response = await fetch(`${backendUrl}/api/metadata`, {
+        headers: {
+          'Bypass-Tunnel-Reminder': 'true'
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setMetadata(data);
@@ -273,7 +306,8 @@ function App() {
     let method = 'GET';
     let headers: Record<string, string> = {
       'Accept': 'application/json',
-      'Authorization': `Bearer ${jwtToken}`
+      'Authorization': `Bearer ${jwtToken}`,
+      'Bypass-Tunnel-Reminder': 'true'
     };
     let body = '';
 

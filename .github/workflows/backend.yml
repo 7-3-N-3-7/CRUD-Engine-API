@@ -1,0 +1,128 @@
+name: Run Backend & Deploy Frontend to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  run-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Spin up Postgres and Keycloak
+        run: |
+          docker compose up -d
+          # Wait for Postgres to be healthy
+          docker compose ps
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compile Java Application
+        run: mvn compile
+
+      - name: Start Spring Boot Backend in Background
+        run: |
+          mvn spring-boot:run > backend.log &
+          echo "Spring Boot starting in background..."
+
+      - name: Start Localtunnel and Expose Port 8080
+        run: |
+          # Install localtunnel globally to ensure it's available
+          npm install -g localtunnel
+          # Run localtunnel pointing to port 8080
+          lt --port 8080 > localtunnel.log &
+          echo "Localtunnel starting in background..."
+
+      - name: Extract and Validate Tunnel URL
+        run: |
+          # Loop to wait until localtunnel logs the public URL
+          for i in {1..30}; do
+            if grep -q "your url is:" localtunnel.log; then
+              break
+            fi
+            echo "Waiting for localtunnel to initialize... ($i/30)"
+            sleep 2
+          done
+          
+          cat localtunnel.log
+          
+          # Extract URL
+          TUNNEL_URL=$(grep -o 'https://[^ ]*' localtunnel.log | head -n 1)
+          if [ -z "$TUNNEL_URL" ]; then
+            echo "Error: Failed to obtain localtunnel URL."
+            exit 1
+          fi
+          
+          echo "Backend URL generated: $TUNNEL_URL"
+          echo "TUNNEL_URL=$TUNNEL_URL" >> $GITHUB_ENV
+          
+          # Write the URL to the frontend public folder so it gets bundled during build
+          mkdir -p frontend/public
+          echo "{\"url\":\"$TUNNEL_URL\"}" > frontend/public/backend-url.json
+          echo "Created frontend/public/backend-url.json:"
+          cat frontend/public/backend-url.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'frontend/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print Connection Details and Keep Server Alive
+        run: |
+          echo "=========================================================="
+          echo "🚀 BACKEND RUNNING & FRONTEND DEPLOYED SUCCESSFULLY!"
+          echo "=========================================================="
+          echo "👉 Frontend URL: https://73n37.github.io/Crud_application/"
+          echo "👉 Live Backend Tunnel URL: ${{ env.TUNNEL_URL }}"
+          echo "=========================================================="
+          echo "Tailing Spring Boot logs. This workflow run will remain"
+          echo "active for testing until canceled."
+          echo ""
+          # Wait and print Spring Boot logs to stdout
+          sleep 5
+          if [ -f logs/crudapp.log ]; then
+            tail -f logs/crudapp.log
+          else
+            tail -f backend.log
+          fi
