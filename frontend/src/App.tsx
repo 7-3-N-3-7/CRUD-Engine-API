@@ -66,38 +66,50 @@ const ARCH_NODES = [
   {
     id: 'client',
     title: 'Client Webapp',
-    subtitle: 'React-TS Single Page App',
-    desc: 'Communicates with the REST endpoints by signing OAuth2-compliant JWT tokens natively in the browser via the Web Crypto API, supporting correlation request tracing and dynamic multi-tenancy.'
+    subtitle: 'React-TS & Vite',
+    desc: 'Communicates with REST endpoints by signing OAuth2-compliant JWT tokens natively in the browser via the Web Crypto API, supporting correlation request tracing (X-Request-ID) and multi-tenancy.'
+  },
+  {
+    id: 'rate_limiter',
+    title: 'Rate Limiter',
+    subtitle: 'Token Bucket Filter',
+    desc: 'Intercepts incoming WebFlux requests, enforcing a sliding Token Bucket limit of 50 requests/min per IP to block denial-of-service attempts. Returns standard RFC 7807 (HTTP 429) details when exceeded.'
   },
   {
     id: 'gateway',
-    title: 'API RestControllers',
-    subtitle: 'Byte Buddy Dynamic Beans',
-    desc: 'At startup, a BeanFactoryPostProcessor scans annotations and uses Byte Buddy to dynamically compile and register separate RestController classes for each entity, improving integration with native Spring MVC/WebFlux filters.'
+    title: 'API Controllers',
+    subtitle: 'Byte Buddy Beans',
+    desc: 'At startup, a BeanFactoryPostProcessor scans annotations and uses Byte Buddy to dynamically compile and register separate WebFlux RestController classes for each entity at runtime.'
+  },
+  {
+    id: 'exceptions',
+    title: 'RFC 7807 Handler',
+    subtitle: 'Unified ControllerAdvice',
+    desc: 'A unified handler intercepts database integrity errors, validation violations, concurrency conflicts, and security/access exceptions, mapping them to standard RFC 7807 Problem Details.'
   },
   {
     id: 'security',
     title: 'Security Filters',
-    subtitle: 'Reactive Context Headers',
-    desc: 'A ReactiveJwtFilter intercepts requests, validates the cryptographic token signature, extracts roles and tenant variables, validates authorization access rules, and propagates values into the Reactor context.'
+    subtitle: 'Reactive WebFilter',
+    desc: 'A ReactiveJwtFilter validates the cryptographic token signature, extracts roles and tenant variables, validates authorization access rules, and propagates values into the Reactor context.'
   },
   {
     id: 'service',
     title: 'Decoupled Core',
-    subtitle: 'Service Layer Registry',
-    desc: 'Delegates transactions. Decouples controllers from entities via a ServiceRegistry lookup system that returns custom service overrides or defaults to a generic dynamic CrudService.'
+    subtitle: 'Service Registry',
+    desc: 'Delegates business logic. Decouples controllers from entities via a ServiceRegistry lookup that returns custom service overrides or defaults to a dynamic reactive CrudService.'
   },
   {
     id: 'data',
     title: 'Dynamic Data Access',
     subtitle: 'JPA Graphs & Specs',
-    desc: 'Executes database queries on WebFlux\'s boundedElastic scheduler. Creates dynamic JPA specifications based on URL query filters, sorts dynamic orderings, and injects JPA Entity Graphs to prevent N+1 issues.'
+    desc: 'Executes database queries on boundedElastic scheduler threads. Creates dynamic JPA specifications from query filters and injects Entity Graphs to solve the N+1 select problem.'
   },
   {
     id: 'database',
-    title: 'Secure Database',
-    subtitle: 'PostgreSQL Tables',
-    desc: 'Stores datasets with tenant-specific columns and database auditing columns. Limits result maps securely according to the context\'s active Tenant ID.'
+    title: 'RLS Database',
+    subtitle: 'PostgreSQL RLS',
+    desc: 'Enforces Row-Level Security (RLS) policies based on transaction-level context setting via SET LOCAL app.current_tenant, isolating records dynamically per tenant.'
   }
 ];
 
@@ -769,6 +781,73 @@ function App() {
         </main>
 
       </div>
+
+      {/* 4. Core Technologies Section */}
+      <section className="tech-stack-section glass-panel">
+        <h3>🛠️ Core Technology Stack & Library Blueprint</h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
+          This framework orchestrates dynamic, runtime-driven CRUD endpoints using high-performance open-source libraries. Below is the list of frameworks/libraries in use and their roles:
+        </p>
+        <div className="tech-grid">
+          <div className="tech-card">
+            <h5>Spring Boot & WebFlux</h5>
+            <p>Runs the high-concurrency Netty web server, utilizing reactive event loops to route requests non-blockingly, supporting correlation tracing and backpressure controls.</p>
+          </div>
+          <div className="tech-card">
+            <h5>Byte Buddy (1.17.7)</h5>
+            <p>Enables compile-free Java bytecode manipulation at runtime, dynamically compiling and inserting actual Spring RestController classes into the ApplicationContext during bootstrap.</p>
+          </div>
+          <div className="tech-card">
+            <h5>Hibernate & JPA</h5>
+            <p>Object-relational mapping and entity persistence framework. Decoupled from WebFlux event loop threads by scheduling operations on a transaction-scoped boundedElastic context.</p>
+          </div>
+          <div className="tech-card">
+            <h5>PostgreSQL RLS</h5>
+            <p>Multi-tenancy isolation layer using native Row-Level Security (RLS) policies. Enforces strict logical boundaries inside SQL transactions using app.current_tenant context variables.</p>
+          </div>
+          <div className="tech-card">
+            <h5>Liquibase (5.0.3)</h5>
+            <p>Declarative, version-controlled database schema migrations engine, applying reproducible changesets (tables, relationships, and RLS policies) automatically on startup.</p>
+          </div>
+          <div className="tech-card">
+            <h5>Jackson 3 (Databind)</h5>
+            <p>Enterprise JSON parsing engine configured with global XSS input sanitizers to strip dangerous script tags and strict deserializers that reject unwhitelisted schema fields.</p>
+          </div>
+          <div className="tech-card">
+            <h5>JJWT (0.13.0)</h5>
+            <p>Cryptographic JSON Web Token decoder. Parses Keycloak credentials and validates signature claims utilizing RS256 public key certificates cached from a JWKS endpoint.</p>
+          </div>
+          <div className="tech-card">
+            <h5>React 19 & Vite 6</h5>
+            <p>Modern frontend framework and ultra-fast build pipeline. Leverages the browser-native Web Crypto API to sign standard OIDC-compliant JWT authorization tokens on the fly.</p>
+          </div>
+        </div>
+
+        <div className="hello-world-guide">
+          <h4>💡 "Hello, World" Framework Extension Walkthrough</h4>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: '1.45' }}>
+            Adding a new dynamic API endpoint and database resource in this framework requires zero boilerplate. Follow this simple checklist:
+          </p>
+          <div className="hello-world-steps">
+            <div className="step-item">
+              <strong>Step 1: Create a JPA Entity</strong>
+              Create a new entity class (e.g. <code>Device.java</code>) extending <code>BaseEntity</code>. Annotate it with <code>@Entity</code> and <code>@CrudResource(path = "devices", dto = DeviceRecord.class, roles = {"{"}"ADMIN", "USER"{"}"})</code>.
+            </div>
+            <div className="step-item">
+              <strong>Step 2: Define a DTO Record</strong>
+              Create a Java record (e.g. <code>DeviceRecord.java</code>) with field validation annotations (like <code>@NotBlank</code>). Map it back to the database entity using <code>@EntityMapping(entity = Device.class)</code>.
+            </div>
+            <div className="step-item">
+              <strong>Step 3: Setup Liquibase Changeset</strong>
+              Write a changeset in the master XML to create your table, map its primary key back to the parent table with a foreign key, and execute the SQL script to enable PostgreSQL Row-Level Security (RLS).
+            </div>
+            <div className="step-item">
+              <strong>Step 4: Launch and Test</strong>
+              Restart the backend! The framework dynamically compiles the new RestController and routes at <code>/api/v1/devices</code>. This frontend console will automatically fetch the new metadata and generate forms.
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
