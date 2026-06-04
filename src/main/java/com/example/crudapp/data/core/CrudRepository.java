@@ -12,17 +12,17 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public class GenericRepository<T extends BaseEntity> {
+public class CrudRepository<T extends BaseEntity> {
     
     @PersistenceContext
     private EntityManager entityManager;
     
     private Class<T> entityClass;
 
-    public GenericRepository() {
+    public CrudRepository() {
     }
 
-    public GenericRepository(Class<T> entityClass, EntityManager entityManager) {
+    public CrudRepository(Class<T> entityClass, EntityManager entityManager) {
         this.entityClass = entityClass;
         this.entityManager = entityManager;
     }

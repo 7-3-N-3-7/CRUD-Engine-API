@@ -1,12 +1,12 @@
 package com.example.crudapp.infrastructure.web;
 
-import com.example.crudapp.api.JavalinUniversalController;
+import com.example.crudapp.api.UniversalCrudController;
 import com.example.crudapp.api.HealthController;
 import com.example.crudapp.api.errors.ErrorResponse;
 import com.example.crudapp.api.errors.ResourceNotFoundException;
 import com.example.crudapp.api.errors.ValidationException;
 import com.example.crudapp.infrastructure.security.JwtInterceptor;
-import com.example.crudapp.logic.DynamicCrudManager;
+import com.example.crudapp.logic.CrudEngine;
 import io.javalin.Javalin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import tools.jackson.databind.ObjectMapper;
 public class JavalinServer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(JavalinServer.class);
 
-    private final DynamicCrudManager crudManager;
+    private final CrudEngine crudManager;
     private final PlatformTransactionManager transactionManager;
     private final JwtInterceptor jwtInterceptor;
     private final DataSource dataSource;
@@ -35,7 +35,7 @@ public class JavalinServer implements CommandLineRunner {
 
     private Javalin app;
 
-    public JavalinServer(DynamicCrudManager crudManager, 
+    public JavalinServer(CrudEngine crudManager, 
                          PlatformTransactionManager transactionManager, 
                          JwtInterceptor jwtInterceptor,
                          DataSource dataSource,
@@ -51,7 +51,7 @@ public class JavalinServer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Starting Javalin server on port {}...", port);
         
-        JavalinUniversalController controller = new JavalinUniversalController(crudManager, transactionManager);
+        UniversalCrudController controller = new UniversalCrudController(crudManager, transactionManager);
         HealthController healthController = new HealthController(dataSource);
 
         app = Javalin.create(config -> {

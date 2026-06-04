@@ -1,9 +1,9 @@
 package com.example.crudapp.api;
 
 import com.example.crudapp.data.core.BaseEntity;
-import com.example.crudapp.logic.DynamicCrudManager;
+import com.example.crudapp.logic.CrudEngine;
 import com.example.crudapp.logic.ResourceMetadata;
-import com.example.crudapp.logic.core.BaseService;
+import com.example.crudapp.logic.core.CrudService;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.DeserializationFeature;
@@ -25,14 +25,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class JavalinUniversalController {
-    private static final Logger log = LoggerFactory.getLogger(JavalinUniversalController.class);
-    private final DynamicCrudManager crudManager;
+public class UniversalCrudController {
+    private static final Logger log = LoggerFactory.getLogger(UniversalCrudController.class);
+    private final CrudEngine crudManager;
     private final ObjectMapper objectMapper;
     private final Validator validator;
     private final TransactionTemplate transactionTemplate;
 
-    public JavalinUniversalController(DynamicCrudManager crudManager, PlatformTransactionManager transactionManager) {
+    public UniversalCrudController(CrudEngine crudManager, PlatformTransactionManager transactionManager) {
         this.crudManager = crudManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.objectMapper = JsonMapper.builder()
@@ -59,7 +59,7 @@ public class JavalinUniversalController {
 
         ResourceMetadata metadata = getMetadataOrThrow(resource);
         
-        BaseService.Page<? extends BaseEntity> entityPage = transactionTemplate.execute(status -> 
+        CrudService.Page<? extends BaseEntity> entityPage = transactionTemplate.execute(status -> 
             metadata.getService().findAll(page, size)
         );
 

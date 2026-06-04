@@ -1,8 +1,8 @@
 package com.example.crudapp.logic;
 
 import com.example.crudapp.data.core.BaseEntity;
-import com.example.crudapp.data.core.GenericRepository;
-import com.example.crudapp.logic.core.BaseService;
+import com.example.crudapp.data.core.CrudRepository;
+import com.example.crudapp.logic.core.CrudService;
 import com.example.crudapp.logic.core.CrudInterceptor;
 
 import java.util.List;
@@ -12,8 +12,8 @@ public class ResourceMetadata<T extends BaseEntity, D> {
     private final Class<T> entityClass;
     private final Class<D> dtoClass;
     private final String basePath;
-    private final GenericRepository<T> repository;
-    private final BaseService<T> service;
+    private final CrudRepository<T> repository;
+    private final CrudService<T> service;
     private final CrudInterceptor<T> interceptor;
     private final List<FieldInfo> fields;
 
@@ -34,8 +34,8 @@ public class ResourceMetadata<T extends BaseEntity, D> {
     public Class<T> getEntityClass() { return entityClass; }
     public Class<D> getDtoClass() { return dtoClass; }
     public String getBasePath() { return basePath; }
-    public GenericRepository<T> getRepository() { return repository; }
-    public BaseService<T> getService() { return service; }
+    public CrudRepository<T> getRepository() { return repository; }
+    public CrudService<T> getService() { return service; }
     public CrudInterceptor<T> getInterceptor() { return interceptor; }
     public List<FieldInfo> getFields() { return fields; }
 
@@ -62,8 +62,8 @@ public class ResourceMetadata<T extends BaseEntity, D> {
         private Class<T> entityClass;
         private Class<D> dtoClass;
         private String basePath;
-        private GenericRepository<T> repository;
-        private BaseService<T> service;
+        private CrudRepository<T> repository;
+        private CrudService<T> service;
         private CrudInterceptor<T> interceptor;
         private List<FieldInfo> fields;
 
@@ -82,12 +82,12 @@ public class ResourceMetadata<T extends BaseEntity, D> {
             return this;
         }
 
-        public Builder<T, D> repository(GenericRepository<T> repository) {
+        public Builder<T, D> repository(CrudRepository<T> repository) {
             this.repository = repository;
             return this;
         }
 
-        public Builder<T, D> service(BaseService<T> service) {
+        public Builder<T, D> service(CrudService<T> service) {
             this.service = service;
             return this;
         }

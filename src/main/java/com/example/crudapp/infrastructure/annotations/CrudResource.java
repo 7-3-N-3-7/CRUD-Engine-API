@@ -1,6 +1,6 @@
 package com.example.crudapp.infrastructure.annotations;
 
-import com.example.crudapp.logic.core.BaseService;
+import com.example.crudapp.logic.core.CrudService;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -19,7 +19,7 @@ public @interface CrudResource {
      * 🏗️ ARCHITECTURE OPTIMIZATION: Custom Service
      * Allows developers to provide a specific Service implementation.
      */
-    Class<? extends BaseService> service() default BaseService.class;
+    Class<? extends CrudService> service() default CrudService.class;
 
     /**
      * 🔒 SECURITY OPTIMIZATION: Role-Based Access Control

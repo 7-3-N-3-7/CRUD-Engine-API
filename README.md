@@ -25,19 +25,18 @@ To maintain a clean system, this project enforces the **Data-Logic-Interface (DL
 ```mermaid
 graph TD
     subgraph Interface Layer [Interface Layer: API Surface]
-        Javalin[Javalin Server] -->|Routes HTTP Requests| Controller[JavalinUniversalController]
+        Javalin[Javalin Server] -->|Routes HTTP Requests| Controller[UniversalCrudController]
         Controller -->|Validates & Mapped to DTO| DTO[ProductRecord / Java Records]
     end
 
     subgraph Logic Layer [Logic Layer: Orchestration Engine]
-        Controller -->|Calls| DynamicCrudManager[DynamicCrudManager]
-        DynamicCrudManager -->|Resolves Service| Service[BaseService]
-        DynamicCrudManager -->|Invokes Hooks| Interceptor[CrudInterceptor]
-        DynamicCrudManager -->|Speeds up reflection| ReflectionCache[MappingCache]
+        Controller -->|Calls| CrudEngine[CrudEngine]
+        CrudEngine -->|Resolves Service| Service[CrudService]
+        CrudEngine -->|Invokes Hooks| Interceptor[CrudInterceptor]
     end
 
     subgraph Data Layer [Data Layer: Persistence]
-        Service -->|Queries| Repository[GenericRepository]
+        Service -->|Queries| Repository[CrudRepository]
         Repository -->|JPA / Hibernate| DB[(PostgreSQL)]
         Liquibase[Liquibase Migrations] -->|Pre-establishes| Schema[DB Schema]
     end
@@ -46,23 +45,23 @@ graph TD
     classDef logic fill:#cff4fc,stroke:#087990,stroke-width:2px;
     classDef data fill:#f8d7da,stroke:#842029,stroke-width:2px;
     class Javalin,Controller,DTO interface;
-    class DynamicCrudManager,Service,Interceptor,ReflectionCache logic;
+    class CrudEngine,Service,Interceptor logic;
     class Repository,DB,Liquibase,Schema data;
 ```
 
 ### 1. Data Layer (`com.example.crudapp.data`)
 *   **Responsibility**: Database schemas, entities, and raw persistence.
-*   **Key Components**: `BaseEntity` (provides hierarchical Parent-Child mapping), `GenericRepository` (encapsulates Hibernate JPA queries), and schema-defining entities like `Product`.
+*   **Key Components**: `BaseEntity` (provides hierarchical Parent-Child mapping), `CrudRepository` (encapsulates Hibernate JPA queries), and schema-defining entities like `Product`.
 *   **Constraint**: This layer has zero knowledge of HTTP requests, API models (DTOs), or authentication mechanisms.
 
 ### 2. Logic Layer (`com.example.crudapp.logic`)
 *   **Responsibility**: Business rules validation, dynamic resource discovery, and lifecycle orchestration.
-*   **Key Components**: `DynamicCrudManager` (scans, registers, and maps components), `BaseService` (generic business queries), and `MappingCache` (accelerates reflection metadata mappings).
+*   **Key Components**: `CrudEngine` (scans, registers, and maps components), `CrudService` (generic business queries), and interceptors (custom lifecycle hooks).
 *   **Constraint**: Acts as the central transaction-boundary manager. It bridges entities (Data) to records (Interface) without coupling them directly.
 
 ### 3. Interface Layer (`com.example.crudapp.api`)
 *   **Responsibility**: Exposing the API surface, validating input request payloads, and handling HTTP routing.
-*   **Key Components**: `JavalinServer` (bootstraps Javalin), `JavalinUniversalController` (handles generic requests), and `Records` (immutable DTOs like `ProductRecord`).
+*   **Key Components**: `JavalinServer` (bootstraps Javalin), `UniversalCrudController` (handles generic requests), and `Records` (immutable DTOs like `ProductRecord`).
 *   **Constraint**: Never directly accesses the database. DTOs are strictly immutable, matching client communication contracts.
 
 ---
@@ -71,10 +70,9 @@ graph TD
 
 This codebase serves as a living laboratory for advanced Java design patterns:
 
-1.  **Registry Pattern**: The `DynamicCrudManager` maintains a registry of all endpoints, mapping URL paths (e.g. `/products`) to their database representations and DTO classes.
+1.  **Registry Pattern**: The `CrudEngine` maintains a registry of all endpoints, mapping URL paths (e.g. `/products`) to their database representations and DTO classes.
 2.  **Strategy Pattern**: Use custom interceptors (implementing `CrudInterceptor`) to inject custom business validation or formatting strategies for specific resources (e.g., converting names to uppercase inside `ProductInterceptor`).
-3.  **Template Method Pattern**: `BaseService` and `CrudInterceptor` define standard lifecycle hooks (`beforeCreate`, `afterCreate`, etc.). Extending classes override only what they need.
-4.  **Flyweight/Caching Pattern**: The `MappingCache` holds constructor and field reflection references, avoiding costly JDK reflection lookups during entity-DTO transformations.
+3.  **Template Method Pattern**: `CrudService` and `CrudInterceptor` define standard lifecycle hooks (`beforeCreate`, `afterCreate`, etc.). Extending classes override only what they need.
 
 ---
 

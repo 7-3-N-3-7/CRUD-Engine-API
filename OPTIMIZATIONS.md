@@ -31,7 +31,7 @@ Currently, we use a single `UniversalCrudController`.
 - **Impact**: Better integration with Spring's native features (Method Security, Swagger, Request Interceptors) which often expect distinct controller classes.
 
 ### 2. Service Layer Registry
-- **Idea**: Decouple the `UniversalCrudController` from the `DynamicCrudManager`. Use a `ServiceRegistry` that can return either the default `BaseService` or a specialized sub-class if one exists in the ApplicationContext.
+- **Idea**: Decouple the `UniversalCrudController` from the `CrudEngine`. Use a `ServiceRegistry` that can return either the default `CrudService` or a specialized sub-class if one exists in the ApplicationContext.
 - **Impact**: Provides an "escape hatch" for complex business logic while maintaining the generic default.
 
 ### 3. DTO Versioning
@@ -60,7 +60,7 @@ Based on a repository audit for a high-grade academic submission, these 5 core f
 
 ### 1. Fully Functional Write Operations (POST/PUT)
 - **Current State**: The `create` method in `UniversalCrudController` is a placeholder (`String` return type), and the `update` method is entirely missing from the REST interface.
-- **Requirement**: Implement a dynamic POST (Create) and PUT (Update) logic using an `ObjectMapper` to map incoming JSON bodies to the respective Entity classes before saving via the `BaseService`.
+- **Requirement**: Implement a dynamic POST (Create) and PUT (Update) logic using an `ObjectMapper` to map incoming JSON bodies to the respective Entity classes before saving via the `CrudService`.
 
 ### 2. Global Exception Handling (`@ControllerAdvice`)
 - **Current State**: Errors (like "Resource not found") throw a raw `RuntimeException`, which results in a generic 500 error for the client.

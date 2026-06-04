@@ -1,7 +1,7 @@
 package com.example.crudapp.infrastructure.security;
 
 import com.example.crudapp.infrastructure.annotations.CrudResource;
-import com.example.crudapp.logic.DynamicCrudManager;
+import com.example.crudapp.logic.CrudEngine;
 import com.example.crudapp.logic.ResourceMetadata;
 import tools.jackson.databind.ObjectMapper;
 
@@ -44,7 +44,7 @@ public class JwtInterceptor implements Handler {
     private String testPublicKeyPem;
 
     @Autowired
-    private DynamicCrudManager crudManager;
+    private CrudEngine crudManager;
 
     @Autowired
     private ObjectMapper objectMapper;

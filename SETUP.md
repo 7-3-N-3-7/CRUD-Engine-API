@@ -125,7 +125,7 @@ public record DeviceRecord(
 ```
 
 #### Why `@EntityMapping` matters:
-*   **Bidirectional Mapping Validation:** During application startup, `DynamicCrudManager` asserts that the entity's `@CrudResource(dto = ...)` matches the DTO's `@EntityMapping(entity = ...)` annotation. If they do not match, the application immediately throws a validation exception and halts execution. This prevents developers from deploying mismatching or unmapped configurations to production.
+*   **Bidirectional Mapping Validation:** During application startup, `CrudEngine` asserts that the entity's `@CrudResource(dto = ...)` matches the DTO's `@EntityMapping(entity = ...)` annotation. If they do not match, the application immediately throws a validation exception and halts execution. This prevents developers from deploying mismatching or unmapped configurations to production.
 *   **Input Validation:** Enforces JSR-380 input validations (e.g. `@NotBlank`, `@Min`, etc.). Violations are caught and mapped directly to unified JSON error payloads (status `400`).
 
 ---
@@ -244,7 +244,7 @@ Client -> HTTP Headers -> TracingFilter (Generates Request-ID)
 
 ### Key Components
 
-*   **Multi-Tenancy Segregation:** `GenericRepository` dynamically injects `WHERE tenantId = :tenantId` filter criteria on queries. The active tenant is extracted from the client's validated JWT token during the `before` filter.
+*   **Multi-Tenancy Segregation:** `CrudRepository` dynamically injects `WHERE tenantId = :tenantId` filter criteria on queries. The active tenant is extracted from the client's validated JWT token during the `before` filter.
 *   **Request Diagnostics:** If a bug occurs, search the logs using the correlation token (`X-Request-ID`). This token is automatically propagated inside SLF4J MDC logs for simple trace aggregation.
 *   **Diagnostics endpoints:**
     *   `/api-docs` returns dynamic, metadata-generated OpenAPI 3.0 specs.

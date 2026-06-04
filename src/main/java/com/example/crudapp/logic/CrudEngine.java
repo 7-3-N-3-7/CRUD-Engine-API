@@ -1,9 +1,9 @@
 package com.example.crudapp.logic;
 
 import com.example.crudapp.data.core.BaseEntity;
-import com.example.crudapp.data.core.GenericRepository;
+import com.example.crudapp.data.core.CrudRepository;
 import com.example.crudapp.infrastructure.annotations.CrudResource;
-import com.example.crudapp.logic.core.BaseService;
+import com.example.crudapp.logic.core.CrudService;
 import com.example.crudapp.logic.core.CrudInterceptor;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -23,9 +23,9 @@ import java.net.URL;
 import java.util.*;
 
 @Service
-public class DynamicCrudManager {
+public class CrudEngine {
 
-    private static final Logger log = LoggerFactory.getLogger(DynamicCrudManager.class);
+    private static final Logger log = LoggerFactory.getLogger(CrudEngine.class);
     private final Map<String, ResourceMetadata<?, ?>> resources = new HashMap<>();
     private final Map<Class<?>, CrudInterceptor<?>> interceptors = new HashMap<>();
 
@@ -111,17 +111,17 @@ public class DynamicCrudManager {
             throw new IllegalStateException("Bidirectional mapping mismatch: DTO Record " + dtoClass.getSimpleName() + " is mapped to " + mappedEntity.getSimpleName() + " but registered on " + entityClass.getSimpleName());
         }
 
-        Class<? extends BaseService> serviceClass = annotation.service();
+        Class<? extends CrudService> serviceClass = annotation.service();
 
-        GenericRepository<T> repository = new GenericRepository<>(entityClass, entityManager);
+        CrudRepository<T> repository = new CrudRepository<>(entityClass, entityManager);
 
-        BaseService<T> service;
+        CrudService<T> service;
         try {
-            service = (BaseService<T>) serviceClass.getDeclaredConstructor().newInstance();
+            service = (CrudService<T>) serviceClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            service = new BaseService<T>() {
+            service = new CrudService<T>() {
                 @Override
-                protected GenericRepository<T> getRepository() {
+                protected CrudRepository<T> getRepository() {
                     return repository;
                 }
             };

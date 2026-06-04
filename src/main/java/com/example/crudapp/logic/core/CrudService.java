@@ -1,13 +1,13 @@
 package com.example.crudapp.logic.core;
 
 import com.example.crudapp.data.core.BaseEntity;
-import com.example.crudapp.data.core.GenericRepository;
+import com.example.crudapp.data.core.CrudRepository;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseService<T extends BaseEntity> {
+public abstract class CrudService<T extends BaseEntity> {
 
-    protected abstract GenericRepository<T> getRepository();
+    protected abstract CrudRepository<T> getRepository();
 
     public List<T> findAll() {
         return getRepository().findAll();
