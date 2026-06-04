@@ -48,6 +48,16 @@ public class CrudAppIntegrationTest {
     @LocalServerPort
     private int port;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.example.crudapp.infrastructure.web.ReactiveRateLimiterFilter rateLimiterFilter;
+
+    @org.junit.jupiter.api.BeforeEach
+    public void setUp() {
+        if (rateLimiterFilter != null) {
+            rateLimiterFilter.reset();
+        }
+    }
+
     private String generateToken(String username, List<String> roles) {
         Map<String, Object> realmAccess = Map.of("roles", roles);
         return io.jsonwebtoken.Jwts.builder()
@@ -365,7 +375,7 @@ public class CrudAppIntegrationTest {
 
         // 2. Get with sorting by price descending
         HttpRequest sortedGet = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products?sort=price,desc"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products?sort=price,desc&size=100"))
                 .header("Authorization", "Bearer " + adminToken)
                 .GET()
                 .build();
@@ -381,7 +391,7 @@ public class CrudAppIntegrationTest {
 
         // 3. Get with filtering (price > 1000)
         HttpRequest filteredGet = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products?price_gt=1000"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products?price_gt=1000&size=100"))
                 .header("Authorization", "Bearer " + adminToken)
                 .GET()
                 .build();
@@ -390,5 +400,108 @@ public class CrudAppIntegrationTest {
         String filteredBody = filteredResponse.body();
         assertTrue(filteredBody.contains("ALPHA LAPTOP"));
         assertTrue(!filteredBody.contains("BETA PHONE"));
+    }
+
+    @Test
+    public void testRateLimiterSecurityEvent() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String testToken = generateToken("admin-user", List.of("ADMIN"));
+        
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .header("Authorization", "Bearer " + testToken)
+                .GET()
+                .build();
+
+        // Perform 50 quick requests (should succeed or return 403/401/200, but rate limiter shouldn't block yet)
+        // Then perform 1 more which should be blocked with 429.
+        int rateLimitCapacity = 50;
+        boolean rateLimited = false;
+        
+        for (int i = 0; i < rateLimitCapacity + 5; i++) {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 429) {
+                rateLimited = true;
+                assertTrue(response.body().contains("API rate limit exceeded"));
+                break;
+            }
+        }
+        assertTrue(rateLimited, "Request should be rate limited with HTTP 429 after exceeding limit");
+    }
+
+    @Test
+    public void testCorsOriginWhitelisting() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 1. Whitelisted Origin
+        HttpRequest requestWhitelisted = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/metadata"))
+                .header("Origin", "http://localhost:5173")
+                .GET()
+                .build();
+        HttpResponse<String> responseWhitelisted = client.send(requestWhitelisted, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, responseWhitelisted.statusCode());
+        assertEquals("http://localhost:5173", responseWhitelisted.headers().firstValue("Access-Control-Allow-Origin").orElse(""));
+
+        // 2. Non-whitelisted Origin (should return 403 Forbidden since the origin is not allowed)
+        HttpRequest requestNonWhitelisted = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/metadata"))
+                .header("Origin", "http://malicious.com")
+                .GET()
+                .build();
+        HttpResponse<String> responseNonWhitelisted = client.send(requestNonWhitelisted, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, responseNonWhitelisted.statusCode());
+    }
+
+    @Test
+    public void testInputXssSanitization() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String testToken = generateToken("admin-user", List.of("ADMIN"));
+
+        // Post a product with XSS payload in description
+        String xssProductJson = "{" +
+                "\"name\":\"Clean Laptop\"," +
+                "\"description\":\"<script>alert('xss')</script>Description clean of script tags\"," +
+                "\"price\":1500.00" +
+                "}";
+
+        HttpRequest postRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .header("Authorization", "Bearer " + testToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(xssProductJson))
+                .build();
+
+        HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, postResponse.statusCode());
+        String body = postResponse.body();
+        // The script tag should be stripped out
+        assertTrue(!body.contains("<script>"));
+        assertTrue(body.contains("Description clean of script tags"));
+    }
+
+    @Test
+    public void testStrictPayloadRestrictions() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String testToken = generateToken("admin-user", List.of("ADMIN"));
+
+        // Post a product with unexpected/unwhitelisted fields
+        String badProductJson = "{" +
+                "\"name\":\"Dirty Laptop\"," +
+                "\"description\":\"Unexpected field check\"," +
+                "\"price\":1500.00," +
+                "\"hackerField\":\"unwhitelisted\"" +
+                "}";
+
+        HttpRequest postRequest = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .header("Authorization", "Bearer " + testToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(badProductJson))
+                .build();
+
+        HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        // Since we enabled fail-on-unknown-properties globally/locally, it should return 400 Bad Request
+        assertEquals(400, postResponse.statusCode());
     }
 }

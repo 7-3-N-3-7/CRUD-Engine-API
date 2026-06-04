@@ -78,33 +78,35 @@ public class ReactiveJwtFilter implements WebFilter {
 
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason=Missing or invalid Authorization header", path);
             exchange.getResponse().setRawStatusCode(401);
             return exchange.getResponse().writeWith(Mono.just(
                 exchange.getResponse().bufferFactory().wrap("Missing or invalid token".getBytes(StandardCharsets.UTF_8))
             ));
         }
-
+ 
         String token = authHeader.substring(7);
         try {
             PublicKey verificationKey = getVerificationKey(token);
             if (verificationKey == null) {
+                log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason=Signing key not found for token verification", path);
                 exchange.getResponse().setRawStatusCode(401);
                 return exchange.getResponse().writeWith(Mono.just(
                     exchange.getResponse().bufferFactory().wrap("Signing key not found for token verification".getBytes(StandardCharsets.UTF_8))
                 ));
             }
-
+ 
             Claims claims = Jwts.parser()
                     .verifyWith(verificationKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-
+ 
             String username = claims.get("preferred_username", String.class);
             if (username == null) {
                 username = claims.getSubject();
             }
-
+ 
             // Extract roles
             List<String> userRoles = new ArrayList<>();
             Map<String, Object> realmAccess = claims.get("realm_access", Map.class);
@@ -116,7 +118,7 @@ public class ReactiveJwtFilter implements WebFilter {
                     }
                 }
             }
-
+ 
             // Extract tenant ID
             String tenant = claims.get("tenant", String.class);
             if (tenant == null) {
@@ -125,10 +127,13 @@ public class ReactiveJwtFilter implements WebFilter {
                     tenant = iss.substring(iss.lastIndexOf("/realms/") + 8);
                 }
             }
-            if (tenant == null) {
+            if (username == null || !username.matches("^[a-zA-Z0-9_\\-@\\.]+$")) {
+                username = "system";
+            }
+            if (tenant == null || !tenant.matches("^[a-zA-Z0-9_\\-]+$")) {
                 tenant = "default";
             }
-
+ 
             // Perform RBAC
             String resource = getResourceName(path);
             if (resource != null) {
@@ -151,8 +156,9 @@ public class ReactiveJwtFilter implements WebFilter {
                                 break;
                             }
                         }
-
+ 
                         if (!authorized) {
+                            log.warn("[SECURITY EVENT] Action=ACCESS_DENIED Resource={} User={} Tenant={} Reason=Insufficient privileges", resource, username, tenant);
                             exchange.getResponse().setRawStatusCode(403);
                             return exchange.getResponse().writeWith(Mono.just(
                                 exchange.getResponse().bufferFactory().wrap("Forbidden: Insufficient privileges".getBytes(StandardCharsets.UTF_8))
@@ -161,21 +167,22 @@ public class ReactiveJwtFilter implements WebFilter {
                     }
                 }
             }
-
+ 
             // Set tenant context & authentication in Reactive Context
             List<GrantedAuthority> authorities = new ArrayList<>();
             for (String role : userRoles) {
                 authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
             }
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
-
+ 
             final String finalTenant = tenant;
             final String finalUser = username;
             return chain.filter(exchange)
                     .contextWrite(Context.of("tenantId", finalTenant, "username", finalUser))
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-
+ 
         } catch (Exception e) {
+            log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason={}", path, e.getMessage());
             log.error("Token verification failed", e);
             exchange.getResponse().setRawStatusCode(401);
             return exchange.getResponse().writeWith(Mono.just(

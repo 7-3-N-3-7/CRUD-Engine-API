@@ -22,11 +22,22 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Configuration
 public class WebFluxConfig {
 
+    @org.springframework.beans.factory.annotation.Value("${app.security.cors.allowed-origins:http://localhost:5173}")
+    private String allowedOriginsProp;
+
     @Bean
     public org.springframework.web.cors.reactive.CorsWebFilter corsFilter() {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+        
+        if (allowedOriginsProp != null && !allowedOriginsProp.trim().isEmpty()) {
+            for (String origin : allowedOriginsProp.split(",")) {
+                config.addAllowedOrigin(origin.trim());
+            }
+        } else {
+            config.addAllowedOriginPattern("*");
+        }
+        
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("X-Request-ID");
@@ -37,6 +48,13 @@ public class WebFluxConfig {
         source.registerCorsConfiguration("/**", config);
 
         return new org.springframework.web.cors.reactive.CorsWebFilter(source);
+    }
+
+    @Bean
+    public tools.jackson.databind.module.SimpleModule jacksonXssModule() {
+        tools.jackson.databind.module.SimpleModule module = new tools.jackson.databind.module.SimpleModule();
+        module.addDeserializer(String.class, new com.example.crudapp.api.UniversalCrudController.XssSanitizingDeserializer());
+        return module;
     }
 
     @Bean

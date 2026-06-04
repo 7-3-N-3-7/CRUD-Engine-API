@@ -8,7 +8,7 @@
     <!-- 🎨 CONSOLE APPENDER: Color-coded and formatted for development -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %cyan(%logger{36}) - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %cyan(%logger{36}) [Req:%X{requestId:-}] [Tenant:%X{tenantId:-}] [User:%X{username:-}] - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -23,7 +23,7 @@
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [Req:%X{requestId:-}] [Tenant:%X{tenantId:-}] [User:%X{username:-}] - %msg%n</pattern>
         </encoder>
     </appender>
 

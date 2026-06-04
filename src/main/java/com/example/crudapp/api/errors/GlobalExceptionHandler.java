@@ -79,6 +79,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
+    @ExceptionHandler(org.springframework.web.server.ServerWebInputException.class)
+    public ResponseEntity<ErrorResponse> handleWebInputException(org.springframework.web.server.ServerWebInputException ex, ServerWebExchange exchange) {
+        String reqId = getRequestId(exchange);
+        Throwable rootCause = ex.getRootCause();
+        String message = rootCause != null ? rootCause.getMessage() : ex.getReason();
+        ErrorResponse res = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                "Invalid payload format: " + message,
+                exchange.getRequest().getPath().value(),
+                reqId,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
+    @ExceptionHandler(tools.jackson.core.JacksonException.class)
+    public ResponseEntity<ErrorResponse> handleJacksonException(tools.jackson.core.JacksonException ex, ServerWebExchange exchange) {
+        String reqId = getRequestId(exchange);
+        ErrorResponse res = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                "JSON payload parsing error: " + ex.getOriginalMessage(),
+                exchange.getRequest().getPath().value(),
+                reqId,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
     @ExceptionHandler({NumberFormatException.class, IllegalArgumentException.class})
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex, ServerWebExchange exchange) {
         String reqId = getRequestId(exchange);

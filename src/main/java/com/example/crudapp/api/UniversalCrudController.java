@@ -43,12 +43,19 @@ public class UniversalCrudController {
     private final ObjectMapper objectMapper;
     private final Validator validator;
     private final TransactionTemplate transactionTemplate;
+    private final jakarta.persistence.EntityManager entityManager;
 
-    public UniversalCrudController(CrudEngine crudManager, PlatformTransactionManager transactionManager) {
+    public UniversalCrudController(CrudEngine crudManager, PlatformTransactionManager transactionManager, jakarta.persistence.EntityManager entityManager) {
         this.crudManager = crudManager;
+        this.entityManager = entityManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
+
+        tools.jackson.databind.module.SimpleModule module = new tools.jackson.databind.module.SimpleModule();
+        module.addDeserializer(String.class, new XssSanitizingDeserializer());
+
         this.objectMapper = JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .addModule(module)
                 .build();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
@@ -85,21 +92,28 @@ public class UniversalCrudController {
 
         return Mono.deferContextual(ctx -> {
             String tenantId = ctx.getOrDefault("tenantId", "default");
+            String username = ctx.getOrDefault("username", "anonymous");
+            String requestId = ctx.getOrDefault("requestId", "unknown");
             org.springframework.security.core.Authentication auth = 
                 (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
             return Mono.fromCallable(() -> {
                 com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                org.slf4j.MDC.put("requestId", requestId);
+                org.slf4j.MDC.put("tenantId", tenantId);
+                org.slf4j.MDC.put("username", username);
                 if (auth != null) {
                     org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 }
                 try {
-                    return transactionTemplate.execute(status -> 
-                        metadata.getService().findAll(page, size, queryParams, sort, metadata.getDtoClass())
-                    );
+                    return transactionTemplate.execute(status -> {
+                        setDbTenantContext(tenantId);
+                        return metadata.getService().findAll(page, size, queryParams, sort, metadata.getDtoClass());
+                    });
                 } finally {
                     com.example.crudapp.infrastructure.security.TenantContext.clear();
                     org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                    org.slf4j.MDC.clear();
                 }
             }).subscribeOn(Schedulers.boundedElastic());
         }).flatMap(entityPage -> {
@@ -120,19 +134,28 @@ public class UniversalCrudController {
 
         return Mono.deferContextual(ctx -> {
             String tenantId = ctx.getOrDefault("tenantId", "default");
+            String username = ctx.getOrDefault("username", "anonymous");
+            String requestId = ctx.getOrDefault("requestId", "unknown");
             org.springframework.security.core.Authentication auth = 
                 (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
             return Mono.fromCallable(() -> {
                 com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                org.slf4j.MDC.put("requestId", requestId);
+                org.slf4j.MDC.put("tenantId", tenantId);
+                org.slf4j.MDC.put("username", username);
                 if (auth != null) {
                     org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 }
                 try {
-                    return transactionTemplate.execute(status -> metadata.getService().findById(id));
+                    return transactionTemplate.execute(status -> {
+                        setDbTenantContext(tenantId);
+                        return metadata.getService().findById(id);
+                    });
                 } finally {
                     com.example.crudapp.infrastructure.security.TenantContext.clear();
                     org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                    org.slf4j.MDC.clear();
                 }
             }).subscribeOn(Schedulers.boundedElastic());
         }).flatMap(opt -> {
@@ -157,11 +180,15 @@ public class UniversalCrudController {
                 return Mono.deferContextual(ctx -> {
                     String tenantId = ctx.getOrDefault("tenantId", "default");
                     String username = ctx.getOrDefault("username", "system");
+                    String requestId = ctx.getOrDefault("requestId", "unknown");
                     org.springframework.security.core.Authentication auth = 
                         (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
                     return Mono.fromCallable(() -> {
                         com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                        org.slf4j.MDC.put("requestId", requestId);
+                        org.slf4j.MDC.put("tenantId", tenantId);
+                        org.slf4j.MDC.put("username", username);
                         if (auth != null) {
                             org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                         } else {
@@ -171,14 +198,17 @@ public class UniversalCrudController {
                         }
                         try {
                             return transactionTemplate.execute(status -> {
+                                setDbTenantContext(tenantId);
                                 metadata.getInterceptor().beforeCreate(entity);
                                 BaseEntity res = (BaseEntity) metadata.getService().save(entity);
                                 metadata.getInterceptor().afterCreate(res);
+                                log.info("[AUDIT MUTATION] Action=CREATE Resource={} User={} Tenant={} RecordID={}", resource, username, tenantId, res.getId());
                                 return res;
                             });
                         } finally {
                             com.example.crudapp.infrastructure.security.TenantContext.clear();
                             org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                            org.slf4j.MDC.clear();
                         }
                     }).subscribeOn(Schedulers.boundedElastic());
                 });
@@ -200,11 +230,15 @@ public class UniversalCrudController {
                 return Mono.deferContextual(ctx -> {
                     String tenantId = ctx.getOrDefault("tenantId", "default");
                     String username = ctx.getOrDefault("username", "system");
+                    String requestId = ctx.getOrDefault("requestId", "unknown");
                     org.springframework.security.core.Authentication auth = 
                         (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
                     return Mono.fromCallable(() -> {
                         com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                        org.slf4j.MDC.put("requestId", requestId);
+                        org.slf4j.MDC.put("tenantId", tenantId);
+                        org.slf4j.MDC.put("username", username);
                         if (auth != null) {
                             org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                         } else {
@@ -214,14 +248,17 @@ public class UniversalCrudController {
                         }
                         try {
                             return transactionTemplate.execute(status -> {
+                                setDbTenantContext(tenantId);
                                 metadata.getInterceptor().beforeUpdate(entity);
                                 BaseEntity res = (BaseEntity) metadata.getService().update(id, entity);
                                 metadata.getInterceptor().afterUpdate(res);
+                                log.info("[AUDIT MUTATION] Action=UPDATE Resource={} User={} Tenant={} RecordID={}", resource, username, tenantId, res.getId());
                                 return res;
                             });
                         } finally {
                             com.example.crudapp.infrastructure.security.TenantContext.clear();
                             org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                            org.slf4j.MDC.clear();
                         }
                     }).subscribeOn(Schedulers.boundedElastic());
                 });
@@ -237,23 +274,31 @@ public class UniversalCrudController {
 
         return Mono.deferContextual(ctx -> {
             String tenantId = ctx.getOrDefault("tenantId", "default");
+            String username = ctx.getOrDefault("username", "anonymous");
+            String requestId = ctx.getOrDefault("requestId", "unknown");
             org.springframework.security.core.Authentication auth = 
                 (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
             return Mono.fromRunnable(() -> {
                 com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                org.slf4j.MDC.put("requestId", requestId);
+                org.slf4j.MDC.put("tenantId", tenantId);
+                org.slf4j.MDC.put("username", username);
                 if (auth != null) {
                     org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 }
                 try {
                     transactionTemplate.executeWithoutResult(status -> {
+                        setDbTenantContext(tenantId);
                         metadata.getInterceptor().beforeDelete(id);
                         metadata.getService().deleteById(id);
                         metadata.getInterceptor().afterDelete(id);
+                        log.info("[AUDIT MUTATION] Action=DELETE Resource={} User={} Tenant={} RecordID={}", resource, username, tenantId, id);
                     });
                 } finally {
                     com.example.crudapp.infrastructure.security.TenantContext.clear();
                     org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                    org.slf4j.MDC.clear();
                 }
             }).subscribeOn(Schedulers.boundedElastic());
         }).then(Mono.just(ResponseEntity.noContent().build()));
@@ -467,5 +512,26 @@ public class UniversalCrudController {
 
         openapi.put("paths", paths);
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(openapi);
+    }
+
+    private void setDbTenantContext(String tenantId) {
+        if (tenantId == null || !tenantId.matches("^[a-zA-Z0-9_\\-]+$")) {
+            throw new IllegalArgumentException("Invalid tenant identifier format");
+        }
+        entityManager.createNativeQuery("SET LOCAL app.current_tenant = '" + tenantId + "'").executeUpdate();
+    }
+
+    public static class XssSanitizingDeserializer extends tools.jackson.databind.ValueDeserializer<String> {
+        @Override
+        public String deserialize(tools.jackson.core.JsonParser p, tools.jackson.databind.DeserializationContext ctxt) {
+            String value = p.getValueAsString();
+            if (value == null) {
+                return null;
+            }
+            // Basic anti-XSS: strip HTML tag patterns and javascript prefixes
+            return value.replaceAll("(?i)<script.*?>.*?</script.*?>", "")
+                        .replaceAll("(?i)<[^>]*?>", "")
+                        .replaceAll("(?i)javascript:", "");
+        }
     }
 }

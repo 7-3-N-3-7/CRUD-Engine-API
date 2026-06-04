@@ -24,7 +24,7 @@ public class ReactiveRequestTracingFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String reqId = exchange.getRequest().getHeaders().getFirst(REQUEST_ID_HEADER);
-        if (reqId == null || reqId.isBlank()) {
+        if (reqId == null || reqId.isBlank() || !reqId.matches("^[a-zA-Z0-9_\\-]+$")) {
             reqId = UUID.randomUUID().toString();
         }
 

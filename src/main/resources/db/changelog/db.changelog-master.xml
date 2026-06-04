@@ -72,4 +72,14 @@
         <addPrimaryKey tableName="entity_attributes" columnNames="entity_id, attribute_key" constraintName="pk_entity_attributes"/>
     </changeSet>
 
+    <changeSet id="5" author="team">
+        <sql dbms="postgresql">
+            ALTER TABLE baseentity ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS tenant_isolation_policy ON baseentity;
+            CREATE POLICY tenant_isolation_policy ON baseentity 
+                USING (tenant_id = current_setting('app.current_tenant', true))
+                WITH CHECK (tenant_id = current_setting('app.current_tenant', true));
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
