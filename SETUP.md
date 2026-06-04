@@ -1,8 +1,8 @@
 # Developer Setup & Extension Manual: Dynamic CRUD Engine
 
-Welcome to the **Dynamic CRUD Engine**. This project is a metadata-driven, enterprise-grade REST engine combining the data safety and persistence power of **Spring Boot (Spring Data JPA)** with the lightweight, performant web server capabilities of **Javalin**. 
+Welcome to the **Dynamic CRUD Engine**. This project is a metadata-driven, enterprise-grade REST engine combining the data safety and persistence power of **Spring Boot (Spring Data JPA)** with the non-blocking, reactive web capabilities of **Spring WebFlux**. 
 
-This manual details how to set up the infrastructure, register new resource endpoints, extend core behaviors, and implement custom logic hooks.
+This manual details how to set up the infrastructure, register new resource endpoints, extend core behaviors, implement custom logic hooks, and manage the frontend application.
 
 ---
 
@@ -393,7 +393,7 @@ This approach runs the app, database, and Keycloak together in isolated containe
 
 ### Step 3: Configure Reverse Proxy (Nginx) & SSL Security
 
-Since Javalin runs on port `8080`, we use **Nginx** as a reverse proxy to route public traffic from port `80` (HTTP) and `443` (HTTPS) to the backend.
+Since the backend runs on port `8080`, we use **Nginx** as a reverse proxy to route public traffic from port `80` (HTTP) and `443` (HTTPS) to the backend.
 
 1.  **Install Nginx on VPS:**
     ```bash
@@ -431,4 +431,39 @@ Since Javalin runs on port `8080`, we use **Nginx** as a reverse proxy to route 
     sudo certbot --nginx -d yourdomain.com
     ```
     Certbot will automatically verify ownership, fetch the certificate, and update the Nginx configuration block to handle secure HTTPS connections.
+
+---
+
+## 8. Frontend Development Setup & Architecture
+
+The user interface lives in the `frontend` directory and is built using React 19, TypeScript, and Vite.
+
+### Installing Dependencies
+Run the following command inside the `frontend` folder to install the required packages:
+```bash
+cd frontend
+npm install
+```
+
+### Running the Development Server
+Start the local hot-reload web server:
+```bash
+npm run dev
+```
+The application will boot up on `http://localhost:5173`. Make sure the Java backend is running on port `8080` so the frontend can retrieve endpoint schemas and route request queries.
+
+### Building for Production
+To bundle the frontend assets for production:
+```bash
+npm run build
+```
+This builds static assets under `frontend/dist/`. In a production deployment, these static assets can be served by Nginx or packaged inside the Spring Boot container resources.
+
+### Local Mock Signer Architecture
+To enable fast, standalone local development, the frontend contains an embedded RSA Private Key in JWK format matching the public key configured in the backend `application.properties` file under `keycloak.test.public-key`. 
+During query execution, `App.tsx` uses the browser's native **Web Crypto API** (`window.crypto.subtle`) to:
+1. Construct standard JWT OAuth2 claims based on the active user identity control selections.
+2. Sign the JWT dynamically with the test private key using the `RSASSA-PKCS1-v1_5` signature scheme.
+3. Attach the token as a `Bearer` header automatically on dynamic HTTP requests.
+This enables immediate RBAC and tenancy test validations without setting up external IAM containers.
 

@@ -1,12 +1,12 @@
-# Generic Spring Boot & Javalin CRUD Engine (v2.0)
+# Generic Spring Boot WebFlux CRUD Engine & Frontend Dashboard (v2.0)
 
-[![Java CI with Maven](https://github.com/73N37/Crud_application/actions/workflows/ci.yml/badge.svg)](https://github.com/73N37/Crud_application/actions/workflows/ci.yml)
+[![Java & Node CI](https://github.com/73N37/Crud_application/actions/workflows/ci.yml/badge.svg)](https://github.com/73N37/Crud_application/actions/workflows/ci.yml)
 [![Java Version](https://img.shields.io/badge/Java-25-orange.svg)](https://jdk.java.net/25/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.4-green.svg)](https://spring.io/projects/spring-boot)
-[![Javalin](https://img.shields.io/badge/Javalin-7.2.2-blue.svg)](https://javalin.io/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green.svg)](https://spring.io/projects/spring-boot)
+[![Spring WebFlux](https://img.shields.io/badge/Spring%20WebFlux-Reactive-blue.svg)](https://spring.io/projects/spring-framework)
 [![Keycloak](https://img.shields.io/badge/Keycloak-24.0.2-red.svg)](https://www.keycloak.org/)
 
-An educational, enterprise-ready, metadata-driven CRUD engine designed to teach students **advanced software engineering principles**, design patterns, and modern security patterns.
+An educational, enterprise-ready, metadata-driven CRUD engine and frontend testing panel designed to teach students **advanced software engineering principles**, design patterns, and modern security patterns.
 
 ---
 
@@ -25,7 +25,7 @@ To maintain a clean system, this project enforces the **Data-Logic-Interface (DL
 ```mermaid
 graph TD
     subgraph Interface Layer [Interface Layer: API Surface]
-        Javalin[Javalin Server] -->|Routes HTTP Requests| Controller[UniversalCrudController]
+        WebFlux[Spring WebFlux / Netty] -->|Routes HTTP Requests| Controller[UniversalCrudController]
         Controller -->|Validates & Mapped to DTO| DTO[ProductRecord / Java Records]
     end
 
@@ -44,7 +44,7 @@ graph TD
     classDef interface fill:#d1e7dd,stroke:#0f5132,stroke-width:2px;
     classDef logic fill:#cff4fc,stroke:#087990,stroke-width:2px;
     classDef data fill:#f8d7da,stroke:#842029,stroke-width:2px;
-    class Javalin,Controller,DTO interface;
+    class WebFlux,Controller,DTO interface;
     class CrudEngine,Service,Interceptor logic;
     class Repository,DB,Liquibase,Schema data;
 ```
@@ -61,7 +61,7 @@ graph TD
 
 ### 3. Interface Layer (`com.example.crudapp.api`)
 *   **Responsibility**: Exposing the API surface, validating input request payloads, and handling HTTP routing.
-*   **Key Components**: `JavalinServer` (bootstraps Javalin), `UniversalCrudController` (handles generic requests), and `Records` (immutable DTOs like `ProductRecord`).
+*   **Key Components**: `DynamicControllerRegister` (generates RestControllers via Byte Buddy at runtime), `UniversalCrudController` (handles generic requests), and `Records` (immutable DTOs like `ProductRecord`).
 *   **Constraint**: Never directly accesses the database. DTOs are strictly immutable, matching client communication contracts.
 
 ---
@@ -134,18 +134,35 @@ docker-compose up -d
 3.  Under **Users**, create a test user (e.g., `test-user`).
 4.  Under **Realm Roles**, create roles `ADMIN` and `USER`, and assign them to your user.
 
-### Step 3: Run the Application
-Start the Spring Boot container:
+### Step 3: Run the Backend Application
+Start the Spring Boot WebFlux server:
 ```bash
 mvn spring-boot:run
 ```
-The server will boot up and start Javalin on port `8080`.
+The server will boot up on `http://localhost:8080`.
 
-### Step 4: Interact with the APIs
+### Step 4: Run the Interactive React-TypeScript Frontend
+In a separate terminal, navigate to the `frontend` directory, install dependencies, and start the Vite development server:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The frontend will boot up on `http://localhost:5173`. Open this URL in your browser to access the platform.
+
+### Step 5: Interact with the APIs & Dashboard
+*   **Frontend Dashboard Panel**: Open `http://localhost:5173` to explore the interactive architecture visualizer and execute live CRUD queries.
 *   **Public Metadata**: `GET http://localhost:8080/api/metadata`
-*   **Swagger API Docs**: `http://localhost:8080/swagger-ui.html`
+*   **Swagger API Docs**: `http://localhost:8080/swagger-ui`
 *   **Secure API Endpoint**: `GET http://localhost:8080/api/products`
-    *(Requires a Bearer JWT Token in the headers acquired from Keycloak!)*
+
+---
+
+## 🎨 Interactive TypeScript Frontend Dashboard
+The `frontend/` directory contains a modern React web application that serves as:
+1.  **Architecture Visualizer**: An interactive graphical schematic mapping core architectural design patterns (Client ➔ Controllers ➔ JWT Security ➔ Service Registry ➔ Specifications/Graphs ➔ DB).
+2.  **Web Crypto RS256 Signer**: Signs standard OIDC JWT authorization tokens natively in the browser using Web Crypto APIs, allowing mock authentication testing without setting up Keycloak locally.
+3.  **Dynamic CRUD Tester**: Automatically reads validation constraints and field DTO attributes from the backend `/api/metadata` endpoint to generate dynamic validation forms, query parameters, sorting specifications, and execution logs.
 
 ---
 
@@ -155,7 +172,7 @@ To compile the project and execute the integration tests, run:
 ```bash
 mvn clean test
 ```
-The test suite (`CrudAppIntegrationTest.java`) tests the metadata registry, successful secure queries, role validation checks (403 Forbidden), and authorization rejections (401 Unauthorized) using mocked RSA tokens.
+The test suite (`CrudAppIntegrationTest.java`) tests the WebFlux pipelines, correlation ID tracing, metadata mapping, role-based access control (403 Forbidden), and authorization policies.
 
 ---
 
@@ -165,4 +182,6 @@ A Continuous Integration pipeline is configured at `.github/workflows/ci.yml`:
 *   **Triggers**: On every push and pull request to the repository.
 *   **Runner**: Running on an isolated `ubuntu-latest` VM.
 *   **Database Service**: Spins up a real PostgreSQL service container in the runner (exposed on port `5433`).
-*   **Execution**: Validates compilation, pulls cached Maven dependencies, and runs tests to guarantee build health.
+*   **Execution**: 
+    1.  Validates and runs tests for the **Java Spring WebFlux Backend** using Maven.
+    2.  Sets up Node.js, installs dependencies, and compiles the **TypeScript React Frontend** to verify compilation safety.
