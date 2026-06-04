@@ -19,6 +19,12 @@ public abstract class CrudService<T extends BaseEntity> {
         return new Page<>(content, total);
     }
 
+    public Page<T> findAll(int page, int size, java.util.Map<String, List<String>> queryParams, String sortParam, Class<?> dtoClass) {
+        List<T> content = getRepository().findAll(page * size, size, queryParams, sortParam, dtoClass);
+        long total = getRepository().count();
+        return new Page<>(content, total);
+    }
+
     public Optional<T> findById(Long id) {
         return getRepository().findById(id);
     }

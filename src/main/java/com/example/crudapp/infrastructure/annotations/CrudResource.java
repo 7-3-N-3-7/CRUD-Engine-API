@@ -26,4 +26,10 @@ public @interface CrudResource {
      * List of roles required to access this resource.
      */
     String[] roles() default {"ANYONE", "USER", "ADMIN"};
+
+    /**
+     * 🚀 ARCHITECTURE OPTIMIZATION: DTO Versioning
+     * Version identifier for routing and schema segregation.
+     */
+    String version() default "v1";
 }

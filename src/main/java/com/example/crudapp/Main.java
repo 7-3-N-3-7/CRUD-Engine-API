@@ -31,7 +31,7 @@ public class Main {
         log.info("--------------------------------------------------");
 
         SpringApplication app = new SpringApplication(Main.class);
-        app.setWebApplicationType(WebApplicationType.NONE);
+        app.setWebApplicationType(WebApplicationType.REACTIVE);
         app.run(args);
     }
 }

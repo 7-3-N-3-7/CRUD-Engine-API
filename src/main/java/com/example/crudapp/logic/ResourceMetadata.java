@@ -12,6 +12,7 @@ public class ResourceMetadata<T extends BaseEntity, D> {
     private final Class<T> entityClass;
     private final Class<D> dtoClass;
     private final String basePath;
+    private final String version;
     private final CrudRepository<T> repository;
     private final CrudService<T> service;
     private final CrudInterceptor<T> interceptor;
@@ -21,6 +22,7 @@ public class ResourceMetadata<T extends BaseEntity, D> {
         this.entityClass = builder.entityClass;
         this.dtoClass = builder.dtoClass;
         this.basePath = builder.basePath;
+        this.version = builder.version;
         this.repository = builder.repository;
         this.service = builder.service;
         this.interceptor = builder.interceptor;
@@ -34,6 +36,7 @@ public class ResourceMetadata<T extends BaseEntity, D> {
     public Class<T> getEntityClass() { return entityClass; }
     public Class<D> getDtoClass() { return dtoClass; }
     public String getBasePath() { return basePath; }
+    public String getVersion() { return version; }
     public CrudRepository<T> getRepository() { return repository; }
     public CrudService<T> getService() { return service; }
     public CrudInterceptor<T> getInterceptor() { return interceptor; }
@@ -62,6 +65,7 @@ public class ResourceMetadata<T extends BaseEntity, D> {
         private Class<T> entityClass;
         private Class<D> dtoClass;
         private String basePath;
+        private String version;
         private CrudRepository<T> repository;
         private CrudService<T> service;
         private CrudInterceptor<T> interceptor;
@@ -79,6 +83,11 @@ public class ResourceMetadata<T extends BaseEntity, D> {
 
         public Builder<T, D> basePath(String basePath) {
             this.basePath = basePath;
+            return this;
+        }
+
+        public Builder<T, D> version(String version) {
+            this.version = version;
             return this;
         }
 

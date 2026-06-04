@@ -7,26 +7,38 @@ import com.example.crudapp.logic.core.CrudService;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.DeserializationFeature;
-import io.javalin.http.Context;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * [INTERFACE LAYER]
+ * Unified Spring WebFlux handler exposing dynamic REST CRUD endpoints,
+ * OpenAPI documentation, and visual Swagger UI configurations.
+ */
+@Component
 public class UniversalCrudController {
     private static final Logger log = LoggerFactory.getLogger(UniversalCrudController.class);
+
     private final CrudEngine crudManager;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -42,98 +54,209 @@ public class UniversalCrudController {
         this.validator = factory.getValidator();
     }
 
-    public void getMetadata(Context ctx) {
+    public Mono<ServerResponse> getMetadata(ServerRequest request) {
         log.debug("🔍 Fetching global metadata");
-        Map<String, List<ResourceMetadata.FieldInfo>> metadata = crudManager.getResources().entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().getFields()
-                ));
-        ctx.json(metadata);
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, ResourceMetadata<?, ?>> e : crudManager.getResources().entrySet()) {
+            Map<String, Object> resMeta = new LinkedHashMap<>();
+            ResourceMetadata<?, ?> meta = e.getValue();
+            resMeta.put("basePath", meta.getBasePath());
+            resMeta.put("version", meta.getVersion());
+            resMeta.put("entityClass", meta.getEntityClass().getName());
+            resMeta.put("dtoClass", meta.getDtoClass().getName());
+            resMeta.put("fields", meta.getFields());
+            result.put(e.getKey(), resMeta);
+        }
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(result);
     }
 
-    public void getAll(Context ctx) {
-        String resource = ctx.pathParam("resource");
-        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(0);
-        int size = ctx.queryParamAsClass("size", Integer.class).getOrDefault(10);
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Mono<ResponseEntity<Flux<?>>> getAll(ServerRequest request) {
+        String resource = request.pathVariable("resource");
+        int page = Integer.parseInt(request.queryParam("page").orElse("0"));
+        int size = Integer.parseInt(request.queryParam("size").orElse("10"));
+        String sort = request.queryParam("sort").orElse(null);
+
+        // Capture all query params for criteria filtering
+        Map<String, List<String>> queryParams = new HashMap<>();
+        request.queryParams().forEach((k, v) -> queryParams.put(k, new ArrayList<>(v)));
 
         ResourceMetadata metadata = getMetadataOrThrow(resource);
-        
-        CrudService.Page<? extends BaseEntity> entityPage = transactionTemplate.execute(status -> 
-            metadata.getService().findAll(page, size)
-        );
 
-        ctx.header("X-Total-Count", String.valueOf(entityPage.getTotalElements()));
-        ctx.json(entityPage.getContent());
-    }
+        return Mono.deferContextual(ctx -> {
+            String tenantId = ctx.getOrDefault("tenantId", "default");
+            org.springframework.security.core.Authentication auth = 
+                (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
-    @SuppressWarnings("unchecked")
-    public void getById(Context ctx) {
-        String resource = ctx.pathParam("resource");
-        Long id = Long.parseLong(ctx.pathParam("id"));
-
-        ResourceMetadata metadata = getMetadataOrThrow(resource);
-        
-        Optional<BaseEntity> result = (Optional<BaseEntity>) transactionTemplate.execute(status -> 
-            metadata.getService().findById(id)
-        );
-        
-        result.ifPresentOrElse(ctx::json, () -> {
-            throw new com.example.crudapp.api.errors.ResourceNotFoundException("Resource '" + resource + "' with ID " + id + " not found");
+            return Mono.fromCallable(() -> {
+                com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                if (auth != null) {
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+                try {
+                    return transactionTemplate.execute(status -> 
+                        metadata.getService().findAll(page, size, queryParams, sort, metadata.getDtoClass())
+                    );
+                } finally {
+                    com.example.crudapp.infrastructure.security.TenantContext.clear();
+                    org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                }
+            }).subscribeOn(Schedulers.boundedElastic());
+        }).flatMap(entityPage -> {
+            // [PERFORMANCE OPTIMIZATION] Streaming response using Flux
+            Flux<? extends BaseEntity> flux = Flux.fromIterable(entityPage.getContent());
+            return Mono.just(ResponseEntity.ok()
+                    .header("X-Total-Count", String.valueOf(entityPage.getTotalElements()))
+                    .body((Flux<?>) flux));
         });
     }
 
-    public void create(Context ctx) {
-        String resource = ctx.pathParam("resource");
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Mono<ResponseEntity<?>> getById(ServerRequest request) {
+        String resource = request.pathVariable("resource");
+        Long id = Long.parseLong(request.pathVariable("id"));
+
         ResourceMetadata metadata = getMetadataOrThrow(resource);
 
-        Object dto = ctx.bodyAsClass(metadata.getDtoClass());
-        validate(dto);
+        return Mono.deferContextual(ctx -> {
+            String tenantId = ctx.getOrDefault("tenantId", "default");
+            org.springframework.security.core.Authentication auth = 
+                (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
-        BaseEntity entity = (BaseEntity) objectMapper.convertValue(dto, metadata.getEntityClass());
-        
-        BaseEntity saved = transactionTemplate.execute(status -> {
-            metadata.getInterceptor().beforeCreate(entity);
-            BaseEntity res = (BaseEntity) metadata.getService().save(entity);
-            metadata.getInterceptor().afterCreate(res);
-            return res;
+            return Mono.fromCallable(() -> {
+                com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                if (auth != null) {
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+                try {
+                    return transactionTemplate.execute(status -> metadata.getService().findById(id));
+                } finally {
+                    com.example.crudapp.infrastructure.security.TenantContext.clear();
+                    org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                }
+            }).subscribeOn(Schedulers.boundedElastic());
+        }).flatMap(opt -> {
+            if (opt.isPresent()) {
+                return Mono.just(ResponseEntity.ok().body(opt.get()));
+            } else {
+                return Mono.error(new com.example.crudapp.api.errors.ResourceNotFoundException("Resource '" + resource + "' with ID " + id + " not found"));
+            }
         });
-
-        ctx.status(201).json(saved);
     }
 
-    public void update(Context ctx) {
-        String resource = ctx.pathParam("resource");
-        Long id = Long.parseLong(ctx.pathParam("id"));
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Mono<ResponseEntity<?>> create(ServerRequest request) {
+        String resource = request.pathVariable("resource");
         ResourceMetadata metadata = getMetadataOrThrow(resource);
 
-        Object dto = ctx.bodyAsClass(metadata.getDtoClass());
-        validate(dto);
+        return request.bodyToMono(metadata.getDtoClass())
+            .flatMap(dto -> {
+                validate(dto);
+                BaseEntity entity = (BaseEntity) objectMapper.convertValue(dto, metadata.getEntityClass());
 
-        BaseEntity entity = (BaseEntity) objectMapper.convertValue(dto, metadata.getEntityClass());
-        
-        BaseEntity updated = transactionTemplate.execute(status -> {
-            metadata.getInterceptor().beforeUpdate(entity);
-            BaseEntity res = (BaseEntity) metadata.getService().update(id, entity);
-            metadata.getInterceptor().afterUpdate(res);
-            return res;
-        });
+                return Mono.deferContextual(ctx -> {
+                    String tenantId = ctx.getOrDefault("tenantId", "default");
+                    String username = ctx.getOrDefault("username", "system");
+                    org.springframework.security.core.Authentication auth = 
+                        (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
 
-        ctx.json(updated);
+                    return Mono.fromCallable(() -> {
+                        com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                        if (auth != null) {
+                            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                        } else {
+                            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+                                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(username, null, List.of())
+                            );
+                        }
+                        try {
+                            return transactionTemplate.execute(status -> {
+                                metadata.getInterceptor().beforeCreate(entity);
+                                BaseEntity res = (BaseEntity) metadata.getService().save(entity);
+                                metadata.getInterceptor().afterCreate(res);
+                                return res;
+                            });
+                        } finally {
+                            com.example.crudapp.infrastructure.security.TenantContext.clear();
+                            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                        }
+                    }).subscribeOn(Schedulers.boundedElastic());
+                });
+            })
+            .flatMap(saved -> Mono.just(ResponseEntity.status(201).body(saved)));
     }
 
-    public void delete(Context ctx) {
-        String resource = ctx.pathParam("resource");
-        Long id = Long.parseLong(ctx.pathParam("id"));
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Mono<ResponseEntity<?>> update(ServerRequest request) {
+        String resource = request.pathVariable("resource");
+        Long id = Long.parseLong(request.pathVariable("id"));
         ResourceMetadata metadata = getMetadataOrThrow(resource);
 
-        transactionTemplate.executeWithoutResult(status -> {
-            metadata.getInterceptor().beforeDelete(id);
-            metadata.getService().deleteById(id);
-            metadata.getInterceptor().afterDelete(id);
-        });
+        return request.bodyToMono(metadata.getDtoClass())
+            .flatMap(dto -> {
+                validate(dto);
+                BaseEntity entity = (BaseEntity) objectMapper.convertValue(dto, metadata.getEntityClass());
 
-        ctx.status(204);
+                return Mono.deferContextual(ctx -> {
+                    String tenantId = ctx.getOrDefault("tenantId", "default");
+                    String username = ctx.getOrDefault("username", "system");
+                    org.springframework.security.core.Authentication auth = 
+                        (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
+
+                    return Mono.fromCallable(() -> {
+                        com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                        if (auth != null) {
+                            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                        } else {
+                            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+                                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(username, null, List.of())
+                            );
+                        }
+                        try {
+                            return transactionTemplate.execute(status -> {
+                                metadata.getInterceptor().beforeUpdate(entity);
+                                BaseEntity res = (BaseEntity) metadata.getService().update(id, entity);
+                                metadata.getInterceptor().afterUpdate(res);
+                                return res;
+                            });
+                        } finally {
+                            com.example.crudapp.infrastructure.security.TenantContext.clear();
+                            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                        }
+                    }).subscribeOn(Schedulers.boundedElastic());
+                });
+            })
+            .flatMap(updated -> Mono.just(ResponseEntity.ok().body(updated)));
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Mono<ResponseEntity<Void>> delete(ServerRequest request) {
+        String resource = request.pathVariable("resource");
+        Long id = Long.parseLong(request.pathVariable("id"));
+        ResourceMetadata metadata = getMetadataOrThrow(resource);
+
+        return Mono.deferContextual(ctx -> {
+            String tenantId = ctx.getOrDefault("tenantId", "default");
+            org.springframework.security.core.Authentication auth = 
+                (org.springframework.security.core.Authentication) ctx.getOrEmpty(org.springframework.security.core.Authentication.class).orElse(null);
+
+            return Mono.fromRunnable(() -> {
+                com.example.crudapp.infrastructure.security.TenantContext.setTenantId(tenantId);
+                if (auth != null) {
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+                try {
+                    transactionTemplate.executeWithoutResult(status -> {
+                        metadata.getInterceptor().beforeDelete(id);
+                        metadata.getService().deleteById(id);
+                        metadata.getInterceptor().afterDelete(id);
+                    });
+                } finally {
+                    com.example.crudapp.infrastructure.security.TenantContext.clear();
+                    org.springframework.security.core.context.SecurityContextHolder.clearContext();
+                }
+            }).subscribeOn(Schedulers.boundedElastic());
+        }).then(Mono.just(ResponseEntity.noContent().build()));
     }
 
     private ResourceMetadata getMetadataOrThrow(String resource) {
@@ -151,9 +274,8 @@ public class UniversalCrudController {
         }
     }
 
-    public void getSwaggerUi(Context ctx) {
-        ctx.contentType("text/html");
-        ctx.result("""
+    public Mono<ServerResponse> getSwaggerUi(ServerRequest request) {
+        return ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue("""
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -194,7 +316,7 @@ public class UniversalCrudController {
     }
 
     @SuppressWarnings("unchecked")
-    public void getOpenApiJson(Context ctx) {
+    public Mono<ServerResponse> getOpenApiJson(ServerRequest request) {
         Map<String, Object> openapi = new LinkedHashMap<>();
         openapi.put("openapi", "3.0.1");
 
@@ -226,6 +348,7 @@ public class UniversalCrudController {
             String path = entry.getKey();
             ResourceMetadata<?, ?> metadata = entry.getValue();
             String schemaName = metadata.getDtoClass().getSimpleName();
+            String version = metadata.getVersion();
 
             Map<String, Object> schema = new LinkedHashMap<>();
             schema.put("type", "object");
@@ -259,7 +382,7 @@ public class UniversalCrudController {
             }
             schemas.put(schemaName, schema);
 
-            String resourcePath = "/api/" + path;
+            String resourcePath = "/api/" + version + "/" + path;
             Map<String, Object> pathOperations = new LinkedHashMap<>();
 
             Map<String, Object> getOp = new LinkedHashMap<>();
@@ -267,7 +390,8 @@ public class UniversalCrudController {
             getOp.put("summary", "List all " + path);
             getOp.put("parameters", List.of(
                     Map.of("name", "page", "in", "query", "required", false, "schema", Map.of("type", "integer", "default", 0)),
-                    Map.of("name", "size", "in", "query", "required", false, "schema", Map.of("type", "integer", "default", 10))
+                    Map.of("name", "size", "in", "query", "required", false, "schema", Map.of("type", "integer", "default", 10)),
+                    Map.of("name", "sort", "in", "query", "required", false, "schema", Map.of("type", "string"))
             ));
             getOp.put("responses", Map.of(
                     "200", Map.of(
@@ -342,6 +466,6 @@ public class UniversalCrudController {
         }
 
         openapi.put("paths", paths);
-        ctx.json(openapi);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(openapi);
     }
 }

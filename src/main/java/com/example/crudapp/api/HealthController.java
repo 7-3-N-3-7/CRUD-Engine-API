@@ -1,11 +1,22 @@
 package com.example.crudapp.api;
 
-import io.javalin.http.Context;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Map;
 
+/**
+ * [INTERFACE LAYER]
+ * Health check endpoint controller for liveness and database connection readiness queries.
+ */
+@Component
 public class HealthController {
     private final DataSource dataSource;
 
@@ -13,17 +24,22 @@ public class HealthController {
         this.dataSource = dataSource;
     }
 
-    public void liveness(Context ctx) {
-        ctx.status(200).result("UP");
+    public Mono<ServerResponse> liveness(ServerRequest request) {
+        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).bodyValue("UP");
     }
 
-    public void readiness(Context ctx) {
-        try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.execute("SELECT 1");
-            ctx.status(200).json(Map.of("status", "UP", "database", "UP"));
-        } catch (Exception e) {
-            ctx.status(503).json(Map.of("status", "DOWN", "database", "DOWN", "error", e.getMessage()));
-        }
+    public Mono<ServerResponse> readiness(ServerRequest request) {
+        return Mono.fromCallable(() -> {
+            try (Connection conn = dataSource.getConnection();
+                 Statement stmt = conn.createStatement()) {
+                stmt.execute("SELECT 1");
+                return Map.of("status", "UP", "database", "UP");
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .flatMap(health -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(health))
+        .onErrorResume(e -> ServerResponse.status(503).contentType(MediaType.APPLICATION_JSON).bodyValue(
+            Map.of("status", "DOWN", "database", "DOWN", "error", e.getMessage())
+        ));
     }
 }

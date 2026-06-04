@@ -1,9 +1,8 @@
 package com.example.crudapp;
 
-import com.example.crudapp.infrastructure.web.JavalinServer;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -20,7 +19,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(properties = "server.port=0")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CrudAppIntegrationTest {
 
     private static final KeyPair keyPair;
@@ -46,8 +45,8 @@ public class CrudAppIntegrationTest {
         registry.add("keycloak.jwk-set-uri", () -> "http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs");
     }
 
-    @Autowired
-    private JavalinServer javalinServer;
+    @LocalServerPort
+    private int port;
 
     private String generateToken(String username, List<String> roles) {
         Map<String, Object> realmAccess = Map.of("roles", roles);
@@ -62,9 +61,22 @@ public class CrudAppIntegrationTest {
                 .compact();
     }
 
+    private String generateTokenWithTenant(String username, List<String> roles, String tenant) {
+        Map<String, Object> realmAccess = Map.of("roles", roles);
+        return io.jsonwebtoken.Jwts.builder()
+                .header()
+                    .keyId("test-key-id")
+                    .and()
+                .subject(username)
+                .claim("preferred_username", username)
+                .claim("tenant", tenant)
+                .claim("realm_access", realmAccess)
+                .signWith(keyPair.getPrivate(), io.jsonwebtoken.Jwts.SIG.RS256)
+                .compact();
+    }
+
     @Test
     public void testRequestTracingCorrelationId() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
 
         // Send request with custom correlation ID
@@ -91,14 +103,13 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testUnifiedExceptionMapping() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
         String testToken = generateToken("admin-user", List.of("ADMIN"));
 
         // 1. Test validation error (empty product payload)
         String invalidProductJson = "{\"name\":\"\",\"description\":\"\",\"price\":-10.00}";
         HttpRequest invalidPost = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(invalidProductJson))
@@ -114,7 +125,7 @@ public class CrudAppIntegrationTest {
 
         // 2. Test resource missing (access non-existent product)
         HttpRequest getNonExistent = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products/999999"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products/999999"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -129,7 +140,6 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testHealthCheckProbes() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
 
         // 1. Get liveness probe
@@ -154,7 +164,6 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testMetadataEndpoint() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/api/metadata"))
@@ -169,7 +178,6 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testSwaggerAndApiDocsEndpoints() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
 
         // 1. Get Swagger-UI html
@@ -189,23 +197,15 @@ public class CrudAppIntegrationTest {
         HttpResponse<String> responseDocs = client.send(requestDocs, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, responseDocs.statusCode());
         assertTrue(responseDocs.body().contains("Generic CRUD Engine API"));
-        assertTrue(responseDocs.body().contains("/api/products"));
+        assertTrue(responseDocs.body().contains("/api/v1/products"));
     }
 
     @Test
     public void testAuditingMultiTenancyAndDynamicAttributes() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
 
         // 1. Create a token for tenant 'tenant-a'
-        Map<String, Object> realmAccess = Map.of("roles", List.of("ADMIN"));
-        String tokenA = io.jsonwebtoken.Jwts.builder()
-                .subject("user-a")
-                .claim("preferred_username", "user-a")
-                .claim("tenant", "tenant-a")
-                .claim("realm_access", realmAccess)
-                .signWith(keyPair.getPrivate(), io.jsonwebtoken.Jwts.SIG.RS256)
-                .compact();
+        String tokenA = generateTokenWithTenant("user-a", List.of("ADMIN"), "tenant-a");
 
         // 2. Post product with dynamic attributes under tenant-a
         String productJson = "{" +
@@ -216,7 +216,7 @@ public class CrudAppIntegrationTest {
                 "}";
 
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + tokenA)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(productJson))
@@ -242,17 +242,11 @@ public class CrudAppIntegrationTest {
         Long productId = Long.parseLong(idStr);
 
         // 3. Create a token for tenant 'tenant-b'
-        String tokenB = io.jsonwebtoken.Jwts.builder()
-                .subject("user-b")
-                .claim("preferred_username", "user-b")
-                .claim("tenant", "tenant-b")
-                .claim("realm_access", realmAccess)
-                .signWith(keyPair.getPrivate(), io.jsonwebtoken.Jwts.SIG.RS256)
-                .compact();
+        String tokenB = generateTokenWithTenant("user-b", List.of("ADMIN"), "tenant-b");
 
         // 4. Fetch products list with tenant-b token -> should NOT return tenant-a product
         HttpRequest getRequestB = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + tokenB)
                 .GET()
                 .build();
@@ -262,7 +256,7 @@ public class CrudAppIntegrationTest {
 
         // 5. Fetch the product directly by ID with tenant-b token -> should return 404 Not Found (filtered by tenant)
         HttpRequest getSingleRequestB = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products/" + productId))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products/" + productId))
                 .header("Authorization", "Bearer " + tokenB)
                 .GET()
                 .build();
@@ -272,14 +266,12 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testProductsEndpointAuthorized() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
-        
         String testToken = generateToken("admin-user", List.of("ADMIN"));
 
         // 1. Get products list (should return 200 OK)
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -290,7 +282,7 @@ public class CrudAppIntegrationTest {
         // 2. Post a new product (should return 201 Created)
         String productJson = "{\"name\":\"Sample Product\",\"description\":\"A sample description\",\"price\":99.99}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(productJson))
@@ -303,14 +295,13 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testProductsEndpointForbidden() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
         
         // Generate token with unprivileged role
         String guestToken = generateToken("guest-user", List.of("GUEST"));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + guestToken)
                 .GET()
                 .build();
@@ -322,12 +313,11 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testProductsEndpointUnauthorized() throws Exception {
-        int port = javalinServer.getPort();
         HttpClient client = HttpClient.newHttpClient();
 
         // 1. Call without Authorization Header
         HttpRequest requestNoAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .GET()
                 .build();
 
@@ -341,12 +331,64 @@ public class CrudAppIntegrationTest {
                 .compact();
 
         HttpRequest requestBadAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
                 .header("Authorization", "Bearer " + badToken)
                 .GET()
                 .build();
 
         HttpResponse<String> responseBadAuth = client.send(requestBadAuth, HttpResponse.BodyHandlers.ofString());
         assertEquals(401, responseBadAuth.statusCode());
+    }
+
+    @Test
+    public void testDynamicFilteringAndSorting() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String adminToken = generateToken("admin-user", List.of("ADMIN"));
+
+        // 1. Post two products with different prices
+        String p1 = "{\"name\":\"Alpha Laptop\",\"description\":\"High performance laptop\",\"price\":1200.00}";
+        String p2 = "{\"name\":\"Beta Phone\",\"description\":\"Smart mobile phone\",\"price\":800.00}";
+
+        client.send(HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .header("Authorization", "Bearer " + adminToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(p1))
+                .build(), HttpResponse.BodyHandlers.ofString());
+
+        client.send(HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .header("Authorization", "Bearer " + adminToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(p2))
+                .build(), HttpResponse.BodyHandlers.ofString());
+
+        // 2. Get with sorting by price descending
+        HttpRequest sortedGet = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products?sort=price,desc"))
+                .header("Authorization", "Bearer " + adminToken)
+                .GET()
+                .build();
+        HttpResponse<String> sortedResponse = client.send(sortedGet, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, sortedResponse.statusCode());
+        String sortedBody = sortedResponse.body();
+        // Alpha Laptop (1200) should appear before Beta Phone (800) in descending sort
+        int idxLaptop = sortedBody.indexOf("ALPHA LAPTOP");
+        int idxPhone = sortedBody.indexOf("BETA PHONE");
+        assertTrue(idxLaptop != -1);
+        assertTrue(idxPhone != -1);
+        assertTrue(idxLaptop < idxPhone);
+
+        // 3. Get with filtering (price > 1000)
+        HttpRequest filteredGet = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products?price_gt=1000"))
+                .header("Authorization", "Bearer " + adminToken)
+                .GET()
+                .build();
+        HttpResponse<String> filteredResponse = client.send(filteredGet, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, filteredResponse.statusCode());
+        String filteredBody = filteredResponse.body();
+        assertTrue(filteredBody.contains("ALPHA LAPTOP"));
+        assertTrue(!filteredBody.contains("BETA PHONE"));
     }
 }

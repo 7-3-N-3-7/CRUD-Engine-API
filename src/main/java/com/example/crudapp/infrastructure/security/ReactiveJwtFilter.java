@@ -5,8 +5,6 @@ import com.example.crudapp.logic.CrudEngine;
 import com.example.crudapp.logic.ResourceMetadata;
 import tools.jackson.databind.ObjectMapper;
 
-import io.javalin.http.Context;
-import io.javalin.http.Handler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
@@ -14,8 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,9 +36,15 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * [ARCHITECTURAL OPTIMIZATION]
+ * Reactive JWT Authentication WebFilter for Spring WebFlux.
+ * Validates OAuth2 JWT signatures, performs dynamic RBAC roles verification,
+ * and propagates tenant contexts securely across asynchronous reactive thread hops.
+ */
 @Component
-public class JwtInterceptor implements Handler {
-    private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
+public class ReactiveJwtFilter implements WebFilter {
+    private static final Logger log = LoggerFactory.getLogger(ReactiveJwtFilter.class);
 
     @Value("${keycloak.jwk-set-uri}")
     private String jwkSetUri;
@@ -54,26 +63,30 @@ public class JwtInterceptor implements Handler {
     private final Object testKeyLock = new Object();
 
     @Override
-    public void handle(Context ctx) throws Exception {
-        // Skip metadata public endpoint
-        if (ctx.path().equals("/api/metadata")) {
-            return;
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String path = exchange.getRequest().getURI().getPath();
+
+        // Skip metadata public endpoints and health checks
+        if (path.equals("/api/metadata") || path.startsWith("/health/") || path.equals("/swagger-ui") || path.equals("/api-docs")) {
+            return chain.filter(exchange);
         }
 
-        String authHeader = ctx.header("Authorization");
+        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            ctx.status(401).result("Missing or invalid token");
-            ctx.skipRemainingHandlers();
-            return;
+            exchange.getResponse().setRawStatusCode(401);
+            return exchange.getResponse().writeWith(Mono.just(
+                exchange.getResponse().bufferFactory().wrap("Missing or invalid token".getBytes(StandardCharsets.UTF_8))
+            ));
         }
 
         String token = authHeader.substring(7);
         try {
             PublicKey verificationKey = getVerificationKey(token);
             if (verificationKey == null) {
-                ctx.status(401).result("Signing key not found for token verification");
-                ctx.skipRemainingHandlers();
-                return;
+                exchange.getResponse().setRawStatusCode(401);
+                return exchange.getResponse().writeWith(Mono.just(
+                    exchange.getResponse().bufferFactory().wrap("Signing key not found for token verification".getBytes(StandardCharsets.UTF_8))
+                ));
             }
 
             Claims claims = Jwts.parser()
@@ -86,9 +99,8 @@ public class JwtInterceptor implements Handler {
             if (username == null) {
                 username = claims.getSubject();
             }
-            ctx.attribute("user", username);
 
-            // Extract roles and perform RBAC
+            // Extract roles
             List<String> userRoles = new ArrayList<>();
             Map<String, Object> realmAccess = claims.get("realm_access", Map.class);
             if (realmAccess != null) {
@@ -100,7 +112,7 @@ public class JwtInterceptor implements Handler {
                 }
             }
 
-            // Extract tenant ID and set TenantContext
+            // Extract tenant ID
             String tenant = claims.get("tenant", String.class);
             if (tenant == null) {
                 String iss = claims.getIssuer();
@@ -111,19 +123,9 @@ public class JwtInterceptor implements Handler {
             if (tenant == null) {
                 tenant = "default";
             }
-            TenantContext.setTenantId(tenant);
 
-            // Populate Spring SecurityContext
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            for (String role : userRoles) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-            }
-            SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(username, null, authorities)
-            );
-
-            // Identify resource for route
-            String resource = getResourceName(ctx);
+            // Perform RBAC
+            String resource = getResourceName(path);
             if (resource != null) {
                 ResourceMetadata<?, ?> metadata = crudManager.getMetadata(resource);
                 if (metadata != null) {
@@ -134,8 +136,10 @@ public class JwtInterceptor implements Handler {
                         boolean authorized = false;
                         for (String allowedRole : allowedRoles) {
                             if ("ANYONE".equalsIgnoreCase(allowedRole)) {
-                                authorized = true;
-                                break;
+                                sortedCheck: {
+                                    authorized = true;
+                                    break;
+                                }
                             }
                             if (userRoles.contains(allowedRole.toUpperCase())) {
                                 authorized = true;
@@ -144,41 +148,55 @@ public class JwtInterceptor implements Handler {
                         }
 
                         if (!authorized) {
-                            ctx.status(403).result("Forbidden: Insufficient privileges");
-                            ctx.skipRemainingHandlers();
-                            return;
+                            exchange.getResponse().setRawStatusCode(403);
+                            return exchange.getResponse().writeWith(Mono.just(
+                                exchange.getResponse().bufferFactory().wrap("Forbidden: Insufficient privileges".getBytes(StandardCharsets.UTF_8))
+                            ));
                         }
                     }
                 }
             }
 
+            // Set tenant context & authentication in Reactive Context
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            for (String role : userRoles) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+            final String finalTenant = tenant;
+            final String finalUser = username;
+            return chain.filter(exchange)
+                    .contextWrite(Context.of("tenantId", finalTenant, "username", finalUser))
+                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+
         } catch (Exception e) {
             log.error("Token verification failed", e);
-            ctx.status(401).result("Invalid token: " + e.getMessage());
-            ctx.skipRemainingHandlers();
+            exchange.getResponse().setRawStatusCode(401);
+            return exchange.getResponse().writeWith(Mono.just(
+                exchange.getResponse().bufferFactory().wrap(("Invalid token: " + e.getMessage()).getBytes(StandardCharsets.UTF_8))
+            ));
         }
     }
 
-    private String getResourceName(Context ctx) {
-        String resource = null;
-        try {
-            resource = ctx.pathParam("resource");
-        } catch (Exception e) {
-            // ignore
-        }
-        if (resource == null || resource.isEmpty()) {
-            String path = ctx.path();
-            if (path.startsWith("/api/")) {
-                String remaining = path.substring(5);
-                int slashIdx = remaining.indexOf('/');
-                if (slashIdx != -1) {
-                    resource = remaining.substring(0, slashIdx);
-                } else {
-                    resource = remaining;
+    private String getResourceName(String path) {
+        if (path.startsWith("/api/")) {
+            String remaining = path.substring(5);
+            // Ignore API versions if present (e.g. v1/products -> products)
+            if (remaining.startsWith("v") && remaining.contains("/")) {
+                int nextSlash = remaining.indexOf('/');
+                if (Character.isDigit(remaining.charAt(nextSlash - 1)) || remaining.substring(0, nextSlash).matches("v\\d+")) {
+                    remaining = remaining.substring(nextSlash + 1);
                 }
             }
+            int slashIdx = remaining.indexOf('/');
+            if (slashIdx != -1) {
+                return remaining.substring(0, slashIdx);
+            } else {
+                return remaining;
+            }
         }
-        return resource;
+        return null;
     }
 
     private PublicKey getVerificationKey(String token) throws Exception {
@@ -228,6 +246,7 @@ public class JwtInterceptor implements Handler {
         return kf.generatePublic(spec);
     }
 
+    @SuppressWarnings("unchecked")
     private synchronized void fetchJwks() {
         try {
             log.info("Fetching Keycloak JWKS from: {}", jwkSetUri);

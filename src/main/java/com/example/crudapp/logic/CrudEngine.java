@@ -3,6 +3,7 @@ package com.example.crudapp.logic;
 import com.example.crudapp.data.core.BaseEntity;
 import com.example.crudapp.data.core.CrudRepository;
 import com.example.crudapp.infrastructure.annotations.CrudResource;
+import com.example.crudapp.infrastructure.mapping.ReflectionCache;
 import com.example.crudapp.logic.core.CrudService;
 import com.example.crudapp.logic.core.CrudInterceptor;
 import jakarta.annotation.PostConstruct;
@@ -31,6 +32,9 @@ public class CrudEngine {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private ServiceRegistry serviceRegistry;
 
     @Value("${crud.scan.package:com.example.crudapp.data}")
     private String scanPackage = "com.example.crudapp.data";
@@ -127,6 +131,9 @@ public class CrudEngine {
             };
         }
 
+        // Decouple service resolution via ServiceRegistry
+        service = serviceRegistry.getService(entityClass, service);
+
         CrudInterceptor<T> interceptor = (CrudInterceptor<T>) interceptors.getOrDefault(entityClass, new CrudInterceptor<T>() {});
         List<ResourceMetadata.FieldInfo> fieldMetadata = inspectFields(dtoClass);
 
@@ -134,6 +141,7 @@ public class CrudEngine {
                 .entityClass(entityClass)
                 .dtoClass((Class<Object>) dtoClass)
                 .basePath(path)
+                .version(annotation.version())
                 .repository(repository)
                 .service(service)
                 .interceptor(interceptor)
@@ -145,16 +153,17 @@ public class CrudEngine {
 
     private List<ResourceMetadata.FieldInfo> inspectFields(Class<?> clazz) {
         List<ResourceMetadata.FieldInfo> infos = new ArrayList<>();
-        for (Field field : clazz.getDeclaredFields()) {
+        for (Field field : ReflectionCache.getDeclaredFields(clazz)) {
             Map<String, Object> constraints = new HashMap<>();
             boolean required = field.isAnnotationPresent(NotNull.class) || field.isAnnotationPresent(NotBlank.class);
             
-            if (field.isAnnotationPresent(Size.class)) {
-                Size size = field.getAnnotation(Size.class);
+            Size size = ReflectionCache.getAnnotation(field, Size.class);
+            if (size != null) {
                 constraints.put("min", size.min());
                 constraints.put("max", size.max());
             }
-            if (field.isAnnotationPresent(Positive.class)) {
+            Positive positive = ReflectionCache.getAnnotation(field, Positive.class);
+            if (positive != null) {
                 constraints.put("positive", true);
             }
 
