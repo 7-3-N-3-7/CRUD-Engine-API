@@ -20,6 +20,54 @@ The backend is built as a **100% native Java application** running on a high-thr
 
 ---
 
+## 🛠️ Frameworks & Libraries Lifecycle Interplay
+
+The following diagram illustrates how all the integrated enterprise libraries and frameworks collaborate during the application lifecycle (from bootstrap-time code generation to request-time security validation and database persistence):
+
+```mermaid
+graph TD
+    subgraph SetupPhase [Phase 1: Bootstrapping & Code Generation]
+        LB[Liquibase 5] -->|1. Migrates Schema & RLS Policies| PG[(PostgreSQL)]
+        SB[Spring Boot 4] -->|2. Initializes Context| BB[Byte Buddy]
+        BB -->|3. Compiles dynamic RestControllers| SB
+    end
+
+    subgraph Authentication [Phase 2: Client Request & Identity Verification]
+        Client[Client React App] -->|4. Authenticates & gets Token| KC[Keycloak Server]
+        KC -->|5. Returns signed RS256 JWT| Client
+        Client -->|6. Requests with Bearer Token| Netty[Spring WebFlux / Netty]
+        Netty -->|7. Parses & validates JWT| JJWT[JJWT Library]
+        JJWT -->|8. Binds tracing context to MDC| LBK[Logback Logging]
+    end
+
+    subgraph Processing [Phase 3: Validation, Logic & Database Isolation]
+        Netty -->|9. Sanitizes & validates JSON| JK[Jackson 3 / Validator]
+        JK -->|10. Delegates transaction| JPA[Spring Data JPA / Hibernate]
+        JPA -->|11. Sets app.current_tenant| PG
+        PG -->|12. Enforces RLS multi-tenant filters| DB_Store[(PostgreSQL Tables)]
+    end
+
+    classDef setup fill:#fef08a,stroke:#ca8a04,stroke-width:2px;
+    classDef auth fill:#bfdbfe,stroke:#2563eb,stroke-width:2px;
+    classDef process fill:#bbf7d0,stroke:#16a34a,stroke-width:2px;
+    class LB,SB,BB setup;
+    class Client,KC,Netty,JJWT,LBK auth;
+    class JK,JPA,PG,DB_Store process;
+```
+
+### Integrated Frameworks & Libraries Index:
+*   **Spring Boot 4 & WebFlux (Netty)**: Non-blocking web server engine executing high-concurrency event loops.
+*   **Byte Buddy**: Compiles and registers dynamic REST controller classes during Spring's bootstrap scanning phase.
+*   **Keycloak**: Enterprise Identity and Access Management (IAM) server issuing signed OAuth2 JWTs.
+*   **JJWT**: Parses and validates the cryptographic signatures of JWT claims against Keycloak certificates.
+*   **Logback**: Provides logging services with Mapped Diagnostic Context (MDC) parameters to trace requests asynchronously.
+*   **Jackson 3 (Databind)**: JSON parser stripping XSS scripting tags and rejecting unwhitelisted fields.
+*   **Spring Data JPA & Hibernate**: Object-relational mapping querying database views and executing RLS settings.
+*   **Liquibase**: Declarative migration engine version-controlling schema schemas and database parameters.
+*   **PostgreSQL**: Secure relational database running Row-Level Security (RLS) isolation logic.
+
+---
+
 ## 🏗️ Architectural Framework: Data-Logic-Interface (DLI)
 
 To maintain a clean system, this project enforces the **Data-Logic-Interface (DLI)** pattern. Each layer has strict responsibilities and boundaries:

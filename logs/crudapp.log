@@ -28418,3 +28418,8 @@ SET
 2026-06-04 23:57:33 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [Req:] [Tenant:] [User:] - Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-06-04 23:57:33 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown initiated...
 2026-06-04 23:57:33 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown completed.
+2026-06-04 23:58:09 [main] INFO  com.example.crudapp.Main [Req:] [Tenant:] [User:] - Starting Generic CRUD Application (Spring Boot)...
+2026-06-04 23:58:09 [main] INFO  com.example.crudapp.Main [Req:] [Tenant:] [User:] - --------------------------------------------------
+2026-06-04 23:58:09 [main] INFO  com.example.crudapp.Main [Req:] [Tenant:] [User:] - 🔑 TEST JWT TOKEN (for Postman/Browser extension):
+2026-06-04 23:58:09 [main] INFO  com.example.crudapp.Main [Req:] [Tenant:] [User:] - Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.zVMnd2RVVkjfD8Fhbd_VWyrsqdL3-xxrLQGT9kJaJSiNCa_Lbu0rwaIKSdGN5IKd
+2026-06-04 23:58:09 [main] INFO  com.example.crudapp.Main [Req:] [Tenant:] [User:] - --------------------------------------------------
