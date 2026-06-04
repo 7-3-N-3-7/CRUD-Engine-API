@@ -40,11 +40,15 @@ jobs:
         run: mvn compile
 
       - name: Start Spring Boot Backend in Background
+        env:
+          RUNNER_TRACKING_ID: ""
         run: |
           mvn spring-boot:run > backend.log &
           echo "Spring Boot starting in background..."
 
       - name: Start Localtunnel and Expose Port 8080
+        env:
+          RUNNER_TRACKING_ID: ""
         run: |
           # Install localtunnel globally to ensure it's available
           npm install -g localtunnel
