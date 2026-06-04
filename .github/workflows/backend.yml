@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   run-and-deploy:
@@ -26,7 +26,12 @@ jobs:
       - name: Spin up Postgres and Keycloak
         run: |
           docker compose up -d
-          # Wait for Postgres to be healthy
+          echo "Waiting for PostgreSQL database to be ready..."
+          until docker exec crud-postgres pg_isready -U user; do
+            echo "PostgreSQL is not ready yet, sleeping 1s..."
+            sleep 1
+          done
+          echo "PostgreSQL is ready and accepting connections!"
           docker compose ps
 
       - name: Set up JDK 25
