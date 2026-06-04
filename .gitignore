@@ -8,3 +8,4 @@ target/
 *.log
 .DS_Store
 frontend_repo/
+frontend/test-results/

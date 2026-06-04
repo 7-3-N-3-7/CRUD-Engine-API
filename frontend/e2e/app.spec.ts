@@ -1,3 +1,4 @@
+import { createPrivateKey, createPublicKey, sign, verify } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
@@ -22,53 +23,37 @@ const TEST_PRIVATE_KEY_JWK = {
 
 /**
  * Generate a signed RS256 JWT token usable against the test backend.
- * Uses the Web Crypto API available inside Playwright's browser context.
- *
- * IMPORTANT: The page MUST have navigated to a real URL (not about:blank)
- * before calling this, because crypto.subtle requires a secure context.
+ * Uses Node crypto in the test runner, avoiding browser secure-context requirements.
  */
+const TEST_PRIVATE_KEY = createPrivateKey({
+  key: TEST_PRIVATE_KEY_JWK,
+  format: 'jwk',
+});
+
+const TEST_PUBLIC_KEY = createPublicKey(TEST_PRIVATE_KEY);
+
+function encodeBase64Url(value: string): string {
+  return Buffer.from(value).toString('base64url');
+}
+
 async function mintJwt(
-  page: import('@playwright/test').Page,
   username = 'admin-user',
   roles: string[] = ['ADMIN'],
   tenant = 'tenant-e2e',
 ): Promise<string> {
-  return page.evaluate(
-    async ({ privateKey, username, roles, tenant }) => {
-      const header = { alg: 'RS256', typ: 'JWT', kid: 'test-key-id' };
-      const payload = {
-        sub: username,
-        preferred_username: username,
-        tenant,
-        realm_access: { roles },
-        iss: 'http://localhost:8081/realms/crud-realm',
-        exp: Math.floor(Date.now() / 1000) + 3600,
-      };
+  const header = { alg: 'RS256', typ: 'JWT', kid: 'test-key-id' };
+  const payload = {
+    sub: username,
+    preferred_username: username,
+    tenant,
+    realm_access: { roles },
+    iss: 'http://localhost:8081/realms/crud-realm',
+    exp: Math.floor(Date.now() / 1000) + 3600,
+  };
 
-      const b64url = (arr: Uint8Array) =>
-        btoa(String.fromCharCode(...arr))
-          .replace(/=/g, '')
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_');
-
-      const enc = new TextEncoder();
-      const headerStr = b64url(enc.encode(JSON.stringify(header)));
-      const payloadStr = b64url(enc.encode(JSON.stringify(payload)));
-      const input = `${headerStr}.${payloadStr}`;
-
-      const key = await crypto.subtle.importKey(
-        'jwk',
-        privateKey,
-        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-        false,
-        ['sign'],
-      );
-
-      const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, enc.encode(input));
-      return `${input}.${b64url(new Uint8Array(sig))}`;
-    },
-    { privateKey: TEST_PRIVATE_KEY_JWK, username, roles, tenant },
-  );
+  const input = `${encodeBase64Url(JSON.stringify(header))}.${encodeBase64Url(JSON.stringify(payload))}`;
+  const signature = sign('RSA-SHA256', Buffer.from(input), TEST_PRIVATE_KEY).toString('base64url');
+  return `${input}.${signature}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -132,10 +117,8 @@ test.describe('Backend connectivity', () => {
 test.describe('CRUD operations via backend API', () => {
   let createdId: number;
 
-  test('POST creates a product', async ({ page, request }) => {
-    // Navigate to a real page so crypto.subtle is available (secure context)
-    await page.goto('/');
-    const token = await mintJwt(page);
+  test('POST creates a product', async ({ request }) => {
+    const token = await mintJwt();
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
       headers: {
@@ -157,9 +140,8 @@ test.describe('CRUD operations via backend API', () => {
     createdId = body.id;
   });
 
-  test('GET ALL returns the created product', async ({ page, request }) => {
-    await page.goto('/');
-    const token = await mintJwt(page);
+  test('GET ALL returns the created product', async ({ request }) => {
+    const token = await mintJwt();
 
     const response = await request.get(`${BACKEND}/api/v1/products?size=100`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -170,10 +152,9 @@ test.describe('CRUD operations via backend API', () => {
     expect(body).toContain('E2E TEST WIDGET');
   });
 
-  test('GET by ID returns the created product', async ({ page, request }) => {
+  test('GET by ID returns the created product', async ({ request }) => {
     test.skip(!createdId, 'No product was created — skipping');
-    await page.goto('/');
-    const token = await mintJwt(page);
+    const token = await mintJwt();
 
     const response = await request.get(`${BACKEND}/api/v1/products/${createdId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -184,10 +165,9 @@ test.describe('CRUD operations via backend API', () => {
     expect(body.id).toBe(createdId);
   });
 
-  test('PUT updates the product', async ({ page, request }) => {
+  test('PUT updates the product', async ({ request }) => {
     test.skip(!createdId, 'No product was created — skipping');
-    await page.goto('/');
-    const token = await mintJwt(page);
+    const token = await mintJwt();
 
     const response = await request.put(`${BACKEND}/api/v1/products/${createdId}`, {
       headers: {
@@ -207,10 +187,9 @@ test.describe('CRUD operations via backend API', () => {
     expect(body.price).toBe(99.99);
   });
 
-  test('DELETE removes the product', async ({ page, request }) => {
+  test('DELETE removes the product', async ({ request }) => {
     test.skip(!createdId, 'No product was created — skipping');
-    await page.goto('/');
-    const token = await mintJwt(page);
+    const token = await mintJwt();
 
     const delResponse = await request.delete(`${BACKEND}/api/v1/products/${createdId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -226,6 +205,32 @@ test.describe('CRUD operations via backend API', () => {
 });
 
 test.describe('Security enforcement', () => {
+  test('mintJwt creates a verifiable RS256 token', async () => {
+    const token = await mintJwt('admin-user', ['ADMIN'], 'tenant-e2e');
+    const [encodedHeader, encodedPayload, encodedSignature] = token.split('.');
+
+    expect([encodedHeader, encodedPayload, encodedSignature]).toHaveLength(3);
+    expect(JSON.parse(Buffer.from(encodedHeader, 'base64url').toString())).toMatchObject({
+      alg: 'RS256',
+      typ: 'JWT',
+      kid: 'test-key-id',
+    });
+    expect(JSON.parse(Buffer.from(encodedPayload, 'base64url').toString())).toMatchObject({
+      sub: 'admin-user',
+      preferred_username: 'admin-user',
+      tenant: 'tenant-e2e',
+      realm_access: { roles: ['ADMIN'] },
+    });
+    expect(
+      verify(
+        'RSA-SHA256',
+        Buffer.from(`${encodedHeader}.${encodedPayload}`),
+        TEST_PUBLIC_KEY,
+        Buffer.from(encodedSignature, 'base64url'),
+      ),
+    ).toBe(true);
+  });
+
   test('401 when no auth token is provided', async ({ request }) => {
     const response = await request.get(`${BACKEND}/api/v1/products`, {
       failOnStatusCode: false,
@@ -233,9 +238,8 @@ test.describe('Security enforcement', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('403 when GUEST role tries to access products', async ({ page, request }) => {
-    await page.goto('/');
-    const token = await mintJwt(page, 'guest-user', ['GUEST']);
+  test('403 when GUEST role tries to access products', async ({ request }) => {
+    const token = await mintJwt('guest-user', ['GUEST']);
 
     const response = await request.get(`${BACKEND}/api/v1/products`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -244,9 +248,8 @@ test.describe('Security enforcement', () => {
     expect(response.status()).toBe(403);
   });
 
-  test('400 for invalid payload with unknown fields', async ({ page, request }) => {
-    await page.goto('/');
-    const token = await mintJwt(page);
+  test('400 for invalid payload with unknown fields', async ({ request }) => {
+    const token = await mintJwt();
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
       headers: {
@@ -264,9 +267,8 @@ test.describe('Security enforcement', () => {
     expect(response.status()).toBe(400);
   });
 
-  test('400 for validation errors (negative price)', async ({ page, request }) => {
-    await page.goto('/');
-    const token = await mintJwt(page);
+  test('400 for validation errors (negative price)', async ({ request }) => {
+    const token = await mintJwt();
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
       headers: {
@@ -288,12 +290,9 @@ test.describe('Security enforcement', () => {
 });
 
 test.describe('Multi-tenant isolation', () => {
-  test('tenant-B cannot see tenant-A products', async ({ page, request }) => {
-    // Navigate first so crypto.subtle is available
-    await page.goto('/');
-
+  test('tenant-B cannot see tenant-A products', async ({ request }) => {
     // Create product as tenant-A
-    const tokenA = await mintJwt(page, 'user-a', ['ADMIN'], 'tenant-alpha');
+    const tokenA = await mintJwt('user-a', ['ADMIN'], 'tenant-alpha');
     const createRes = await request.post(`${BACKEND}/api/v1/products`, {
       headers: {
         Authorization: `Bearer ${tokenA}`,
@@ -308,7 +307,7 @@ test.describe('Multi-tenant isolation', () => {
     expect(createRes.status()).toBe(201);
 
     // Attempt to list products as tenant-B
-    const tokenB = await mintJwt(page, 'user-b', ['ADMIN'], 'tenant-beta');
+    const tokenB = await mintJwt('user-b', ['ADMIN'], 'tenant-beta');
     const listRes = await request.get(`${BACKEND}/api/v1/products?size=100`, {
       headers: { Authorization: `Bearer ${tokenB}` },
     });
