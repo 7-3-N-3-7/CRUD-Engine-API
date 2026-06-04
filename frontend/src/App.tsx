@@ -114,7 +114,7 @@ const ARCH_NODES = [
 ];
 
 function App() {
-  const [backendUrl, setBackendUrl] = useState('http://localhost:8080');
+  const [backendUrl, setBackendUrl] = useState<string | null>(null);
 
   // Detect deployed backend URL on mount
   useEffect(() => {
@@ -136,11 +136,15 @@ function App() {
           if (data.url) {
             console.log("Detected backendUrl from backend-url.json:", data.url);
             setBackendUrl(data.url);
+            return;
           }
         }
       } catch (e) {
-        console.log("No deployed backend-url.json found, using default:", backendUrl);
+        console.log("No deployed backend-url.json found.");
       }
+
+      // Fallback
+      setBackendUrl('http://localhost:8080');
     };
     detectUrl();
   }, []);
@@ -222,34 +226,45 @@ function App() {
   };
 
   // Load API Metadata from Spring Boot
-  const fetchMetadata = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/metadata`, {
-        headers: {
-          'Bypass-Tunnel-Reminder': 'true'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMetadata(data);
-        setIsUsingMock(false);
-        const keys = Object.keys(data);
-        if (keys.length > 0) {
-          setSelectedResource(keys[0]);
-        }
-      } else {
-        throw new Error("Metadata request failed");
-      }
-    } catch (e) {
-      console.warn("Backend metadata could not be fetched. Using mock fallback.", e);
-      setMetadata(MOCK_METADATA);
-      setIsUsingMock(true);
-      setSelectedResource('products');
-    }
-  };
-
   useEffect(() => {
+    if (backendUrl === null) return;
+
+    let active = true;
+    const fetchMetadata = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/metadata`, {
+          headers: {
+            'Bypass-Tunnel-Reminder': 'true'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (active) {
+            setMetadata(data);
+            setIsUsingMock(false);
+            const keys = Object.keys(data);
+            if (keys.length > 0) {
+              setSelectedResource(keys[0]);
+            }
+          }
+        } else {
+          throw new Error("Metadata request failed");
+        }
+      } catch (e) {
+        if (active) {
+          console.warn("Backend metadata could not be fetched. Using mock fallback.", e);
+          setMetadata(MOCK_METADATA);
+          setIsUsingMock(true);
+          setSelectedResource('products');
+        }
+      }
+    };
+
     fetchMetadata();
+
+    return () => {
+      active = false;
+    };
   }, [backendUrl]);
 
   useEffect(() => {
@@ -525,7 +540,7 @@ function App() {
             <input 
               type="text" 
               className="input-control" 
-              value={backendUrl} 
+              value={backendUrl || ''} 
               onChange={e => setBackendUrl(e.target.value)} 
             />
           </div>
