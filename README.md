@@ -6,7 +6,7 @@
 [![Spring WebFlux](https://img.shields.io/badge/Spring%20WebFlux-Reactive-blue.svg)](https://spring.io/projects/spring-framework)
 [![Keycloak](https://img.shields.io/badge/Keycloak-24.0.2-red.svg)](https://www.keycloak.org/)
 
-An educational, enterprise-ready, metadata-driven CRUD engine and frontend testing panel designed to teach students **advanced software engineering principles**, design patterns, and modern security patterns.
+An educational, enterprise-ready, metadata-driven CRUD engine and frontend testing panel designed to teach students **advanced software engineering principles**, design patterns, and modern reactive security patterns.
 
 ---
 
@@ -14,7 +14,9 @@ An educational, enterprise-ready, metadata-driven CRUD engine and frontend testi
 
 Traditional applications require developers to write repetitive controllers, services, and repositories for every single database entity (e.g., `Product`, `User`, `Order`). This is called **boilerplate code**.
 
-This project implements a **Generic CRUD Engine**. By defining a simple database entity class and annotating it, the engine **dynamically generates** and secures HTTP endpoints at runtime. You write the infrastructure once, and the application expands dynamically.
+This project implements a **Generic CRUD Engine**. By defining a simple database entity class and annotating it, the engine **dynamically generates** and secures HTTP endpoints at runtime using **Byte Buddy** class generation and dynamic WebFlux functional mapping. You write the infrastructure once, and the application expands dynamically.
+
+The backend is built as a **100% native Java application** running on a high-throughput, non-blocking Spring WebFlux reactive loop (Netty), completely auditing and verifying the elimination of custom Python scripts from all runtime and build pipelines.
 
 ---
 
@@ -27,42 +29,46 @@ graph TD
     subgraph Interface Layer [Interface Layer: API Surface]
         WebFlux[Spring WebFlux / Netty] -->|Routes HTTP Requests| Controller[UniversalCrudController]
         Controller -->|Validates & Mapped to DTO| DTO[ProductRecord / Java Records]
+        Limiter[ReactiveRateLimiterFilter] -->|Token Bucket Rate Limiting| WebFlux
+        Xss[XssSanitizingDeserializer] -->|Cleans Inputs| DTO
     end
 
     subgraph Logic Layer [Logic Layer: Orchestration Engine]
         Controller -->|Calls| CrudEngine[CrudEngine]
         CrudEngine -->|Resolves Service| Service[CrudService]
         CrudEngine -->|Invokes Hooks| Interceptor[CrudInterceptor]
+        GlobalHandler[GlobalExceptionHandler] -->|RFC 7807 Problem Details| Controller
     end
 
     subgraph Data Layer [Data Layer: Persistence]
-        Service -->|Queries| Repository[CrudRepository]
-        Repository -->|JPA / Hibernate| DB[(PostgreSQL)]
+        Service -->|Queries in boundedElastic| Repository[CrudRepository]
+        Repository -->|JPA / Hibernate / RLS| DB[(PostgreSQL)]
         Liquibase[Liquibase Migrations] -->|Pre-establishes| Schema[DB Schema]
+        RLS[Row-Level Security] -->|Isolates Tenants| DB
     end
 
     classDef interface fill:#d1e7dd,stroke:#0f5132,stroke-width:2px;
     classDef logic fill:#cff4fc,stroke:#087990,stroke-width:2px;
     classDef data fill:#f8d7da,stroke:#842029,stroke-width:2px;
-    class WebFlux,Controller,DTO interface;
-    class CrudEngine,Service,Interceptor logic;
-    class Repository,DB,Liquibase,Schema data;
+    class WebFlux,Controller,DTO,Limiter,Xss interface;
+    class CrudEngine,Service,Interceptor,GlobalHandler logic;
+    class Repository,DB,Liquibase,Schema,RLS data;
 ```
 
 ### 1. Data Layer (`com.example.crudapp.data`)
 *   **Responsibility**: Database schemas, entities, and raw persistence.
 *   **Key Components**: `BaseEntity` (provides hierarchical Parent-Child mapping), `CrudRepository` (encapsulates Hibernate JPA queries), and schema-defining entities like `Product`.
-*   **Constraint**: This layer has zero knowledge of HTTP requests, API models (DTOs), or authentication mechanisms.
+*   **Tenant Isolation**: Implemented via PostgreSQL **Row-Level Security (RLS)** at the database layer. Transactions set a local parameter `app.current_tenant` to restrict records visibility contextually.
 
 ### 2. Logic Layer (`com.example.crudapp.logic`)
 *   **Responsibility**: Business rules validation, dynamic resource discovery, and lifecycle orchestration.
 *   **Key Components**: `CrudEngine` (scans, registers, and maps components), `CrudService` (generic business queries), and interceptors (custom lifecycle hooks).
-*   **Constraint**: Acts as the central transaction-boundary manager. It bridges entities (Data) to records (Interface) without coupling them directly.
+*   **Exception Mapping**: Spring Boot's native **RFC 7807 Problem Details** support is integrated. `GlobalExceptionHandler` converts validation failures, optimistic locking conflicts, security violations, and database integrity failures into standard Problem Details JSON payloads.
 
 ### 3. Interface Layer (`com.example.crudapp.api`)
 *   **Responsibility**: Exposing the API surface, validating input request payloads, and handling HTTP routing.
 *   **Key Components**: `DynamicControllerRegister` (generates RestControllers via Byte Buddy at runtime), `UniversalCrudController` (handles generic requests), and `Records` (immutable DTOs like `ProductRecord`).
-*   **Constraint**: Never directly accesses the database. DTOs are strictly immutable, matching client communication contracts.
+*   **Security Filters**: Includes `ReactiveRateLimiterFilter` (token-bucket rate limiting), CORS origin whitelisting filters, and standard input sanitizers like the global `XssSanitizingDeserializer` to prevent cross-site scripting (XSS).
 
 ---
 
@@ -76,34 +82,33 @@ This codebase serves as a living laboratory for advanced Java design patterns:
 
 ---
 
-## 🔒 Security Architecture: Keycloak IAM Integration
+## 🔒 Security Architecture: Enterprise-Hardened OIDC
 
 The API is fully secured using **OAuth 2.0 / OpenID Connect (OIDC)** via Keycloak.
 
 ```
 Incoming HTTP request -> Header: Authorization: Bearer <JWT>
-                        |
-                        v
-    JwtInterceptor (Parses JWT, decodes Key ID 'kid')
-                        |
-                        +---> Verifies signature (RS256) via JWKS
-                        |
-                        +---> Extracts user name (preferred_username)
-                        |
-                        +---> Extracts user roles (realm_access.roles)
-                        |
-                        v
-      Checks authorization matching @CrudResource(roles = ...)
+                         |
+                         v
+    ReactiveJwtFilter (Validates Token, extracts Username/Roles/Tenant)
+                         |
+                         +---> Checks authorization matching @CrudResource(roles = ...)
+                         |
+                         +---> Registers SecurityContext & Reactive Context variables
+                         |
+                         v
+       Propagates TenantContext dynamically to JDBC boundary for RLS
 ```
 
 *   **Public vs. Private Routes**: The `/api/metadata` endpoint is public. Dynamic endpoints like `/api/products` are secured and require authentication.
-*   **JWKS (JSON Web Key Sets)**: The `JwtInterceptor` fetches Keycloak's public certificates on demand from the certificate URI and caches them dynamically to prevent network latency.
-*   **Role-Based Access Control (RBAC)**: Allowed roles are specified on the entity class (e.g. `@CrudResource(roles={"ADMIN", "USER"})`). The interceptor automatically validates that the JWT contains a matching role.
-*   **Mock Verification for Tests**: To keep tests fast and independent of the Keycloak container, tests generate a local RSA keypair, register the public key using `@DynamicPropertySource`, and sign test tokens dynamically.
+*   **PostgreSQL Row-Level Security (RLS)**: Database-level isolation restricts queries dynamically based on the active JWT tenant claim, preventing data exposure between tenants.
+*   **Token-Bucket Rate Limiter**: Limits client requests to a max capacity of 50 requests/minute per IP, returning a standard `429 Too Many Requests` problem detail when exceeded.
+*   **XSS Sanitization & Jackson Payload Restriction**: All incoming JSON payloads undergo global sanitization to strip dangerous script tags, and the deserializer is configured to strictly fail on unknown/unwhitelisted properties.
+*   **Correlation Tracing**: A unique `requestId` is generated for each request and propagated across asynchronous thread boundaries using reactive logback MDC, matching log statements to specific web execution flows.
 
 ---
 
-## 📦 Database Migrations with Liquibase
+## 📦 Database Migrations & Validation
 
 Instead of letting Hibernate auto-generate the database schema (`ddl-auto=update`), which is risky for production systems, this project uses **Liquibase**.
 *   **Version Control for DB**: All database migrations are described declaratively in `db.changelog-master.xml`.
@@ -150,12 +155,6 @@ npm run dev
 ```
 The frontend will boot up on `http://localhost:5173`. Open this URL in your browser to access the platform.
 
-### Step 5: Interact with the APIs & Dashboard
-*   **Frontend Dashboard Panel**: Open `http://localhost:5173` to explore the interactive architecture visualizer and execute live CRUD queries.
-*   **Public Metadata**: `GET http://localhost:8080/api/metadata`
-*   **Swagger API Docs**: `http://localhost:8080/swagger-ui`
-*   **Secure API Endpoint**: `GET http://localhost:8080/api/products`
-
 ---
 
 ## 🎨 Interactive TypeScript Frontend Dashboard
@@ -172,7 +171,7 @@ To compile the project and execute the integration tests, run:
 ```bash
 mvn clean test
 ```
-The test suite (`CrudAppIntegrationTest.java`) tests the WebFlux pipelines, correlation ID tracing, metadata mapping, role-based access control (403 Forbidden), and authorization policies.
+The test suite (`CrudAppIntegrationTest.java`) tests the WebFlux pipelines, correlation ID tracing, metadata mapping, role-based access control, rate-limiting, and validation mapping. All responses follow the RFC 7807 Problem Details structure.
 
 ---
 

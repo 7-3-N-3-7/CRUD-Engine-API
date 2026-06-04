@@ -1,8 +1,8 @@
 # Developer Setup & Extension Manual: Dynamic CRUD Engine
 
-Welcome to the **Dynamic CRUD Engine**. This project is a metadata-driven, enterprise-grade REST engine combining the data safety and persistence power of **Spring Boot (Spring Data JPA)** with the non-blocking, reactive web capabilities of **Spring WebFlux**. 
+Welcome to the **Dynamic CRUD Engine**. This project is a metadata-driven, enterprise-grade REST engine combining the data safety and persistence power of **Spring Boot (Spring Data JPA)** with the non-blocking, reactive web capabilities of **Spring WebFlux (Netty)**. 
 
-This manual details how to set up the infrastructure, register new resource endpoints, extend core behaviors, implement custom logic hooks, and manage the frontend application.
+This manual details how to set up the infrastructure, register new resource endpoints, extend core behaviors, implement custom logic hooks, manage the frontend application, and configure advanced production-grade features.
 
 ---
 
@@ -44,6 +44,19 @@ spring.jpa.properties.hibernate.format_sql=true
 # Keycloak Token Signature verification certs
 keycloak.jwk-set-uri=http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs
 keycloak.issuer=http://localhost:8081/realms/crud-realm
+
+# Input Payload and Network Restrictions (Slowloris & Body Limit Protections)
+server.max-http-header-size=8KB
+spring.codec.max-in-memory-size=2MB
+server.netty.connection-timeout=10s
+server.netty.idle-timeout=30s
+server.netty.max-keep-alive-requests=100
+
+# Strict JSON Schema Validation
+spring.jackson.deserialization.fail-on-unknown-properties=true
+
+# RFC 7807 Problem Details Support
+spring.webflux.problemdetails.enabled=true
 ```
 
 ---
@@ -192,9 +205,9 @@ public class DeviceInterceptor implements CrudInterceptor<Device> {
 
 ---
 
-## 5. Liquibase Database Migrations
+## 5. Liquibase Database Migrations & RLS Policies
 
-Every schema adjustment (creating tables, altering columns) must be configured in Liquibase changesets to enable automated deployment pipelines.
+Every schema adjustment must be configured in Liquibase changesets. To enforce Row-Level Security (RLS) at the database layer, the changesets should also create policies.
 
 Add a changeset to `src/main/resources/db/changelog/db.changelog-master.xml`:
 ```xml
@@ -220,36 +233,44 @@ Add a changeset to `src/main/resources/db/changelog/db.changelog-master.xml`:
                              referencedTableName="baseentity"
                              onDelete="CASCADE"/>
 </changeSet>
+
+<changeSet id="6" author="security-team" dbms="postgresql">
+    <!-- Enable RLS on the baseentity table if not already enabled -->
+    <sql>
+        ALTER TABLE baseentity ENABLE ROW LEVEL SECURITY;
+        DROP POLICY IF EXISTS tenant_isolation_policy ON baseentity;
+        CREATE POLICY tenant_isolation_policy ON baseentity
+        USING (tenant_id = current_setting('app.current_tenant', true))
+        WITH CHECK (tenant_id = current_setting('app.current_tenant', true));
+    </sql>
+</changeSet>
 ```
 
 ---
 
-## 6. Core Enterprise Mechanisms
+## 6. Core Enterprise & Security Mechanisms
 
-Understanding how the background engine handles requests is essential for modifying or debugging.
-
-### Request Flow Diagram
+### Dynamic Row-Level Security (RLS) Isolation
+The dynamic security context sets a transaction-local variable (`app.current_tenant`) inside the database connection right before executing SQL statements. When running on WebFlux, this is achieved by capturing the tenant ID from the subscriber context and injecting it inside the database-bounded blocking scheduler (`boundedElastic` thread pool boundary):
+```sql
+SET LOCAL app.current_tenant = 'tenant-id';
 ```
-Client -> HTTP Headers -> TracingFilter (Generates Request-ID)
-   -> JwtInterceptor (Validates Token, populates TenantContext + Spring Security Context)
-   -> CRUD Resource mapping checks Role privileges (RBAC)
-   -> DTO Mapper maps payload to Entity
-   -> Business Interceptors execute Hooks (beforeCreate / beforeUpdate)
-   -> BaseEntity Persist (Populates Auditing, TenantID, Revision Version)
-   -> Database Write
-   -> Business Interceptors execute Hooks (afterCreate / afterUpdate)
-   -> Response (JSON payload + X-Request-ID Header)
-   -> AFTER Filter (Flushes MDC, ThreadLocal TenantContext, SecurityContext to prevent leaks)
-```
+Any queries issued in that transaction will only select or write rows matching that `tenant_id`.
 
-### Key Components
+### Token-Bucket Rate Limiting Filter
+A Token Bucket filter (`ReactiveRateLimiterFilter`) intercepts all WebFlux requests before routing them.
+- **Rules**: Max capacity of 50 tokens per IP, refilling at a rate of 50 tokens per minute.
+- **Overlimit response**: Returns `429 Too Many Requests` formatted as a Problem Details response.
 
-*   **Multi-Tenancy Segregation:** `CrudRepository` dynamically injects `WHERE tenantId = :tenantId` filter criteria on queries. The active tenant is extracted from the client's validated JWT token during the `before` filter.
-*   **Request Diagnostics:** If a bug occurs, search the logs using the correlation token (`X-Request-ID`). This token is automatically propagated inside SLF4J MDC logs for simple trace aggregation.
-*   **Diagnostics endpoints:**
-    *   `/api-docs` returns dynamic, metadata-generated OpenAPI 3.0 specs.
-    *   `/swagger-ui` renders a graphical web console mapped to client-defined routes.
-    *   `/health/readiness` and `/health/liveness` provide diagnostics verification (useful for Kubernetes cluster deployment checks).
+### Logback MDC Context Propagation
+Logback MDC parameters (`traceId`, `tenantId`, `username`) are propagated across reactive boundaries using WebFlux filters and custom context-driven log wrappers, ensuring trace correlation remains contiguous in high-scale asynchronous logs.
+
+### RFC 7807 Problem Details
+Spring Boot's native `ProblemDetail` is used by the `GlobalExceptionHandler` to translate exceptions into standardized structures. It captures `status`, `title`, `detail`, `instance` (URI path), and extends them with:
+- `timestamp`: Instant of occurrence.
+- `requestId`: The correlation ID for troubleshooting.
+- `error` / `message`: Backwards compatibility fields.
+- `details`: Map of detailed validation failures (for 400 Bad Request).
 
 ---
 
@@ -458,12 +479,3 @@ To bundle the frontend assets for production:
 npm run build
 ```
 This builds static assets under `frontend/dist/`. In a production deployment, these static assets can be served by Nginx or packaged inside the Spring Boot container resources.
-
-### Local Mock Signer Architecture
-To enable fast, standalone local development, the frontend contains an embedded RSA Private Key in JWK format matching the public key configured in the backend `application.properties` file under `keycloak.test.public-key`. 
-During query execution, `App.tsx` uses the browser's native **Web Crypto API** (`window.crypto.subtle`) to:
-1. Construct standard JWT OAuth2 claims based on the active user identity control selections.
-2. Sign the JWT dynamically with the test private key using the `RSASSA-PKCS1-v1_5` signature scheme.
-3. Attach the token as a `Bearer` header automatically on dynamic HTTP requests.
-This enables immediate RBAC and tenancy test validations without setting up external IAM containers.
-

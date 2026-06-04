@@ -20549,3 +20549,2596 @@ SET
 2026-06-04 23:13:47 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [Req:] [Tenant:] [User:] - Closing JPA EntityManagerFactory for persistence unit 'default'
 2026-06-04 23:13:47 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown initiated...
 2026-06-04 23:13:47 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown completed.
+2026-06-04 23:21:47 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils [Req:] [Tenant:] [User:] - Could not detect default configuration classes for test class [com.example.crudapp.CrudAppIntegrationTest]: CrudAppIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-06-04 23:21:47 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper [Req:] [Tenant:] [User:] - Found @SpringBootConfiguration com.example.crudapp.Main for test class com.example.crudapp.CrudAppIntegrationTest
+2026-06-04 23:21:47 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils [Req:] [Tenant:] [User:] - Could not detect default configuration classes for test class [com.example.crudapp.CrudAppIntegrationTest]: CrudAppIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-06-04 23:21:47 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper [Req:] [Tenant:] [User:] - Found @SpringBootConfiguration com.example.crudapp.Main for test class com.example.crudapp.CrudAppIntegrationTest
+2026-06-04 23:21:48 [background-preinit] INFO  o.h.validator.internal.util.Version [Req:] [Tenant:] [User:] - HV000001: Hibernate Validator 9.0.1.Final
+2026-06-04 23:21:48 [main] INFO  c.e.crudapp.CrudAppIntegrationTest [Req:] [Tenant:] [User:] - Starting CrudAppIntegrationTest using Java 25.0.3 with PID 47700 (started by vase_ in C:\Users\vase_\Desktop\Crud_application)
+2026-06-04 23:21:48 [main] DEBUG c.e.crudapp.CrudAppIntegrationTest [Req:] [Tenant:] [User:] - Running with Spring Boot v4.0.6, Spring v7.0.7
+2026-06-04 23:21:48 [main] INFO  c.e.crudapp.CrudAppIntegrationTest [Req:] [Tenant:] [User:] - No active profile set, falling back to 1 default profile: "default"
+2026-06-04 23:21:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [Req:] [Tenant:] [User:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-04 23:21:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [Req:] [Tenant:] [User:] - Finished Spring Data repository scanning in 25 ms. Found 0 JPA repository interfaces.
+2026-06-04 23:21:49 [main] INFO  c.e.c.i.w.DynamicControllerRegister [Req:] [Tenant:] [User:] - Generated and registered controller bean for: Product at /api/v1/products
+2026-06-04 23:21:50 [main] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Starting...
+2026-06-04 23:21:50 [main] INFO  com.zaxxer.hikari.pool.HikariPool [Req:] [Tenant:] [User:] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@256a5df0
+2026-06-04 23:21:50 [main] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Start completed.
+2026-06-04 23:21:51 [main] INFO  liquibase.database [Req:] [Tenant:] [User:] - Set default schema name to public
+2026-06-04 23:21:52 [main] INFO  liquibase.changelog [Req:] [Tenant:] [User:] - Reading from public.databasechangelog
+2026-06-04 23:21:52 [main] INFO  liquibase.ui [Req:] [Tenant:] [User:] - Database is up to date, no changesets to execute
+2026-06-04 23:21:52 [main] INFO  liquibase.changelog [Req:] [Tenant:] [User:] - Reading from public.databasechangelog
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - UPDATE SUMMARY
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - Run:                          0
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - Previously run:               5
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - Filtered out:                 0
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - -------------------------------
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - Total change sets:            5
+2026-06-04 23:21:52 [main] INFO  liquibase.util [Req:] [Tenant:] [User:] - Update summary generated
+2026-06-04 23:21:52 [main] INFO  liquibase.command [Req:] [Tenant:] [User:] - Command execution complete
+2026-06-04 23:21:52 [main] INFO  org.hibernate.orm.jpa [Req:] [Tenant:] [User:] - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-06-04 23:21:52 [main] INFO  org.hibernate.orm.core [Req:] [Tenant:] [User:] - HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-06-04 23:21:53 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo [Req:] [Tenant:] [User:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-04 23:21:53 [main] INFO  o.hibernate.orm.connections.pooling [Req:] [Tenant:] [User:] - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5433/cruddb]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 15.17
+	Default catalog/schema: cruddb/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-04 23:21:54 [main] INFO  org.hibernate.orm.core [Req:] [Tenant:] [User:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-04 23:21:54 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [Req:] [Tenant:] [User:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-04 23:21:54 [main] INFO  c.example.crudapp.logic.CrudEngine [Req:] [Tenant:] [User:] - Registered interceptor ProductInterceptor for entity Product
+2026-06-04 23:21:54 [main] INFO  c.example.crudapp.logic.CrudEngine [Req:] [Tenant:] [User:] - 🚀 Registering dynamic resource: [Product] at path [/api/products]
+2026-06-04 23:21:54 [main] INFO  o.s.b.s.a.ReactiveUserDetailsServiceAutoConfiguration [Req:] [Tenant:] [User:] - 
+
+Using generated security password: aa7aec92-129c-442a-8f52-7594ac3c6293
+
+2026-06-04 23:21:55 [main] INFO  o.s.b.reactor.netty.NettyWebServer [Req:] [Tenant:] [User:] - Netty started on port 53433 (http)
+2026-06-04 23:21:55 [main] INFO  c.e.crudapp.CrudAppIntegrationTest [Req:] [Tenant:] [User:] - Started CrudAppIntegrationTest in 7.451 seconds (process running for 9.402)
+2026-06-04 23:21:56 [parallel-1] WARN  c.e.c.i.security.ReactiveJwtFilter [Req:] [Tenant:] [User:] - [SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path=/api/v1/products Reason=Missing or invalid Authorization header
+2026-06-04 23:21:56 [parallel-2] WARN  c.e.c.i.security.ReactiveJwtFilter [Req:] [Tenant:] [User:] - [SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path=/api/v1/products Reason=The parsed JWT indicates it was signed with the 'HS384' signature algorithm, but the provided sun.security.rsa.RSAPublicKeyImpl key may not be used to verify HS384 signatures.  Because the specified key reflects a specific and expected algorithm, and the JWT does not reflect this algorithm, it is likely that the JWT was not expected and therefore should not be trusted.  Another possibility is that the parser was provided the incorrect signature verification key, but this cannot be assumed for security reasons.
+2026-06-04 23:21:56 [parallel-2] ERROR c.e.c.i.security.ReactiveJwtFilter [Req:] [Tenant:] [User:] - Token verification failed
+io.jsonwebtoken.UnsupportedJwtException: The parsed JWT indicates it was signed with the 'HS384' signature algorithm, but the provided sun.security.rsa.RSAPublicKeyImpl key may not be used to verify HS384 signatures.  Because the specified key reflects a specific and expected algorithm, and the JWT does not reflect this algorithm, it is likely that the JWT was not expected and therefore should not be trusted.  Another possibility is that the parser was provided the incorrect signature verification key, but this cannot be assumed for security reasons.
+	at io.jsonwebtoken.impl.DefaultJwtParser.verifySignature(DefaultJwtParser.java:353)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:576)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:364)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parse(DefaultJwtParser.java:94)
+	at io.jsonwebtoken.impl.io.AbstractParser.parse(AbstractParser.java:36)
+	at io.jsonwebtoken.impl.io.AbstractParser.parse(AbstractParser.java:29)
+	at io.jsonwebtoken.impl.DefaultJwtParser.parseSignedClaims(DefaultJwtParser.java:827)
+	at com.example.crudapp.infrastructure.security.ReactiveJwtFilter.filter(ReactiveJwtFilter.java:102)
+	at org.springframework.web.server.handler.DefaultWebFilterChain.invokeFilter(DefaultWebFilterChain.java:111)
+	at org.springframework.web.server.handler.DefaultWebFilterChain.lambda$filter$0(DefaultWebFilterChain.java:106)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:46)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:83)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onComplete(MonoPeekTerminal.java:303)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onComplete(MonoPeekTerminal.java:303)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:155)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:75)
+	at reactor.core.publisher.FluxFilter$FilterSubscriber.onNext(FluxFilter.java:114)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:75)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:83)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerNext(FluxConcatMapNoPrefetch.java:258)
+	at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onNext(FluxConcatMap.java:868)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:158)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onNext(FluxMapFuseable.java:130)
+	at reactor.core.publisher.FluxFilterFuseable$FilterFuseableSubscriber.onNext(FluxFilterFuseable.java:119)
+	at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2564)
+	at reactor.core.publisher.FluxFilterFuseable$FilterFuseableSubscriber.request(FluxFilterFuseable.java:191)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.request(FluxMapFuseable.java:172)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.request(MonoFlatMap.java:194)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2325)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+	at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:109)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2361)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onSubscribe(Operators.java:2235)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onSubscribe(MonoNext.java:71)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onSubscribe(FluxConcatMapNoPrefetch.java:163)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:200)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:82)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:75)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:75)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569)
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:268)
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:83)
+	at reactor.core.publisher.FluxFilter$FilterSubscriber.onComplete(FluxFilter.java:167)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onComplete(FluxPeekFuseable.java:936)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:86)
+	at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2566)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2361)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onSubscribe(Operators.java:2235)
+	at reactor.core.publisher.MonoJust.subscribe(MonoJust.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onComplete(FluxSwitchIfEmpty.java:83)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onComplete(MonoNext.java:103)
+	at reactor.core.publisher.FluxFilter$FilterSubscriber.onComplete(FluxFilter.java:167)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.checkTerminated(FluxFlatMap.java:851)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.drainLoop(FluxFlatMap.java:613)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.drain(FluxFlatMap.java:593)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onComplete(FluxFlatMap.java:470)
+	at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onComplete(FluxPeekFuseable.java:278)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:357)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.request(FluxPeekFuseable.java:144)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onSubscribe(FluxFlatMap.java:374)
+	at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onSubscribe(FluxPeekFuseable.java:178)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:200)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:82)
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:75)
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:165)
+	at reactor.core.publisher.Operators$BaseFluxToMonoOperator.completePossiblyEmpty(Operators.java:2093)
+	at reactor.core.publisher.FluxDefaultIfEmpty$DefaultIfEmptySubscriber.onComplete(FluxDefaultIfEmpty.java:134)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.core.publisher.FluxFilter$FilterSubscriber.onComplete(FluxFilter.java:167)
+	at reactor.core.publisher.FluxMap$MapConditionalSubscriber.onComplete(FluxMap.java:275)
+	at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1862)
+	at reactor.core.publisher.MonoCacheTime$CoordinatorSubscriber.signalCached(MonoCacheTime.java:353)
+	at reactor.core.publisher.MonoCacheTime$CoordinatorSubscriber.onNext(MonoCacheTime.java:372)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onNext(FluxPeek.java:203)
+	at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:75)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:184)
+	at reactor.core.publisher.MonoPublishOn$PublishOnSubscriber.run(MonoPublishOn.java:181)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:72)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+Caused by: io.jsonwebtoken.security.InvalidKeyException: MAC verification keys must be SecretKey instances.  Specified key is of type sun.security.rsa.RSAPublicKeyImpl
+	at io.jsonwebtoken.impl.security.DefaultMacAlgorithm.validateKey(DefaultMacAlgorithm.java:161)
+	at io.jsonwebtoken.impl.security.AbstractSecureDigestAlgorithm.verify(AbstractSecureDigestAlgorithm.java:67)
+	at io.jsonwebtoken.impl.security.AbstractSecureDigestAlgorithm.verify(AbstractSecureDigestAlgorithm.java:29)
+	at io.jsonwebtoken.impl.DefaultJwtParser.verifySignature(DefaultJwtParser.java:337)
+	... 93 common frames omitted
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9020ded1-37c8-44dc-943a-fb665823e270] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9020ded1-37c8-44dc-943a-fb665823e270] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9020ded1-37c8-44dc-943a-fb665823e270] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-04 23:21:56 [boundedElastic-1] INFO  c.e.c.api.UniversalCrudController [Req:9020ded1-37c8-44dc-943a-fb665823e270] [Tenant:default] [User:admin-user] - [AUDIT MUTATION] Action=CREATE Resource=products User=admin-user Tenant=default RecordID=72
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9089fc98-451f-494a-9c25-d0dab38aec31] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9089fc98-451f-494a-9c25-d0dab38aec31] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-04 23:21:56 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9089fc98-451f-494a-9c25-d0dab38aec31] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] INFO  c.e.c.api.UniversalCrudController [Req:9089fc98-451f-494a-9c25-d0dab38aec31] [Tenant:default] [User:admin-user] - [AUDIT MUTATION] Action=CREATE Resource=products User=admin-user Tenant=default RecordID=73
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:742f8c99-6455-438b-90f8-3ecbc42d5aba] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:57 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:742f8c99-6455-438b-90f8-3ecbc42d5aba] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:742f8c99-6455-438b-90f8-3ecbc42d5aba] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=? 
+    order by
+        p1_0.price desc
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:742f8c99-6455-438b-90f8-3ecbc42d5aba] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:3ad08979-5045-46fe-8fca-2f469c66ad14] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:57 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:3ad08979-5045-46fe-8fca-2f469c66ad14] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:3ad08979-5045-46fe-8fca-2f469c66ad14] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=? 
+        and p1_0.price>?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:3ad08979-5045-46fe-8fca-2f469c66ad14] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - 
+    
+SET
+    LOCAL app.current_tenant = 'tenant-a'
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] INFO  c.e.c.api.UniversalCrudController [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - [AUDIT MUTATION] Action=CREATE Resource=products User=user-a Tenant=tenant-a RecordID=74
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - 
+    insert 
+    into
+        entity_attributes
+        (entity_id, attribute_key, attribute_value) 
+    values
+        (?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ff94a1f0-b28e-495b-8282-42ae4200abc3] [Tenant:tenant-a] [User:user-a] - 
+    insert 
+    into
+        entity_attributes
+        (entity_id, attribute_key, attribute_value) 
+    values
+        (?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:14982a17-87c2-4e0d-ab4c-5cd0cf1a6a05] [Tenant:tenant-b] [User:user-b] - 
+    
+SET
+    LOCAL app.current_tenant = 'tenant-b'
+2026-06-04 23:21:57 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:14982a17-87c2-4e0d-ab4c-5cd0cf1a6a05] [Tenant:tenant-b] [User:user-b] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:14982a17-87c2-4e0d-ab4c-5cd0cf1a6a05] [Tenant:tenant-b] [User:user-b] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:14982a17-87c2-4e0d-ab4c-5cd0cf1a6a05] [Tenant:tenant-b] [User:user-b] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2b77bc20-ee4b-4dea-b24e-9482b28da75a] [Tenant:tenant-b] [User:user-b] - 
+    
+SET
+    LOCAL app.current_tenant = 'tenant-b'
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2b77bc20-ee4b-4dea-b24e-9482b28da75a] [Tenant:tenant-b] [User:user-b] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_0.id=?
+2026-06-04 23:21:57 [parallel-10] DEBUG c.e.c.api.UniversalCrudController [Req:] [Tenant:] [User:] - 🔍 Fetching global metadata
+2026-06-04 23:21:57 [parallel-11] DEBUG c.e.c.api.UniversalCrudController [Req:] [Tenant:] [User:] - 🔍 Fetching global metadata
+2026-06-04 23:21:57 [parallel-12] DEBUG c.e.c.api.UniversalCrudController [Req:] [Tenant:] [User:] - 🔍 Fetching global metadata
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:1c90eef7-15ff-4362-8d88-10e8052583a2] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:57 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:1c90eef7-15ff-4362-8d88-10e8052583a2] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:1c90eef7-15ff-4362-8d88-10e8052583a2] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:1c90eef7-15ff-4362-8d88-10e8052583a2] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:940613a2-7058-4c5f-b207-12ee1ec3f040] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:940613a2-7058-4c5f-b207-12ee1ec3f040] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:940613a2-7058-4c5f-b207-12ee1ec3f040] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] INFO  c.e.c.api.UniversalCrudController [Req:940613a2-7058-4c5f-b207-12ee1ec3f040] [Tenant:default] [User:admin-user] - [AUDIT MUTATION] Action=CREATE Resource=products User=admin-user Tenant=default RecordID=75
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fd58b58c-ee81-43f0-9a12-6d54b3661fbd] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fd58b58c-ee81-43f0-9a12-6d54b3661fbd] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        baseentity
+        (created_by, created_date, last_modified_by, last_modified_date, parent_id, tenant_id, version) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fd58b58c-ee81-43f0-9a12-6d54b3661fbd] [Tenant:default] [User:admin-user] - 
+    insert 
+    into
+        product
+        (description, name, price, id) 
+    values
+        (?, ?, ?, ?)
+2026-06-04 23:21:57 [boundedElastic-1] INFO  c.e.c.api.UniversalCrudController [Req:fd58b58c-ee81-43f0-9a12-6d54b3661fbd] [Tenant:default] [User:admin-user] - [AUDIT MUTATION] Action=CREATE Resource=products User=admin-user Tenant=default RecordID=76
+2026-06-04 23:21:57 [parallel-18] DEBUG c.e.c.api.UniversalCrudController [Req:] [Tenant:] [User:] - 🔍 Fetching global metadata
+2026-06-04 23:21:58 [parallel-21] WARN  c.e.c.i.security.ReactiveJwtFilter [Req:] [Tenant:] [User:] - [SECURITY EVENT] Action=ACCESS_DENIED Resource=products User=guest-user Tenant=default Reason=Insufficient privileges
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:453e1185-0016-4cec-bcb7-57737ee3945d] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:453e1185-0016-4cec-bcb7-57737ee3945d] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:453e1185-0016-4cec-bcb7-57737ee3945d] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:453e1185-0016-4cec-bcb7-57737ee3945d] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:94573474-b9f1-40f6-a9fe-5c7cbd508aec] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:94573474-b9f1-40f6-a9fe-5c7cbd508aec] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:94573474-b9f1-40f6-a9fe-5c7cbd508aec] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:94573474-b9f1-40f6-a9fe-5c7cbd508aec] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:387b72f2-596f-4a69-95ce-f77a4f3f3fda] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:387b72f2-596f-4a69-95ce-f77a4f3f3fda] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:387b72f2-596f-4a69-95ce-f77a4f3f3fda] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:387b72f2-596f-4a69-95ce-f77a4f3f3fda] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8e0229e-3a36-461d-8271-ef156d3678af] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:d8e0229e-3a36-461d-8271-ef156d3678af] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8e0229e-3a36-461d-8271-ef156d3678af] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8e0229e-3a36-461d-8271-ef156d3678af] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ffa5238a-6209-430b-8495-e4a1e952df01] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:ffa5238a-6209-430b-8495-e4a1e952df01] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ffa5238a-6209-430b-8495-e4a1e952df01] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:ffa5238a-6209-430b-8495-e4a1e952df01] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b613b718-99af-46c0-b3cf-18a5c1960eba] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:b613b718-99af-46c0-b3cf-18a5c1960eba] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b613b718-99af-46c0-b3cf-18a5c1960eba] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b613b718-99af-46c0-b3cf-18a5c1960eba] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cef83005-7363-426d-81b3-2fc07a367104] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:cef83005-7363-426d-81b3-2fc07a367104] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cef83005-7363-426d-81b3-2fc07a367104] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cef83005-7363-426d-81b3-2fc07a367104] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a3b4f624-8248-498d-8013-3966f6d5cb34] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:a3b4f624-8248-498d-8013-3966f6d5cb34] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a3b4f624-8248-498d-8013-3966f6d5cb34] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a3b4f624-8248-498d-8013-3966f6d5cb34] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a5800352-6627-4e3e-b1fe-976cb77004df] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:a5800352-6627-4e3e-b1fe-976cb77004df] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a5800352-6627-4e3e-b1fe-976cb77004df] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a5800352-6627-4e3e-b1fe-976cb77004df] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:dae2500e-66f5-41b9-8773-7b9b376d42d7] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:dae2500e-66f5-41b9-8773-7b9b376d42d7] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:dae2500e-66f5-41b9-8773-7b9b376d42d7] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:dae2500e-66f5-41b9-8773-7b9b376d42d7] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2c0dfea5-352c-464f-b800-a2a20a725785] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:2c0dfea5-352c-464f-b800-a2a20a725785] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2c0dfea5-352c-464f-b800-a2a20a725785] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2c0dfea5-352c-464f-b800-a2a20a725785] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cd5dc4a7-0939-49d9-899e-6919a3cee993] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:cd5dc4a7-0939-49d9-899e-6919a3cee993] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cd5dc4a7-0939-49d9-899e-6919a3cee993] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cd5dc4a7-0939-49d9-899e-6919a3cee993] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8abd50a-d347-40db-ac88-1a1379e5ad76] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:d8abd50a-d347-40db-ac88-1a1379e5ad76] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8abd50a-d347-40db-ac88-1a1379e5ad76] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d8abd50a-d347-40db-ac88-1a1379e5ad76] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d0e7f65a-37ea-4d5d-9848-c5836dbe1068] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:d0e7f65a-37ea-4d5d-9848-c5836dbe1068] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d0e7f65a-37ea-4d5d-9848-c5836dbe1068] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d0e7f65a-37ea-4d5d-9848-c5836dbe1068] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:91400b65-9b08-4e6c-9a53-7c0ce1378812] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:91400b65-9b08-4e6c-9a53-7c0ce1378812] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:91400b65-9b08-4e6c-9a53-7c0ce1378812] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:91400b65-9b08-4e6c-9a53-7c0ce1378812] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:6d720c96-2923-467e-8a8a-56deb4415fc3] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:6d720c96-2923-467e-8a8a-56deb4415fc3] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:6d720c96-2923-467e-8a8a-56deb4415fc3] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:6d720c96-2923-467e-8a8a-56deb4415fc3] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:131e7a9e-9c3e-4eb6-b862-90ddd8ee8b5a] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:131e7a9e-9c3e-4eb6-b862-90ddd8ee8b5a] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:131e7a9e-9c3e-4eb6-b862-90ddd8ee8b5a] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:131e7a9e-9c3e-4eb6-b862-90ddd8ee8b5a] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:517302c8-b94c-45f2-a031-65f6f690349b] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:517302c8-b94c-45f2-a031-65f6f690349b] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:517302c8-b94c-45f2-a031-65f6f690349b] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:517302c8-b94c-45f2-a031-65f6f690349b] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f39ec0a2-b661-4fbd-ae54-053aaba663c8] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:f39ec0a2-b661-4fbd-ae54-053aaba663c8] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f39ec0a2-b661-4fbd-ae54-053aaba663c8] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f39ec0a2-b661-4fbd-ae54-053aaba663c8] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4caec904-3877-48de-a0c9-9c52d4741800] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:4caec904-3877-48de-a0c9-9c52d4741800] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4caec904-3877-48de-a0c9-9c52d4741800] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4caec904-3877-48de-a0c9-9c52d4741800] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:efa76d78-9392-4c7c-8293-01aa74d4de1b] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:efa76d78-9392-4c7c-8293-01aa74d4de1b] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:efa76d78-9392-4c7c-8293-01aa74d4de1b] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:efa76d78-9392-4c7c-8293-01aa74d4de1b] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b443fd20-8a61-4e80-bcd3-692ebd8a5ae9] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:b443fd20-8a61-4e80-bcd3-692ebd8a5ae9] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b443fd20-8a61-4e80-bcd3-692ebd8a5ae9] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b443fd20-8a61-4e80-bcd3-692ebd8a5ae9] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9e7818c3-afaa-44d0-87c3-4f84f7390b1b] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:9e7818c3-afaa-44d0-87c3-4f84f7390b1b] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9e7818c3-afaa-44d0-87c3-4f84f7390b1b] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9e7818c3-afaa-44d0-87c3-4f84f7390b1b] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:278f3889-a606-4407-91db-203cc8973f12] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:278f3889-a606-4407-91db-203cc8973f12] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:278f3889-a606-4407-91db-203cc8973f12] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:278f3889-a606-4407-91db-203cc8973f12] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf432191-b819-4fe5-8b8a-b4f716720b85] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:cf432191-b819-4fe5-8b8a-b4f716720b85] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf432191-b819-4fe5-8b8a-b4f716720b85] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf432191-b819-4fe5-8b8a-b4f716720b85] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fb13fd13-cccb-4fd8-8514-a0cca697919f] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:fb13fd13-cccb-4fd8-8514-a0cca697919f] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fb13fd13-cccb-4fd8-8514-a0cca697919f] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:fb13fd13-cccb-4fd8-8514-a0cca697919f] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:946a6961-0272-4b9b-8601-e55c58ff1f45] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:946a6961-0272-4b9b-8601-e55c58ff1f45] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:946a6961-0272-4b9b-8601-e55c58ff1f45] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:946a6961-0272-4b9b-8601-e55c58ff1f45] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b51bb784-72e0-4760-a9dc-cd930fa4885d] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:b51bb784-72e0-4760-a9dc-cd930fa4885d] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b51bb784-72e0-4760-a9dc-cd930fa4885d] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b51bb784-72e0-4760-a9dc-cd930fa4885d] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:8f2aa571-09a0-4fe1-b420-ab82085a2ca7] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:8f2aa571-09a0-4fe1-b420-ab82085a2ca7] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:8f2aa571-09a0-4fe1-b420-ab82085a2ca7] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:8f2aa571-09a0-4fe1-b420-ab82085a2ca7] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:40fedeb0-ba67-46cf-8d73-a3aafa2c9f82] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:40fedeb0-ba67-46cf-8d73-a3aafa2c9f82] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:40fedeb0-ba67-46cf-8d73-a3aafa2c9f82] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:40fedeb0-ba67-46cf-8d73-a3aafa2c9f82] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b686c78b-8c14-45d1-af54-720cbcf82849] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:b686c78b-8c14-45d1-af54-720cbcf82849] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b686c78b-8c14-45d1-af54-720cbcf82849] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:b686c78b-8c14-45d1-af54-720cbcf82849] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:04053c00-5107-44f9-898d-1209fdb0e1bb] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:04053c00-5107-44f9-898d-1209fdb0e1bb] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:04053c00-5107-44f9-898d-1209fdb0e1bb] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:04053c00-5107-44f9-898d-1209fdb0e1bb] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e08f1e3d-3f50-41cf-974b-9a4da250a2e6] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:e08f1e3d-3f50-41cf-974b-9a4da250a2e6] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e08f1e3d-3f50-41cf-974b-9a4da250a2e6] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e08f1e3d-3f50-41cf-974b-9a4da250a2e6] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:884a2c20-1e7b-4b36-9e26-026bdd9d0eb7] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:884a2c20-1e7b-4b36-9e26-026bdd9d0eb7] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:884a2c20-1e7b-4b36-9e26-026bdd9d0eb7] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:884a2c20-1e7b-4b36-9e26-026bdd9d0eb7] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:58 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:05c22011-09a8-4427-b8fb-5604baffc282] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:58 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:05c22011-09a8-4427-b8fb-5604baffc282] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:05c22011-09a8-4427-b8fb-5604baffc282] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:05c22011-09a8-4427-b8fb-5604baffc282] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf7ac664-babb-4f8c-bf77-ccd412a82840] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:cf7ac664-babb-4f8c-bf77-ccd412a82840] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf7ac664-babb-4f8c-bf77-ccd412a82840] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cf7ac664-babb-4f8c-bf77-ccd412a82840] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e3eb05a1-4dde-445a-ac06-7467b522ad40] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:e3eb05a1-4dde-445a-ac06-7467b522ad40] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e3eb05a1-4dde-445a-ac06-7467b522ad40] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:e3eb05a1-4dde-445a-ac06-7467b522ad40] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a2d47851-946f-4ebb-95e5-303a620c916e] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:a2d47851-946f-4ebb-95e5-303a620c916e] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a2d47851-946f-4ebb-95e5-303a620c916e] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a2d47851-946f-4ebb-95e5-303a620c916e] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:764907b3-9899-4508-93c1-3540b3ecbfd5] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:764907b3-9899-4508-93c1-3540b3ecbfd5] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:764907b3-9899-4508-93c1-3540b3ecbfd5] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:764907b3-9899-4508-93c1-3540b3ecbfd5] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:73aaf2ed-9a09-4c4b-9d0e-51a2adc5e955] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:73aaf2ed-9a09-4c4b-9d0e-51a2adc5e955] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:73aaf2ed-9a09-4c4b-9d0e-51a2adc5e955] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:73aaf2ed-9a09-4c4b-9d0e-51a2adc5e955] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9198e9b2-f4ca-4a83-98ce-54dda1bcab65] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:9198e9b2-f4ca-4a83-98ce-54dda1bcab65] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9198e9b2-f4ca-4a83-98ce-54dda1bcab65] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:9198e9b2-f4ca-4a83-98ce-54dda1bcab65] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cee1c598-b51e-48c2-8861-d86742afedd9] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:cee1c598-b51e-48c2-8861-d86742afedd9] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cee1c598-b51e-48c2-8861-d86742afedd9] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:cee1c598-b51e-48c2-8861-d86742afedd9] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4700ccc5-912c-4430-969d-3d4a51961bbe] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:4700ccc5-912c-4430-969d-3d4a51961bbe] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4700ccc5-912c-4430-969d-3d4a51961bbe] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:4700ccc5-912c-4430-969d-3d4a51961bbe] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5a48846f-91d0-42a1-9194-55fafa8dd204] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:5a48846f-91d0-42a1-9194-55fafa8dd204] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5a48846f-91d0-42a1-9194-55fafa8dd204] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5a48846f-91d0-42a1-9194-55fafa8dd204] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5231bc53-96bd-4d32-a753-ce4e467ce447] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:5231bc53-96bd-4d32-a753-ce4e467ce447] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5231bc53-96bd-4d32-a753-ce4e467ce447] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:5231bc53-96bd-4d32-a753-ce4e467ce447] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2130069f-b856-4452-b91c-f3199c86e87b] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:2130069f-b856-4452-b91c-f3199c86e87b] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2130069f-b856-4452-b91c-f3199c86e87b] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2130069f-b856-4452-b91c-f3199c86e87b] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:0f43d0e1-2ef8-4927-97df-48c1b9eb79d6] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:0f43d0e1-2ef8-4927-97df-48c1b9eb79d6] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:0f43d0e1-2ef8-4927-97df-48c1b9eb79d6] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:0f43d0e1-2ef8-4927-97df-48c1b9eb79d6] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d1fd38a1-e2de-4c23-b99e-871a12cc35d1] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:d1fd38a1-e2de-4c23-b99e-871a12cc35d1] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d1fd38a1-e2de-4c23-b99e-871a12cc35d1] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:d1fd38a1-e2de-4c23-b99e-871a12cc35d1] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f1bbd631-3a41-400d-967d-b682fa4d766e] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:f1bbd631-3a41-400d-967d-b682fa4d766e] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f1bbd631-3a41-400d-967d-b682fa4d766e] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:f1bbd631-3a41-400d-967d-b682fa4d766e] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:616f8d2b-f40a-43c7-b4a4-ff5563af46d3] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:616f8d2b-f40a-43c7-b4a4-ff5563af46d3] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:616f8d2b-f40a-43c7-b4a4-ff5563af46d3] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:616f8d2b-f40a-43c7-b4a4-ff5563af46d3] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2a776682-8874-45fc-9622-4ad504787f39] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] WARN  org.hibernate.orm.query [Req:2a776682-8874-45fc-9622-4ad504787f39] [Tenant:default] [User:admin-user] - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2a776682-8874-45fc-9622-4ad504787f39] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:2a776682-8874-45fc-9622-4ad504787f39] [Tenant:default] [User:admin-user] - 
+    select
+        count(p1_0.id) 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    where
+        p1_1.tenant_id=?
+2026-06-04 23:21:59 [parallel-11] WARN  c.e.c.i.w.ReactiveRateLimiterFilter [Req:] [Tenant:] [User:] - [SECURITY EVENT] Action=RATE_LIMIT_EXCEEDED IP=127.0.0.1
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a113bf00-e1a0-4bb6-894f-e6d052428291] [Tenant:default] [User:admin-user] - 
+    
+SET
+    LOCAL app.current_tenant = 'default'
+2026-06-04 23:21:59 [boundedElastic-1] DEBUG org.hibernate.SQL [Req:a113bf00-e1a0-4bb6-894f-e6d052428291] [Tenant:default] [User:admin-user] - 
+    select
+        p1_0.id,
+        a1_0.entity_id,
+        a1_0.attribute_key,
+        a1_0.attribute_value,
+        p1_1.created_by,
+        p1_1.created_date,
+        p1_1.last_modified_by,
+        p1_1.last_modified_date,
+        p1_1.parent_id,
+        p1_1.tenant_id,
+        p1_1.version,
+        p1_0.description,
+        p1_0.name,
+        p1_0.price 
+    from
+        product p1_0 
+    join
+        baseentity p1_1 
+            on p1_0.id=p1_1.id 
+    left join
+        entity_attributes a1_0 
+            on p1_1.id=a1_0.entity_id 
+    where
+        p1_0.id=?
+2026-06-04 23:21:59 [SpringApplicationShutdownHook] INFO  o.s.b.reactor.netty.GracefulShutdown [Req:] [Tenant:] [User:] - Commencing graceful shutdown. Waiting for active requests to complete
+2026-06-04 23:21:59 [netty-shutdown] INFO  o.s.b.reactor.netty.GracefulShutdown [Req:] [Tenant:] [User:] - Graceful shutdown complete
+2026-06-04 23:22:01 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [Req:] [Tenant:] [User:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-04 23:22:01 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown initiated...
+2026-06-04 23:22:01 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource [Req:] [Tenant:] [User:] - HikariPool-1 - Shutdown completed.
