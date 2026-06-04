@@ -215,20 +215,110 @@ The `frontend/` directory contains a modern React web application that serves as
 
 ## 🧪 Running Automated Tests
 
-To compile the project and execute the integration tests, run:
+### Backend Integration Tests
+
+To compile the project and execute the backend integration tests, run:
 ```bash
 mvn clean test
 ```
-The test suite (`CrudAppIntegrationTest.java`) tests the WebFlux pipelines, correlation ID tracing, metadata mapping, role-based access control, rate-limiting, and validation mapping. All responses follow the RFC 7807 Problem Details structure.
+The test suite (`CrudAppIntegrationTest.java`) covers 14 test cases across the WebFlux pipelines, including correlation ID tracing, metadata mapping, role-based access control, rate-limiting, CORS origin whitelisting, XSS sanitization, tenant isolation via RLS, and RFC 7807 error response validation.
+
+### Frontend E2E Tests (Playwright)
+
+The project includes a comprehensive **Playwright E2E test suite** that validates the full stack — frontend rendering, backend connectivity, CRUD operations, security enforcement, and multi-tenant isolation.
+
+**Prerequisites**: A running backend (Spring Boot + PostgreSQL) is required.
+
+```bash
+cd frontend
+npm install
+npm run build
+npx vite preview &       # Serves the production build on port 4173
+npx playwright install chromium
+npx playwright test      # Runs all E2E tests
+```
+
+The E2E suite covers **16 test cases** across 5 categories:
+
+| Category | Tests | What's Validated |
+|----------|-------|-----------------|
+| **Frontend Rendering** | 3 | Page title, architecture diagram nodes, version badge |
+| **Backend Connectivity** | 3 | No mock fallback, health endpoint, metadata API |
+| **CRUD Operations** | 5 | POST → GET ALL → GET by ID → PUT → DELETE lifecycle |
+| **Security Enforcement** | 4 | 401 unauthenticated, 403 unauthorized role, 400 unknown fields, 400 validation |
+| **Multi-Tenant Isolation** | 1 | Tenant B cannot see Tenant A's products |
+
+JWT tokens for E2E tests are minted in-browser using the **Web Crypto API** (`crypto.subtle`) with the same RSA key pair configured in the backend, enabling realistic authentication testing without Keycloak.
 
 ---
 
 ## ⛓️ Continuous Integration (CI) with GitHub Actions
 
-A Continuous Integration pipeline is configured at `.github/workflows/ci.yml`:
-*   **Triggers**: On every push and pull request to the repository.
-*   **Runner**: Running on an isolated `ubuntu-latest` VM.
-*   **Database Service**: Spins up a real PostgreSQL service container in the runner (exposed on port `5433`).
-*   **Execution**: 
-    1.  Validates and runs tests for the **Java Spring WebFlux Backend** using Maven.
-    2.  Sets up Node.js, installs dependencies, and compiles the **TypeScript React Frontend** to verify compilation safety.
+The CI/CD pipeline is defined across three workflow files in `.github/workflows/`:
+
+### 1. `ci.yml` — Build, Test & E2E Pipeline
+
+[![Java & Node CI](https://github.com/73N37/Crud_application/actions/workflows/ci.yml/badge.svg)](https://github.com/73N37/Crud_application/actions/workflows/ci.yml)
+
+**Triggers**: On every push and pull request to `main` / `master`.
+
+```mermaid
+graph LR
+    subgraph BuildJob ["Job 1: build"]
+        A["Checkout"] --> B["Set up JDK 25"]
+        B --> C["mvn clean test"]
+        C --> D["Set up Node.js"]
+        D --> E["npm ci"]
+        E --> F["npm run build"]
+    end
+
+    subgraph E2EJob ["Job 2: e2e"]
+        G["Checkout"] --> H["Compile Backend"]
+        H --> I["Start Spring Boot"]
+        I --> J["Wait for Health Check"]
+        J --> K["Build Frontend"]
+        K --> L["Start Vite Preview"]
+        L --> M["Install Playwright"]
+        M --> N["Run E2E Tests"]
+        N --> O["Upload Report"]
+    end
+
+    BuildJob --> E2EJob
+```
+
+*   **`build` job**: Runs `mvn clean test` (14 integration tests) and compiles the React frontend.
+*   **`e2e` job** (depends on `build`): Spins up a real PostgreSQL service container, launches Spring Boot in background, builds and serves the frontend via Vite preview, then runs all 16 Playwright E2E tests against the live stack.
+*   **Timeout**: 10 minutes hard cap to prevent runaway builds.
+*   **Artifacts**: Playwright test results and traces are uploaded on failure for debugging.
+
+### 2. `deploy-pages.yml` — GitHub Pages Deployment
+
+**Triggers**: On push to `main` / `master`, or manual `workflow_dispatch`.
+
+Builds the React frontend and deploys it to **GitHub Pages** at:
+> 🌐 **https://73n37.github.io/Crud_application/**
+
+The frontend auto-detects its backend URL via:
+1. `?backendUrl=` query parameter (manual override)
+2. `./backend-url.json` (injected by the backend runner workflow)
+3. Fallback to `http://localhost:8080` (local development)
+
+### 3. `backend.yml` — Live Backend Runner (Manual)
+
+**Triggers**: Manual `workflow_dispatch` only.
+
+Spins up the full backend stack (PostgreSQL + Keycloak + Spring Boot) on a GitHub Actions runner and exposes port 8080 via **localtunnel**. The dynamic tunnel URL is embedded into `backend-url.json` and deployed alongside the frontend to GitHub Pages — enabling live testing of the hosted frontend against a real backend.
+
+*   **Timeout**: 10 minutes (auto-terminates to prevent infinite runner costs).
+*   **Use case**: Temporary live demo or integration testing when no persistent hosting is available.
+
+---
+
+## 🌐 Live Frontend
+
+The interactive dashboard is hosted on GitHub Pages and updated automatically on every push:
+
+> **https://73n37.github.io/Crud_application/**
+
+When no backend is available, the frontend falls back to **mock mode** with sample data, displaying a "Connection Failed: Running Mock Fallback" banner. To connect it to a live backend, either run the `backend.yml` workflow or start the backend locally.
+
