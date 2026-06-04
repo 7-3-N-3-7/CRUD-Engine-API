@@ -29,6 +29,11 @@ jobs:
           echo "Waiting for PostgreSQL database to be ready..."
           until docker exec crud-postgres pg_isready -U user; do
             echo "PostgreSQL is not ready yet, sleeping 1s..."
+            if [ "$(docker inspect -f '{{.State.Running}}' crud-postgres 2>/dev/null)" = "false" ]; then
+              echo "CRITICAL: crud-postgres container has stopped!"
+              docker compose logs postgres
+              exit 1
+            fi
             sleep 1
           done
           echo "PostgreSQL is ready and accepting connections!"
