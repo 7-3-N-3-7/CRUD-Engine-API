@@ -23,6 +23,9 @@ const TEST_PRIVATE_KEY_JWK = {
 /**
  * Generate a signed RS256 JWT token usable against the test backend.
  * Uses the Web Crypto API available inside Playwright's browser context.
+ *
+ * IMPORTANT: The page MUST have navigated to a real URL (not about:blank)
+ * before calling this, because crypto.subtle requires a secure context.
  */
 async function mintJwt(
   page: import('@playwright/test').Page,
@@ -130,6 +133,8 @@ test.describe('CRUD operations via backend API', () => {
   let createdId: number;
 
   test('POST creates a product', async ({ page, request }) => {
+    // Navigate to a real page so crypto.subtle is available (secure context)
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
@@ -153,6 +158,7 @@ test.describe('CRUD operations via backend API', () => {
   });
 
   test('GET ALL returns the created product', async ({ page, request }) => {
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.get(`${BACKEND}/api/v1/products?size=100`, {
@@ -166,6 +172,7 @@ test.describe('CRUD operations via backend API', () => {
 
   test('GET by ID returns the created product', async ({ page, request }) => {
     test.skip(!createdId, 'No product was created — skipping');
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.get(`${BACKEND}/api/v1/products/${createdId}`, {
@@ -179,6 +186,7 @@ test.describe('CRUD operations via backend API', () => {
 
   test('PUT updates the product', async ({ page, request }) => {
     test.skip(!createdId, 'No product was created — skipping');
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.put(`${BACKEND}/api/v1/products/${createdId}`, {
@@ -201,6 +209,7 @@ test.describe('CRUD operations via backend API', () => {
 
   test('DELETE removes the product', async ({ page, request }) => {
     test.skip(!createdId, 'No product was created — skipping');
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const delResponse = await request.delete(`${BACKEND}/api/v1/products/${createdId}`, {
@@ -225,6 +234,7 @@ test.describe('Security enforcement', () => {
   });
 
   test('403 when GUEST role tries to access products', async ({ page, request }) => {
+    await page.goto('/');
     const token = await mintJwt(page, 'guest-user', ['GUEST']);
 
     const response = await request.get(`${BACKEND}/api/v1/products`, {
@@ -235,6 +245,7 @@ test.describe('Security enforcement', () => {
   });
 
   test('400 for invalid payload with unknown fields', async ({ page, request }) => {
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
@@ -254,6 +265,7 @@ test.describe('Security enforcement', () => {
   });
 
   test('400 for validation errors (negative price)', async ({ page, request }) => {
+    await page.goto('/');
     const token = await mintJwt(page);
 
     const response = await request.post(`${BACKEND}/api/v1/products`, {
@@ -277,6 +289,9 @@ test.describe('Security enforcement', () => {
 
 test.describe('Multi-tenant isolation', () => {
   test('tenant-B cannot see tenant-A products', async ({ page, request }) => {
+    // Navigate first so crypto.subtle is available
+    await page.goto('/');
+
     // Create product as tenant-A
     const tokenA = await mintJwt(page, 'user-a', ['ADMIN'], 'tenant-alpha');
     const createRes = await request.post(`${BACKEND}/api/v1/products`, {
