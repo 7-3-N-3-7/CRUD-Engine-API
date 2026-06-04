@@ -26,25 +26,25 @@ The following diagram illustrates how all the integrated enterprise libraries an
 
 ```mermaid
 graph TD
-    subgraph SetupPhase [Phase 1: Bootstrapping & Code Generation]
-        LB[Liquibase 5] -->|1. Migrates Schema & RLS Policies| PG[(PostgreSQL)]
-        SB[Spring Boot 4] -->|2. Initializes Context| BB[Byte Buddy]
-        BB -->|3. Compiles dynamic RestControllers| SB
+    subgraph SetupPhase ["Phase 1: Bootstrapping & Code Generation"]
+        LB["Liquibase 5"] -->|"1. Migrates Schema & RLS Policies"| PG[("PostgreSQL")]
+        SB["Spring Boot 4"] -->|"2. Initializes Context"| BB["Byte Buddy"]
+        BB -->|"3. Compiles dynamic RestControllers"| SB
     end
 
-    subgraph Authentication [Phase 2: Client Request & Identity Verification]
-        Client[Client React App] -->|4. Authenticates & gets Token| KC[Keycloak Server]
-        KC -->|5. Returns signed RS256 JWT| Client
-        Client -->|6. Requests with Bearer Token| Netty[Spring WebFlux / Netty]
-        Netty -->|7. Parses & validates JWT| JJWT[JJWT Library]
-        JJWT -->|8. Binds tracing context to MDC| LBK[Logback Logging]
+    subgraph Authentication ["Phase 2: Client Request & Identity Verification"]
+        Client["Client React App"] -->|"4. Authenticates & gets Token"| KC["Keycloak Server"]
+        KC -->|"5. Returns signed RS256 JWT"| Client
+        Client -->|"6. Requests with Bearer Token"| Netty["Spring WebFlux / Netty"]
+        Netty -->|"7. Parses & validates JWT"| JJWT["JJWT Library"]
+        JJWT -->|"8. Binds tracing context to MDC"| LBK["Logback Logging"]
     end
 
-    subgraph Processing [Phase 3: Validation, Logic & Database Isolation]
-        Netty -->|9. Sanitizes & validates JSON| JK[Jackson 3 / Validator]
-        JK -->|10. Delegates transaction| JPA[Spring Data JPA / Hibernate]
-        JPA -->|11. Sets app.current_tenant| PG
-        PG -->|12. Enforces RLS multi-tenant filters| DB_Store[(PostgreSQL Tables)]
+    subgraph Processing ["Phase 3: Validation, Logic & Database Isolation"]
+        Netty -->|"9. Sanitizes & validates JSON"| JK["Jackson 3 / Validator"]
+        JK -->|"10. Delegates transaction"| JPA["Spring Data JPA / Hibernate"]
+        JPA -->|"11. Sets app.current_tenant"| PG
+        PG -->|"12. Enforces RLS multi-tenant filters"| DB_Store[("PostgreSQL Tables")]
     end
 
     classDef setup fill:#fef08a,stroke:#ca8a04,stroke-width:2px;
@@ -74,25 +74,25 @@ To maintain a clean system, this project enforces the **Data-Logic-Interface (DL
 
 ```mermaid
 graph TD
-    subgraph Interface Layer [Interface Layer: API Surface]
-        WebFlux[Spring WebFlux / Netty] -->|Routes HTTP Requests| Controller[UniversalCrudController]
-        Controller -->|Validates & Mapped to DTO| DTO[ProductRecord / Java Records]
-        Limiter[ReactiveRateLimiterFilter] -->|Token Bucket Rate Limiting| WebFlux
-        Xss[XssSanitizingDeserializer] -->|Cleans Inputs| DTO
+    subgraph InterfaceLayer ["Interface Layer: API Surface"]
+        WebFlux["Spring WebFlux / Netty"] -->|"Routes HTTP Requests"| Controller["UniversalCrudController"]
+        Controller -->|"Validates & Mapped to DTO"| DTO["ProductRecord / Java Records"]
+        Limiter["ReactiveRateLimiterFilter"] -->|"Token Bucket Rate Limiting"| WebFlux
+        Xss["XssSanitizingDeserializer"] -->|"Cleans Inputs"| DTO
     end
 
-    subgraph Logic Layer [Logic Layer: Orchestration Engine]
-        Controller -->|Calls| CrudEngine[CrudEngine]
-        CrudEngine -->|Resolves Service| Service[CrudService]
-        CrudEngine -->|Invokes Hooks| Interceptor[CrudInterceptor]
-        GlobalHandler[GlobalExceptionHandler] -->|RFC 7807 Problem Details| Controller
+    subgraph LogicLayer ["Logic Layer: Orchestration Engine"]
+        Controller -->|"Calls"| CrudEngine["CrudEngine"]
+        CrudEngine -->|"Resolves Service"| Service["CrudService"]
+        CrudEngine -->|"Invokes Hooks"| Interceptor["CrudInterceptor"]
+        GlobalHandler["GlobalExceptionHandler"] -->|"RFC 7807 Problem Details"| Controller
     end
 
-    subgraph Data Layer [Data Layer: Persistence]
-        Service -->|Queries in boundedElastic| Repository[CrudRepository]
-        Repository -->|JPA / Hibernate / RLS| DB[(PostgreSQL)]
-        Liquibase[Liquibase Migrations] -->|Pre-establishes| Schema[DB Schema]
-        RLS[Row-Level Security] -->|Isolates Tenants| DB
+    subgraph DataLayer ["Data Layer: Persistence"]
+        Service -->|"Queries in boundedElastic"| Repository["CrudRepository"]
+        Repository -->|"JPA / Hibernate / RLS"| DB[("PostgreSQL")]
+        Liquibase["Liquibase Migrations"] -->|"Pre-establishes"| Schema["DB Schema"]
+        RLS["Row-Level Security"] -->|"Isolates Tenants"| DB
     end
 
     classDef interface fill:#d1e7dd,stroke:#0f5132,stroke-width:2px;
