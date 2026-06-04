@@ -43,7 +43,6 @@ public abstract class BaseEntity {
     private String createdBy;
 
     @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
@@ -52,9 +51,9 @@ public abstract class BaseEntity {
     private String lastModifiedBy;
 
     @LastModifiedDate
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_modified_date")
     private LocalDateTime lastModifiedDate;
+
 
     // Single-Database Multi-Tenancy field
     @Column(name = "tenant_id", nullable = false)
