@@ -23,7 +23,7 @@ const TEST_PRIVATE_KEY_JWK = {
 
 /**
  * Generate a signed RS256 JWT token usable against the test backend.
- * Uses the Web Crypto API available inside Playwright's browser context.
+ * Uses Node crypto in the test runner, avoiding browser secure-context requirements.
  */
 const TEST_PRIVATE_KEY = createPrivateKey({
   key: TEST_PRIVATE_KEY_JWK,
