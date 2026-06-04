@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   run-and-deploy:
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -133,10 +134,10 @@ jobs:
           echo "Tailing Spring Boot logs. This workflow run will remain"
           echo "active for testing until canceled."
           echo ""
-          # Wait and print Spring Boot logs to stdout
+          # Wait and print Spring Boot logs to stdout (bounded to 20 minutes)
           sleep 5
           if [ -f logs/crudapp.log ]; then
-            tail -f logs/crudapp.log
+            timeout 600 tail -f logs/crudapp.log || true
           else
-            tail -f backend.log
+            timeout 600 tail -f backend.log || true
           fi
