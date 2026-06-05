@@ -49,7 +49,7 @@ public class DynamicControllerRegister implements BeanDefinitionRegistryPostProc
                         .annotateType(
                                 AnnotationDescription.Builder.ofType(RestController.class).build(),
                                 AnnotationDescription.Builder.ofType(RequestMapping.class)
-                                        .defineArray("value", new String[]{"/api/" + version + "/" + path})
+                                        .defineArray("value", new String[]{"/api/" + path})
                                         .build()
                         )
                         .defineConstructor(Visibility.PUBLIC)

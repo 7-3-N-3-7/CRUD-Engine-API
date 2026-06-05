@@ -119,7 +119,7 @@ public class CrudAppIntegrationTest {
         // 1. Test validation error (empty product payload)
         String invalidProductJson = "{\"name\":\"\",\"description\":\"\",\"price\":-10.00}";
         HttpRequest invalidPost = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(invalidProductJson))
@@ -135,7 +135,7 @@ public class CrudAppIntegrationTest {
 
         // 2. Test resource missing (access non-existent product)
         HttpRequest getNonExistent = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products/999999"))
+                .uri(URI.create("http://localhost:" + port + "/api/products/999999"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -207,7 +207,7 @@ public class CrudAppIntegrationTest {
         HttpResponse<String> responseDocs = client.send(requestDocs, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, responseDocs.statusCode());
         assertTrue(responseDocs.body().contains("Generic CRUD Engine API"));
-        assertTrue(responseDocs.body().contains("/api/v1/products"));
+        assertTrue(responseDocs.body().contains("/api/products"));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class CrudAppIntegrationTest {
                 "}";
 
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + tokenA)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(productJson))
@@ -256,7 +256,7 @@ public class CrudAppIntegrationTest {
 
         // 4. Fetch products list with tenant-b token -> should NOT return tenant-a product
         HttpRequest getRequestB = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + tokenB)
                 .GET()
                 .build();
@@ -266,7 +266,7 @@ public class CrudAppIntegrationTest {
 
         // 5. Fetch the product directly by ID with tenant-b token -> should return 404 Not Found (filtered by tenant)
         HttpRequest getSingleRequestB = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products/" + productId))
+                .uri(URI.create("http://localhost:" + port + "/api/products/" + productId))
                 .header("Authorization", "Bearer " + tokenB)
                 .GET()
                 .build();
@@ -281,7 +281,7 @@ public class CrudAppIntegrationTest {
 
         // 1. Get products list (should return 200 OK)
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -292,7 +292,7 @@ public class CrudAppIntegrationTest {
         // 2. Post a new product (should return 201 Created)
         String productJson = "{\"name\":\"Sample Product\",\"description\":\"A sample description\",\"price\":99.99}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(productJson))
@@ -311,7 +311,7 @@ public class CrudAppIntegrationTest {
         String guestToken = generateToken("guest-user", List.of("GUEST"));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + guestToken)
                 .GET()
                 .build();
@@ -327,7 +327,7 @@ public class CrudAppIntegrationTest {
 
         // 1. Call without Authorization Header
         HttpRequest requestNoAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .GET()
                 .build();
 
@@ -341,7 +341,7 @@ public class CrudAppIntegrationTest {
                 .compact();
 
         HttpRequest requestBadAuth = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + badToken)
                 .GET()
                 .build();
@@ -360,14 +360,14 @@ public class CrudAppIntegrationTest {
         String p2 = "{\"name\":\"Beta Phone\",\"description\":\"Smart mobile phone\",\"price\":800.00}";
 
         client.send(HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + adminToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(p1))
                 .build(), HttpResponse.BodyHandlers.ofString());
 
         client.send(HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + adminToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(p2))
@@ -375,7 +375,7 @@ public class CrudAppIntegrationTest {
 
         // 2. Get with sorting by price descending
         HttpRequest sortedGet = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products?sort=price,desc&size=100"))
+                .uri(URI.create("http://localhost:" + port + "/api/products?sort=price,desc&size=100"))
                 .header("Authorization", "Bearer " + adminToken)
                 .GET()
                 .build();
@@ -391,7 +391,7 @@ public class CrudAppIntegrationTest {
 
         // 3. Get with filtering (price > 1000)
         HttpRequest filteredGet = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products?price_gt=1000&size=100"))
+                .uri(URI.create("http://localhost:" + port + "/api/products?price_gt=1000&size=100"))
                 .header("Authorization", "Bearer " + adminToken)
                 .GET()
                 .build();
@@ -408,7 +408,7 @@ public class CrudAppIntegrationTest {
         String testToken = generateToken("admin-user", List.of("ADMIN"));
         
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .GET()
                 .build();
@@ -466,7 +466,7 @@ public class CrudAppIntegrationTest {
                 "}";
 
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(xssProductJson))
@@ -494,7 +494,7 @@ public class CrudAppIntegrationTest {
                 "}";
 
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/v1/products"))
+                .uri(URI.create("http://localhost:" + port + "/api/products"))
                 .header("Authorization", "Bearer " + testToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(badProductJson))

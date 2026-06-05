@@ -427,7 +427,7 @@ public class UniversalCrudController {
             }
             schemas.put(schemaName, schema);
 
-            String resourcePath = "/api/" + version + "/" + path;
+            String resourcePath = "/api/" + path;
             Map<String, Object> pathOperations = new LinkedHashMap<>();
 
             Map<String, Object> getOp = new LinkedHashMap<>();
