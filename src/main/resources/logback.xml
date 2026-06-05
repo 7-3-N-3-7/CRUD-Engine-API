@@ -33,7 +33,7 @@
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
 
     <!-- 🧠 APP LOGGING: High granularity for our Meta-Programming engine -->
-    <logger name="com.example.crudapp" level="DEBUG" />
+    <logger name="com.org73n37.crudapp" level="DEBUG" />
     
     <!-- 🔒 SECURITY LOGGING: Track authentication and access attempts -->
     <logger name="org.springframework.security" level="INFO" />
