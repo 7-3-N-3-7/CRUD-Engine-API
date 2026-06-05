@@ -404,29 +404,34 @@ public class CrudAppIntegrationTest {
 
     @Test
     public void testRateLimiterSecurityEvent() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
-        String testToken = generateToken("admin-user", List.of("ADMIN"));
-        
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/api/products"))
-                .header("Authorization", "Bearer " + testToken)
-                .GET()
-                .build();
+        rateLimiterFilter.setForceRateLimit(true);
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            String testToken = generateToken("admin-user", List.of("ADMIN"));
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:" + port + "/api/products"))
+                    .header("Authorization", "Bearer " + testToken)
+                    .GET()
+                    .build();
 
-        // Perform 50 quick requests (should succeed or return 403/401/200, but rate limiter shouldn't block yet)
-        // Then perform 1 more which should be blocked with 429.
-        int rateLimitCapacity = 50;
-        boolean rateLimited = false;
-        
-        for (int i = 0; i < rateLimitCapacity + 5; i++) {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 429) {
-                rateLimited = true;
-                assertTrue(response.body().contains("API rate limit exceeded"));
-                break;
+            // Perform 50 quick requests (should succeed or return 403/401/200, but rate limiter shouldn't block yet)
+            // Then perform 1 more which should be blocked with 429.
+            int rateLimitCapacity = 50;
+            boolean rateLimited = false;
+            
+            for (int i = 0; i < rateLimitCapacity + 5; i++) {
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() == 429) {
+                    rateLimited = true;
+                    assertTrue(response.body().contains("API rate limit exceeded"));
+                    break;
+                }
             }
+            assertTrue(rateLimited, "Request should be rate limited with HTTP 429 after exceeding limit");
+        } finally {
+            rateLimiterFilter.setForceRateLimit(false);
         }
-        assertTrue(rateLimited, "Request should be rate limited with HTTP 429 after exceeding limit");
     }
 
     @Test

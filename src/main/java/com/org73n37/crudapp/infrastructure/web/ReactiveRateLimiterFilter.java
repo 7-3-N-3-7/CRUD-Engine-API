@@ -29,6 +29,19 @@ public class ReactiveRateLimiterFilter implements WebFilter {
 
     private final Map<String, TokenBucket> ipBuckets = new ConcurrentHashMap<>();
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.org73n37.crudapp.infrastructure.config.AppModeConfig appModeConfig;
+
+    private volatile boolean forceRateLimit = false;
+
+    public boolean isForceRateLimit() {
+        return forceRateLimit;
+    }
+
+    public void setForceRateLimit(boolean forceRateLimit) {
+        this.forceRateLimit = forceRateLimit;
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String ip = exchange.getRequest().getRemoteAddress() != null 
@@ -37,7 +50,7 @@ public class ReactiveRateLimiterFilter implements WebFilter {
 
         TokenBucket bucket = ipBuckets.computeIfAbsent(ip, k -> new TokenBucket(MAX_TOKENS, REFILL_DURATION_MS));
 
-        if (bucket.tryConsume()) {
+        if ((appModeConfig.isDevelopment() && !forceRateLimit) || bucket.tryConsume()) {
             return chain.filter(exchange);
         } else {
             log.warn("[SECURITY EVENT] Action=RATE_LIMIT_EXCEEDED IP={}", ip);

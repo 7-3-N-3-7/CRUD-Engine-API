@@ -58,6 +58,9 @@ public class ReactiveJwtFilter implements WebFilter {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private com.org73n37.crudapp.infrastructure.config.AppModeConfig appModeConfig;
+
     private final Map<String, PublicKey> jwkCache = new ConcurrentHashMap<>();
     private PublicKey parsedTestPublicKey = null;
     private final Object testKeyLock = new Object();
@@ -218,7 +221,7 @@ public class ReactiveJwtFilter implements WebFilter {
     }
 
     private PublicKey getVerificationKey(String token) throws Exception {
-        if (testPublicKeyPem != null && !testPublicKeyPem.trim().isEmpty()) {
+        if (appModeConfig.isDevelopment() && testPublicKeyPem != null && !testPublicKeyPem.trim().isEmpty()) {
             synchronized (testKeyLock) {
                 if (parsedTestPublicKey == null) {
                     parsedTestPublicKey = parsePemPublicKey(testPublicKeyPem);
