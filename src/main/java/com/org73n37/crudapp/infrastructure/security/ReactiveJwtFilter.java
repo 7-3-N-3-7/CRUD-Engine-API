@@ -181,12 +181,18 @@ public class ReactiveJwtFilter implements WebFilter {
                     .contextWrite(Context.of("tenantId", finalTenant, "username", finalUser))
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
  
-        } catch (Exception e) {
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
             log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason={}", path, e.getMessage());
-            log.error("Token verification failed", e);
+            log.debug("Token verification failure details", e);
             exchange.getResponse().setRawStatusCode(401);
             return exchange.getResponse().writeWith(Mono.just(
                 exchange.getResponse().bufferFactory().wrap(("Invalid token: " + e.getMessage()).getBytes(StandardCharsets.UTF_8))
+            ));
+        } catch (Exception e) {
+            log.error("Unexpected error during token filtering", e);
+            exchange.getResponse().setRawStatusCode(500);
+            return exchange.getResponse().writeWith(Mono.just(
+                exchange.getResponse().bufferFactory().wrap("Internal Server Error".getBytes(StandardCharsets.UTF_8))
             ));
         }
     }
