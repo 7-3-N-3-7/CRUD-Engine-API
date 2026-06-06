@@ -13,7 +13,6 @@
 	<modules>
 		<module>crud-engine-core</module>
 		<module>crud-engine-jpa</module>
-		<module>crud-engine-mongodb</module>
 		<module>crud-engine-inmemory</module>
 		<module>crud-engine-webflux</module>
 		<module>crud-engine-security-keycloak</module>
@@ -40,11 +39,6 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jpa</artifactId>
-				<version>${spring-boot.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
@@ -82,11 +76,6 @@
 			<dependency>
 				<groupId>com.org73n37</groupId>
 				<artifactId>crud-engine-jpa</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.org73n37</groupId>
-				<artifactId>crud-engine-mongodb</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

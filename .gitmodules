@@ -16,9 +16,6 @@
 [submodule "crud-engine-inmemory"]
 	path = crud-engine-inmemory
 	url = https://github.com/7-3-N-3-7/crud-engine-inmemory.git
-[submodule "crud-engine-mongodb"]
-	path = crud-engine-mongodb
-	url = https://github.com/7-3-N-3-7/crud-engine-mongodb.git
 [submodule "crud-engine-plugin-ratelimiter"]
 	path = crud-engine-plugin-ratelimiter
 	url = https://github.com/7-3-N-3-7/crud-engine-plugin-ratelimiter.git
