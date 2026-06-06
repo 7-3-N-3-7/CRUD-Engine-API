@@ -1,481 +1,264 @@
-# Developer Setup & Extension Manual: Dynamic CRUD Engine
+# Developer Setup & Extension Manual: Dynamic CRUD Engine (v3.0)
 
-Welcome to the **Dynamic CRUD Engine**. This project is a metadata-driven, enterprise-grade REST engine combining the data safety and persistence power of **Spring Boot (Spring Data JPA)** with the non-blocking, reactive web capabilities of **Spring WebFlux (Netty)**. 
+Welcome to the **Dynamic CRUD Engine**. This project is a modular, metadata-driven REST engine combining a high-throughput **Spring WebFlux (Netty)** API layer with a pluggable **Service Provider Interface (SPI) Storage Layer** and decoupled security and filtering plugins.
 
-This manual details how to set up the infrastructure, register new resource endpoints, extend core behaviors, implement custom logic hooks, manage the frontend application, and configure advanced production-grade features.
+This manual details how to manage the Git submodule workflow, register new resource endpoints for different databases, implement custom logic hooks, and deploy the application.
 
 ---
 
-## 1. Local Infrastructure Configuration Setup
+## 1. Git Submodule Workflow & Multi-Module Layout
 
-The application depends on **PostgreSQL** (for persistence) and **Keycloak** (for JWT authentication and Role-Based Access Control).
+The project is structured as 1 parent shell repository coordinating 8 independent Git submodules. 
+
+### How to Clone the Project
+Because the modules are hosted in separate repositories, you must clone recursively to fetch all files:
+```bash
+git clone --recursive https://github.com/73N37/Crud_application.git
+```
+If you have already cloned the repository without the `--recursive` flag, run:
+```bash
+git submodule update --init --recursive
+```
+
+### Developing Inside Submodules
+When editing files inside a submodule (such as `crud-engine-core`):
+1.  Navigate into the submodule directory: `cd crud-engine-core`
+2.  Make your code edits.
+3.  Commit and push directly inside the submodule:
+    ```bash
+    git add .
+    git commit -m "feat: updated core capabilities"
+    git push origin main
+    ```
+4.  Navigate back to the parent directory: `cd ..`
+5.  Pin the new submodule commit in the parent repository:
+    ```bash
+    git add crud-engine-core
+    git commit -m "chore: pin crud-engine-core to latest commit"
+    git push
+    ```
+
+---
+
+## 2. Pluggable Storage Layer (SPI)
+
+The engine delegates database operations to a `CrudStorageProvider<T>` resolved at runtime by matching `CrudStorageProviderFactory` implementations. The framework supports three persistence layers out of the box:
+
+### A. SQL/JPA Storage (`crud-engine-jpa`)
+*   **Trigger**: Any entity annotated with `jakarta.persistence.Entity` is managed by `JpaStorageProviderFactory` and persists to PostgreSQL using Hibernate.
+*   **Multi-Tenancy**: Secured using Row-Level Security (RLS) policies at the PostgreSQL database level.
+
+### B. MongoDB Storage (`crud-engine-mongodb`)
+*   **Trigger**: Any entity annotated with `org.springframework.data.mongodb.core.mapping.Document` is managed by `MongoStorageProviderFactory` and persists to MongoDB using `MongoTemplate`.
+*   **Tenancy & Filtering**: Filters collections dynamically in memory/queries using tenant claims and regex-based criteria.
+
+### C. In-Memory Storage (`crud-engine-inmemory`)
+*   **Trigger**: Used as a fallback if no database annotations are detected, or for unit testing.
+*   **Mechanism**: A thread-safe, concurrent hash map segregated by tenant id.
+
+---
+
+## 3. Registering a New Resource Entity
+
+Adding a new resource (e.g. `Device`) is as simple as defining the class, mapping it to a database structure, and creating a DTO record.
+
+### Option A: Creating a JPA Resource
+Create the entity in the sample application (`src/main/java/com/org73n37/crudapp/data/Device.java`):
+```java
+package com.org73n37.crudapp.data;
+
+import com.org73n37.crudapp.api.records.DeviceRecord;
+import com.org73n37.crudapp.data.core.BaseEntity;
+import com.org73n37.crudapp.infrastructure.annotations.CrudResource;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
+
+@Entity
+@CrudResource(path = "devices", dto = DeviceRecord.class, roles = {"ADMIN", "USER"})
+public class Device extends BaseEntity {
+    @Column(nullable = false)
+    private String modelName;
+
+    public Device() {}
+    public String getModelName() { return modelName; }
+    public void setModelName(String modelName) { this.modelName = modelName; }
+}
+```
+
+### Option B: Creating a MongoDB Resource
+Create the document in the sample application:
+```java
+package com.org73n37.crudapp.data;
+
+import com.org73n37.crudapp.api.records.DeviceRecord;
+import com.org73n37.crudapp.data.core.BaseEntity;
+import com.org73n37.crudapp.infrastructure.annotations.CrudResource;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "devices")
+@CrudResource(path = "devices", dto = DeviceRecord.class, roles = {"ADMIN", "USER"})
+public class Device extends BaseEntity {
+    private String modelName;
+
+    public Device() {}
+    public String getModelName() { return modelName; }
+    public void setModelName(String modelName) { this.modelName = modelName; }
+}
+```
+
+### Creating the DTO Record
+Create the corresponding record mapping (`src/main/java/com/org73n37/crudapp/api/records/DeviceRecord.java`):
+```java
+package com.org73n37.crudapp.api.records;
+
+import com.org73n37.crudapp.data.Device;
+import com.org73n37.crudapp.infrastructure.annotations.EntityMapping;
+import jakarta.validation.constraints.NotBlank;
+import java.util.Map;
+
+@EntityMapping(entity = Device.class)
+public record DeviceRecord(
+    @NotBlank(message = "Model name cannot be blank")
+    String modelName,
+    Map<String, String> attributes
+) {}
+```
+
+---
+
+## 4. Custom Hook Interceptors
+
+Interceptors allow you to run business logic around database actions.
+
+### Entity-Specific Interceptor
+To run rules for a specific resource type, create a class implementing `CrudInterceptor<T>`:
+```java
+package com.org73n37.crudapp.domain.device;
+
+import com.org73n37.crudapp.data.Device;
+import com.org73n37.crudapp.logic.core.CrudInterceptor;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DeviceInterceptor implements CrudInterceptor<Device> {
+    @Override
+    public void beforeCreate(Device entity) {
+        entity.setModelName(entity.getModelName().toUpperCase());
+    }
+}
+```
+
+### Global/Assignable Interceptor
+To apply an interceptor to **all resources** extending a common parent, register it against the parent class (e.g. `BaseEntity`). `CrudEngine` resolves and merges assignable interceptors automatically:
+```java
+package com.org73n37.crudapp.logic.auditlog;
+
+import com.org73n37.crudapp.data.core.BaseEntity;
+import com.org73n37.crudapp.logic.core.CrudInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AuditLoggingInterceptor implements CrudInterceptor<BaseEntity> {
+    private static final Logger log = LoggerFactory.getLogger(AuditLoggingInterceptor.class);
+
+    @Override
+    public void beforeCreate(BaseEntity entity) {
+        log.info("[AUDIT] Creating resource: {} for tenant {}", entity.getClass().getSimpleName(), entity.getTenantId());
+    }
+}
+```
+
+---
+
+## 5. Local Infrastructure Configuration Setup
+
+The application dependencies (PostgreSQL, MongoDB, Keycloak) run inside Docker containers.
 
 ### Step 1: Spin up Containers
-Run the following command at the project root to spin up the required PostgreSQL and Keycloak instances:
 ```bash
 docker-compose up -d
 ```
 *   **PostgreSQL:** Runs on port `5433` (DB: `cruddb`, Username: `user`, Password: `password`).
 *   **Keycloak:** Runs on port `8081` (Admin Credentials: `admin`/`admin`).
 
-### Step 2: Configure Keycloak Admin Console
+### Step 2: Configure Keycloak Realm
 1.  Navigate to `http://localhost:8081/admin` and log in.
 2.  Create a realm named `crud-realm`.
 3.  Create roles: `ADMIN`, `USER`, `GUEST`.
-4.  Create client `crud-client` or configure users and roles.
-5.  Generate a JWT containing the user identity, roles list under `realm_access.roles`, and optionally a custom `tenant` claim (e.g. `tenant-a`).
-
-### Step 3: Application Configuration properties
-Review `src/main/resources/application.properties` to align settings:
-```properties
-server.port=8080
-
-# Database Connectivity (linked to Docker PostgreSQL instance)
-spring.datasource.url=jdbc:postgresql://localhost:5433/cruddb
-spring.datasource.username=user
-spring.datasource.password=password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA validation and formatting
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-
-# Keycloak Token Signature verification certs
-keycloak.jwk-set-uri=http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs
-keycloak.issuer=http://localhost:8081/realms/crud-realm
-
-# Input Payload and Network Restrictions (Slowloris & Body Limit Protections)
-server.max-http-header-size=8KB
-spring.codec.max-in-memory-size=2MB
-server.netty.connection-timeout=10s
-server.netty.idle-timeout=30s
-server.netty.max-keep-alive-requests=100
-
-# Strict JSON Schema Validation
-spring.jackson.deserialization.fail-on-unknown-properties=true
-
-# RFC 7807 Problem Details Support
-spring.webflux.problemdetails.enabled=true
-```
+4.  Create user `test-user`, assign credentials and mapping roles.
 
 ---
 
-## 2. Registering a New Resource Entity
+## 6. Hostinger VPS Deployment
 
-The CRUD engine registers resource endpoints dynamically at startup by scanning JPA entities. Follow this guide to add a new resource endpoint (e.g., `Device`).
+Because the application runs Java 25, Keycloak, and PostgreSQL as persistent daemon processes, **Hostinger Shared Web Hosting plans cannot run this stack**. You must deploy on a **Hostinger VPS Plan** running Ubuntu 22.04 LTS or 24.04 LTS.
 
-### Step 1: Create the JPA Entity
-Your entity class must extend `BaseEntity` and be annotated with `@Entity` and `@CrudResource`.
-
-Create `src/main/java/com/example/crudapp/data/Device.java`:
-```java
-package com.example.crudapp.data;
-
-import com.example.crudapp.api.records.DeviceRecord;
-import com.example.crudapp.data.core.BaseEntity;
-import com.example.crudapp.infrastructure.annotations.CrudResource;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
-
-@Entity
-@CrudResource(
-    path = "devices", 
-    dto = DeviceRecord.class, 
-    roles = {"ADMIN", "USER"} // RBAC Roles allowed to query/write to this resource
-)
-public class Device extends BaseEntity {
-
-    @Column(nullable = false)
-    private String modelName;
-
-    @Column(nullable = false)
-    private String serialNumber;
-
-    // Default constructor is required by Hibernate
-    public Device() {}
-
-    public String getModelName() { return modelName; }
-    public void setModelName(String modelName) { this.modelName = modelName; }
-
-    public String getSerialNumber() { return serialNumber; }
-    public void setSerialNumber(String serialNumber) { this.serialNumber = serialNumber; }
-}
-```
-
-#### Why extending `BaseEntity` matters:
-*   **JPA Auditing:** Automatically manages database audit logging fields (`created_by`, `created_date`, `last_modified_by`, `last_modified_date`).
-*   **Optimistic Version Locking:** Maps a `@Version` field to prevent simultaneous transactional overwrites (prevents dirty writes).
-*   **Multi-Tenancy Segregation:** Implements a logical `tenantId` field to separate and restrict read/write boundaries automatically.
-*   **Dynamic Attributes:** Inherits an `@ElementCollection` map to let users post custom runtime fields not defined in the schema.
-
----
-
-## 3. Creating and Mapping the DTO Record
-
-To protect the internal database layout, client endpoints accept and return DTO records rather than raw database entities.
-
-### Step 1: Create the Java Record
-Create `src/main/java/com/example/crudapp/api/records/DeviceRecord.java`:
-```java
-package com.example.crudapp.api.records;
-
-import com.example.crudapp.data.Device;
-import com.example.crudapp.infrastructure.annotations.EntityMapping;
-import jakarta.validation.constraints.NotBlank;
-import java.util.Map;
-
-@EntityMapping(entity = Device.class) // Maps this DTO Record back to the JPA Entity
-public record DeviceRecord(
-    @NotBlank(message = "Model name cannot be blank")
-    String modelName,
-
-    @NotBlank(message = "Serial number cannot be blank")
-    String serialNumber,
-
-    Map<String, String> attributes // Capture dynamic custom attributes
-) {}
-```
-
-#### Why `@EntityMapping` matters:
-*   **Bidirectional Mapping Validation:** During application startup, `CrudEngine` asserts that the entity's `@CrudResource(dto = ...)` matches the DTO's `@EntityMapping(entity = ...)` annotation. If they do not match, the application immediately throws a validation exception and halts execution. This prevents developers from deploying mismatching or unmapped configurations to production.
-*   **Input Validation:** Enforces JSR-380 input validations (e.g. `@NotBlank`, `@Min`, etc.). Violations are caught and mapped directly to unified JSON error payloads (status `400`).
-
----
-
-## 4. Custom Hook Interceptors
-
-Sometimes you need to validate business logic, format fields, or log specific audits before an entity is written to or deleted from the database. This is achieved by creating an interceptor.
-
-### Step 1: Create the Interceptor
-Create a class implementing `CrudInterceptor<T>`.
-
-Create `src/main/java/com/example/crudapp/domain/device/DeviceInterceptor.java`:
-```java
-package com.example.crudapp.domain.device;
-
-import com.example.crudapp.data.Device;
-import com.example.crudapp.logic.core.CrudInterceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-@Component
-public class DeviceInterceptor implements CrudInterceptor<Device> {
-    private static final Logger log = LoggerFactory.getLogger(DeviceInterceptor.class);
-
-    @Override
-    public void beforeCreate(Device entity) {
-        log.info("Processing device creation hook for Model: {}", entity.getModelName());
-        // Capitalize the serial number format
-        if (entity.getSerialNumber() != null) {
-            entity.setSerialNumber(entity.getSerialNumber().toUpperCase());
-        }
-    }
-
-    @Override
-    public void afterCreate(Device entity) {
-        log.info("Device registered with ID: {}", entity.getId());
-    }
-
-    @Override
-    public void beforeUpdate(Device entity) {
-        log.info("Pre-update hook executed for device ID: {}", entity.getId());
-    }
-
-    @Override
-    public void afterUpdate(Device entity) {
-        log.info("Device updated: {}", entity.getId());
-    }
-
-    @Override
-    public void beforeDelete(Long id) {
-        log.info("Pre-delete check executing for Device: {}", id);
-    }
-
-    @Override
-    public void afterDelete(Long id) {
-        log.info("Device removed: {}", id);
-    }
-}
-```
-
-#### Why interceptors matter:
-*   Instead of writing custom controllers and routing tables for every single resource, you write simple interceptors. The core engine detects these interceptors automatically and registers them to run around JDBC persist operations, keeping the CRUD engine extremely modular.
-
----
-
-## 5. Liquibase Database Migrations & RLS Policies
-
-Every schema adjustment must be configured in Liquibase changesets. To enforce Row-Level Security (RLS) at the database layer, the changesets should also create policies.
-
-Add a changeset to `src/main/resources/db/changelog/db.changelog-master.xml`:
-```xml
-<changeSet id="5" author="developer">
-    <!-- Device Entity Table -->
-    <createTable tableName="device">
-        <column name="id" type="bigint">
-            <constraints primaryKey="true" nullable="false"/>
-        </column>
-        <column name="model_name" type="varchar(255)">
-            <constraints nullable="false"/>
-        </column>
-        <column name="serial_number" type="varchar(255)">
-            <constraints nullable="false"/>
-        </column>
-    </createTable>
-
-    <!-- Map device ID reference back to baseentity primary key -->
-    <addForeignKeyConstraint baseColumnNames="id"
-                             baseTableName="device"
-                             constraintName="fk_device_baseentity"
-                             referencedColumnNames="id"
-                             referencedTableName="baseentity"
-                             onDelete="CASCADE"/>
-</changeSet>
-
-<changeSet id="6" author="security-team" dbms="postgresql">
-    <!-- Enable RLS on the baseentity table if not already enabled -->
-    <sql>
-        ALTER TABLE baseentity ENABLE ROW LEVEL SECURITY;
-        DROP POLICY IF EXISTS tenant_isolation_policy ON baseentity;
-        CREATE POLICY tenant_isolation_policy ON baseentity
-        USING (tenant_id = current_setting('app.current_tenant', true))
-        WITH CHECK (tenant_id = current_setting('app.current_tenant', true));
-    </sql>
-</changeSet>
-```
-
----
-
-## 6. Core Enterprise & Security Mechanisms
-
-### Dynamic Row-Level Security (RLS) Isolation
-The dynamic security context sets a transaction-local variable (`app.current_tenant`) inside the database connection right before executing SQL statements. When running on WebFlux, this is achieved by capturing the tenant ID from the subscriber context and injecting it inside the database-bounded blocking scheduler (`boundedElastic` thread pool boundary):
-```sql
-SET LOCAL app.current_tenant = 'tenant-id';
-```
-Any queries issued in that transaction will only select or write rows matching that `tenant_id`.
-
-### Token-Bucket Rate Limiting Filter
-A Token Bucket filter (`ReactiveRateLimiterFilter`) intercepts all WebFlux requests before routing them.
-- **Rules**: Max capacity of 50 tokens per IP, refilling at a rate of 50 tokens per minute.
-- **Overlimit response**: Returns `429 Too Many Requests` formatted as a Problem Details response.
-
-### Logback MDC Context Propagation
-Logback MDC parameters (`traceId`, `tenantId`, `username`) are propagated across reactive boundaries using WebFlux filters and custom context-driven log wrappers, ensuring trace correlation remains contiguous in high-scale asynchronous logs.
-
-### RFC 7807 Problem Details
-Spring Boot's native `ProblemDetail` is used by the `GlobalExceptionHandler` to translate exceptions into standardized structures. It captures `status`, `title`, `detail`, `instance` (URI path), and extends them with:
-- `timestamp`: Instant of occurrence.
-- `requestId`: The correlation ID for troubleshooting.
-- `error` / `message`: Backwards compatibility fields.
-- `details`: Map of detailed validation failures (for 400 Bad Request).
-
----
-
-## 7. Hostinger Deployment (VPS & Database Setup)
-
-Because the application runs Java (JDK 25), Keycloak, and PostgreSQL as persistent daemon processes, **Hostinger Shared Web Hosting plans cannot run this stack**. You must purchase a **Hostinger VPS Plan** (running Linux distributions like **Ubuntu 22.04 LTS / 24.04 LTS**).
-
-Below are the instructions to set up the database and deploy both backend options (Uber-JAR vs. Docker Compose) on a Hostinger VPS.
-
----
-
-### Step 1: Install PostgreSQL Database on Hostinger VPS
-
-You can deploy PostgreSQL natively on the VPS or inside a Docker container. Here is how to set up a native installation:
-
-1.  **Connect to your Hostinger VPS via SSH:**
-    ```bash
-    ssh root@YOUR_VPS_IP
-    ```
-2.  **Install PostgreSQL:**
-    ```bash
-    sudo apt update
-    sudo apt install postgresql postgresql-contrib -y
-    ```
-3.  **Create the Database and User:**
-    Switch to the postgres system account:
-    ```bash
-    sudo -i -u postgres
-    psql
-    ```
-    Execute the SQL commands:
-    ```sql
-    CREATE DATABASE cruddb;
-    CREATE USER dbuser WITH PASSWORD 'secure_vps_password';
-    GRANT ALL PRIVILEGES ON DATABASE cruddb TO dbuser;
-    \q
-    exit
-    ```
-4.  *(Optional)* **Enable External Connections:**
-    If your app runs on a separate server, edit `/etc/postgresql/18/main/postgresql.conf` (replace `18` with your active PostgreSQL version) and set:
-    ```ini
-    listen_addresses = '*'
-    ```
-    Then, edit `/etc/postgresql/18/main/pg_hba.conf` to whitelist specific IPs:
-    ```text
-    host    cruddb          dbuser          YOUR_APP_SERVER_IP/32    scram-sha-256
-    ```
-    Restart PostgreSQL to apply:
-    ```bash
-    sudo systemctl restart postgresql
-    ```
-
----
-
-### Step 2: Deploy the Java Backend App
-
-Choose one of the two standard deployment approaches:
-
-#### Option A: Native Deployment (Uber-JAR + systemd)
-
+### Option A: Native Deployment (systemd)
 1.  **Install Java Runtime (JRE 25) on your VPS:**
-    Download and extract the Eclipse Temurin JRE 25 binary:
     ```bash
     wget https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25%2B9/OpenJDK25U-jre_x64_linux_hotspot_25_9.tar.gz
     tar -xvf OpenJDK25U-jre_x64_linux_hotspot_25_9.tar.gz
-    sudo mkdir -p /usr/lib/jvm
     sudo mv jdk-25* /usr/lib/jvm/java-25-openjdk
     sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-25-openjdk/bin/java 1
     ```
-2.  **Package the Application locally:**
-    Build the fat-jar containing all dependencies:
+2.  **Package the application:**
     ```bash
     mvn clean package
     ```
-3.  **Upload the JAR to your Hostinger VPS:**
-    Copy the built jar using SCP:
+3.  **Upload the Uber-JAR to the VPS:**
     ```bash
-    scp target/crudapp-0.0.1-SNAPSHOT.jar root@YOUR_VPS_IP:/var/www/crudapp.jar
+    scp crud-app-sample/target/crud-app-sample-0.0.1-SNAPSHOT.jar root@YOUR_VPS_IP:/var/www/crudapp.jar
     ```
-4.  **Create a systemd Service for Automatic Restarts:**
-    Create the configuration file:
+4.  **Create a systemd Service:**
     ```bash
     sudo nano /etc/systemd/system/crudapp.service
     ```
-    Paste the following service definition (replace placeholders):
+    Paste the configuration details:
     ```ini
     [Unit]
     Description=Dynamic CRUD Application
-    After=network.target postgresql.service
+    After=network.target
 
     [Service]
     User=root
     WorkingDirectory=/var/www
     ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cruddb -Dspring.datasource.username=dbuser -Dspring.datasource.password=secure_vps_password -Dkeycloak.jwk-set-uri=http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs -Dkeycloak.issuer=http://localhost:8081/realms/crud-realm /var/www/crudapp.jar
-    SuccessExitStatus=143
     Restart=always
-    RestartSec=10
-
-    [Service]
-    StandardOutput=journal
-    StandardError=journal
-    SyslogIdentifier=crudapp
 
     [Install]
     WantedBy=multi-user.target
     ```
-5.  **Enable and Start the Service:**
+5.  **Start the Service:**
     ```bash
     sudo systemctl daemon-reload
-    sudo systemctl enable crudapp
-    sudo systemctl start crudapp
-    ```
-    Monitor logs using:
-    ```bash
-    journalctl -u crudapp -f
+    sudo systemctl enable crudapp --now
     ```
 
----
+### Option B: Reverse Proxy Routing (Nginx)
+Install Nginx to secure the API behind port `80`/`443` and configure SSL certificates:
+```bash
+sudo apt install nginx python3-certbot-nginx -y
+```
+Create a site configuration under `/etc/nginx/sites-available/crudapp`:
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
 
-#### Option B: Containerized Deployment (Docker Compose)
-
-This approach runs the app, database, and Keycloak together in isolated containers using our pre-configured Docker stack.
-
-1.  **Install Docker and Docker Compose on Hostinger VPS:**
-    Follow the standard repository setups:
-    ```bash
-    sudo apt update
-    sudo apt install docker.io docker-compose -y
-    sudo systemctl enable docker --now
-    ```
-2.  **Clone / Transfer Project files to the VPS:**
-    Clone your repository into `/var/www/crudapp` or copy it using SFTP.
-3.  **Run the Stack:**
-    Navigate to the directory and boot up the containers:
-    ```bash
-    cd /var/www/crudapp
-    docker-compose up -d --build
-    ```
-
----
-
-### Step 3: Configure Reverse Proxy (Nginx) & SSL Security
-
-Since the backend runs on port `8080`, we use **Nginx** as a reverse proxy to route public traffic from port `80` (HTTP) and `443` (HTTPS) to the backend.
-
-1.  **Install Nginx on VPS:**
-    ```bash
-    sudo apt install nginx -y
-    ```
-2.  **Configure Virtual Host:**
-    Create a configuration file:
-    ```bash
-    sudo nano /etc/nginx/sites-available/crudapp
-    ```
-    Paste the following server block (replace `yourdomain.com` with your actual domain):
-    ```nginx
-    server {
-        listen 80;
-        server_name yourdomain.com;
-
-        location / {
-            proxy_pass http://127.0.0.1:8080;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
-    ```
-    Activate the site and restart Nginx:
-    ```bash
-    sudo ln -s /etc/nginx/sites-available/crudapp /etc/nginx/sites-enabled/
-    sudo systemctl restart nginx
-    ```
-3.  **Configure Free HTTPS (Certbot / Let's Encrypt):**
-    Install Certbot:
-    ```bash
-    sudo apt install certbot python3-certbot-nginx -y
-    sudo certbot --nginx -d yourdomain.com
-    ```
-    Certbot will automatically verify ownership, fetch the certificate, and update the Nginx configuration block to handle secure HTTPS connections.
-
----
-
-## 8. Frontend Development Setup & Architecture
-
-The user interface lives in the `frontend` directory and is built using React 19, TypeScript, and Vite.
-
-### Installing Dependencies
-Run the following command inside the `frontend` folder to install the required packages:
-```bash
-cd frontend
-npm install
+}
 ```
-
-### Running the Development Server
-Start the local hot-reload web server:
+Link the config and restart Nginx:
 ```bash
-npm run dev
+sudo ln -s /etc/nginx/sites-available/crudapp /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+sudo certbot --nginx -d yourdomain.com
 ```
-The application will boot up on `http://localhost:5173`. Make sure the Java backend is running on port `8080` so the frontend can retrieve endpoint schemas and route request queries.
-
-### Building for Production
-To bundle the frontend assets for production:
-```bash
-npm run build
-```
-This builds static assets under `frontend/dist/`. In a production deployment, these static assets can be served by Nginx or packaged inside the Spring Boot container resources.
