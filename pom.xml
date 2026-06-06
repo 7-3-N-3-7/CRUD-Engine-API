@@ -13,8 +13,12 @@
 	<modules>
 		<module>crud-engine-core</module>
 		<module>crud-engine-jpa</module>
+		<module>crud-engine-mongodb</module>
+		<module>crud-engine-inmemory</module>
 		<module>crud-engine-webflux</module>
 		<module>crud-engine-security-keycloak</module>
+		<module>crud-engine-plugin-ratelimiter</module>
+		<module>crud-engine-plugin-auditlog</module>
 		<module>crud-engine-spring-boot-starter</module>
 		<module>crud-app-sample</module>
 	</modules>
@@ -36,6 +40,11 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jpa</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
@@ -77,12 +86,32 @@
 			</dependency>
 			<dependency>
 				<groupId>com.org73n37</groupId>
+				<artifactId>crud-engine-mongodb</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.org73n37</groupId>
+				<artifactId>crud-engine-inmemory</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.org73n37</groupId>
 				<artifactId>crud-engine-webflux</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.org73n37</groupId>
 				<artifactId>crud-engine-security-keycloak</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.org73n37</groupId>
+				<artifactId>crud-engine-plugin-ratelimiter</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.org73n37</groupId>
+				<artifactId>crud-engine-plugin-auditlog</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

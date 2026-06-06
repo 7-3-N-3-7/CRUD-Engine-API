@@ -4,3 +4,24 @@
 [submodule "crud-engine-security-keycloak"]
 	path = crud-engine-security-keycloak
 	url = https://github.com/7-3-N-3-7/crud-engine-security-keycloak.git
+[submodule "crud-engine-core"]
+	path = crud-engine-core
+	url = https://github.com/7-3-N-3-7/crud-engine-core.git
+[submodule "crud-engine-webflux"]
+	path = crud-engine-webflux
+	url = https://github.com/7-3-N-3-7/crud-engine-webflux.git
+[submodule "crud-engine-spring-boot-starter"]
+	path = crud-engine-spring-boot-starter
+	url = https://github.com/7-3-N-3-7/crud-engine-spring-boot-starter.git
+[submodule "crud-engine-inmemory"]
+	path = crud-engine-inmemory
+	url = https://github.com/7-3-N-3-7/crud-engine-inmemory.git
+[submodule "crud-engine-mongodb"]
+	path = crud-engine-mongodb
+	url = https://github.com/7-3-N-3-7/crud-engine-mongodb.git
+[submodule "crud-engine-plugin-ratelimiter"]
+	path = crud-engine-plugin-ratelimiter
+	url = https://github.com/7-3-N-3-7/crud-engine-plugin-ratelimiter.git
+[submodule "crud-engine-plugin-auditlog"]
+	path = crud-engine-plugin-auditlog
+	url = https://github.com/7-3-N-3-7/crud-engine-plugin-auditlog.git
