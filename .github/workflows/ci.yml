@@ -1,5 +1,5 @@
 name: Java CI with Maven
-
+# Trigger rebuild with public submodules
 on:
   push:
     branches: [ main, master ]
