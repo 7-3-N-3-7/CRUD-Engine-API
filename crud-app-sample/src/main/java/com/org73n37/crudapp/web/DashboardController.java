@@ -254,6 +254,10 @@ public class DashboardController {
                         .header("Accept", "application/json")
                         .header("Authorization", "Bearer " + jwtToken);
 
+                if (method.equals("POST") || method.equals("PUT")) {
+                    reqBuilder.header("Content-Type", "application/json");
+                }
+
                 if (method.equals("GET")) {
                     reqBuilder.GET();
                 } else if (method.equals("DELETE")) {
