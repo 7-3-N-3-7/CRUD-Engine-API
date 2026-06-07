@@ -158,8 +158,7 @@ public class DashboardController {
         // In WebFlux, @RequestParam only binds query parameters, so form-encoded
         // POST bodies must be read explicitly via ServerWebExchange.getFormData().
         return exchange.getFormData().flatMap(form -> {
-            Map<String, String> allParams = new LinkedHashMap<>();
-            form.forEach((k, v) -> allParams.put(k, (v != null && !v.isEmpty()) ? v.get(0) : null));
+            Map<String, String> allParams = new LinkedHashMap<>(form.toSingleValueMap());
 
             String selectedResource = allParams.get("selectedResource");
             String selectedOp = allParams.get("selectedOp");
