@@ -22,3 +22,6 @@
 [submodule "crud-engine-plugin-auditlog"]
 	path = crud-engine-plugin-auditlog
 	url = https://github.com/7-3-N-3-7/crud-engine-plugin-auditlog.git
+[submodule "crud-engine-weaviate"]
+	path = crud-engine-weaviate
+	url = https://github.com/7-3-N-3-7/crud-engine-weaviate.git

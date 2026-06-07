@@ -19,7 +19,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = "spring.autoconfigure.exclude=com.org73n37.crudapp.data.weaviate.config.WeaviateAutoConfiguration"
+)
 public class CrudAppIntegrationTest {
 
     private static final KeyPair keyPair;

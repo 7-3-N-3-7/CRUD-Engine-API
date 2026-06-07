@@ -14,6 +14,7 @@
 		<module>crud-engine-core</module>
 		<module>crud-engine-jpa</module>
 		<module>crud-engine-inmemory</module>
+		<module>crud-engine-weaviate</module>
 		<module>crud-engine-webflux</module>
 		<module>crud-engine-security-keycloak</module>
 		<module>crud-engine-plugin-ratelimiter</module>
@@ -81,6 +82,11 @@
 			<dependency>
 				<groupId>com.org73n37</groupId>
 				<artifactId>crud-engine-inmemory</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.org73n37</groupId>
+				<artifactId>crud-engine-weaviate</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
