@@ -39,5 +39,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Apply spring-boot-starter migration patch
+        run: |
+          if grep -q '<artifactId>crud-engine-security-keycloak</artifactId>' crud-engine-spring-boot-starter/pom.xml; then
+            git -C crud-engine-spring-boot-starter apply --3way ../migration-patches/0002-crud-engine-spring-boot-starter-drop-security-keycloak-dep.patch
+          fi
+
       - name: Build and test with Maven
         run: mvn clean test
