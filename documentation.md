@@ -41,7 +41,7 @@ The `GenericSpecification` has been upgraded to support meta-filtering (owner, i
 | **Schema Factory** | `/api/meta/schemas` - Manage Entities at runtime. |
 | **Zero-Code Proxy** | `/api/v3/{resource}` - Unified entry point for dynamic data. |
 | **Virtual Storage** | Single `virtual_documents` table using JSON blobs. |
-| **Security Tier** | Three-tier RBAC: ADMIN, USER, ANYONE. |
+| **Security Tier** | Deny-by-default RBAC enforced in `crud-engine-core` (`ReactiveJwtFilter`); roles such as ADMIN / USER must be granted explicitly, `ANYONE` opts a resource into public access. |
 
 ---
 

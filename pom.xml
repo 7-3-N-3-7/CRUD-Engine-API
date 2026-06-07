@@ -16,7 +16,6 @@
 		<module>crud-engine-inmemory</module>
 		<module>crud-engine-weaviate</module>
 		<module>crud-engine-webflux</module>
-		<module>crud-engine-security-keycloak</module>
 		<module>crud-engine-plugin-ratelimiter</module>
 		<module>crud-engine-plugin-auditlog</module>
 		<module>crud-engine-spring-boot-starter</module>
@@ -97,11 +96,6 @@
 			<dependency>
 				<groupId>com.org73n37</groupId>
 				<artifactId>crud-engine-webflux</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.org73n37</groupId>
-				<artifactId>crud-engine-security-keycloak</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
