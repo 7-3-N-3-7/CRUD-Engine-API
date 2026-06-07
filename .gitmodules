@@ -25,6 +25,3 @@
 [submodule "crud-engine-weaviate"]
 	path = crud-engine-weaviate
 	url = https://github.com/7-3-N-3-7/crud-engine-weaviate.git
-[submodule "Crud_frontend"]
-	path = Crud_frontend
-	url = https://github.com/7-3-N-3-7/Crud_frontend.git

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic CRUD Platform Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+    <div class="dashboard">
+        
+        <!-- 1. Glassmorphic Header -->
+        <header class="header glass-panel">
+            <div class="title-area">
+                <h1>Dynamic CRUD Engine Platform</h1>
+                <p>Metadata-Driven Reactive Micro-Service Panel (0.00% JS/TS)</p>
+            </div>
+            <div class="badge-version">WEBFLUX v4.0.6</div>
+        </header>
+
+        <!-- 2. Architectural Diagram Block -->
+        <section class="arch-container glass-panel">
+            <div class="arch-header">
+                <h3 style="margin: 0; fontSize: 1.2rem; fontWeight: 600;">System Architecture Blueprint</h3>
+                <span style="fontSize: 0.8rem; color: var(--text-muted);">Click on any component to inspect details</span>
+            </div>
+            <div class="arch-flow">
+                <div th:each="node, iterStat : ${archNodes}" style="display: contents;">
+                    <a class="arch-node-link" th:href="@{/dashboard(resource=${selectedResource}, op=${selectedOp}, activeNode=${node.id})}">
+                        <div th:class="${node.id == activeArchNode.id} ? 'arch-node active' : 'arch-node'">
+                            <h4 th:text="${node.title}">Node Title</h4>
+                            <span th:text="${node.subtitle}">Node Subtitle</span>
+                        </div>
+                    </a>
+                    <div th:if="${!iterStat.last}" class="arch-arrow">➜</div>
+                </div>
+            </div>
+            <div class="arch-detail-panel" th:if="${activeArchNode != null}">
+                <h5 th:text="'⚡ ' + ${activeArchNode.title} + ' (' + ${activeArchNode.subtitle} + ')'">⚡ Node Title</h5>
+                <p th:text="${activeArchNode.desc}">Node description detail goes here...</p>
+            </div>
+        </section>
+
+        <!-- 3. Columns Layout -->
+        <div class="main-grid">
+            
+            <!-- Left Column: Security Control Panel -->
+            <aside class="sidebar-panel glass-panel">
+                <div>
+                    <h3>Security & Tenancy</h3>
+                    <p style="color: var(--text-secondary); fontSize: 0.8rem; margin: 4px 0 0 0;">Configure credentials to test endpoint policies</p>
+                </div>
+                
+                <form th:action="@{/dashboard/security}" method="POST">
+                    <input type="hidden" name="selectedResource" th:value="${selectedResource}" />
+                    <input type="hidden" name="selectedOp" th:value="${selectedOp}" />
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Tenant ID</label>
+                        <input 
+                            type="text" 
+                            name="tenantId"
+                            class="input-control" 
+                            th:value="${tenantId}" 
+                        />
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Preferred Username</label>
+                        <input 
+                            type="text" 
+                            name="username"
+                            class="input-control" 
+                            th:value="${username}" 
+                        />
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Identity Role Mapping</label>
+                        <div style="display: flex; gap: 8px;">
+                            <label style="flex: 1; text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);"
+                                   th:styleappend="${selectedRole == 'ADMIN'} ? 'border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6,182,212,0.08);' : ''">
+                                <input type="radio" name="selectedRole" value="ADMIN" th:checked="${selectedRole == 'ADMIN'}" style="display: none;" />
+                                ADMIN
+                            </label>
+                            <label style="flex: 1; text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);"
+                                   th:styleappend="${selectedRole == 'GUEST'} ? 'border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6,182,212,0.08);' : ''">
+                                <input type="radio" name="selectedRole" value="GUEST" th:checked="${selectedRole == 'GUEST'}" style="display: none;" />
+                                GUEST
+                            </label>
+                            <label style="flex: 1; text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);"
+                                   th:styleappend="${selectedRole == 'NONE'} ? 'border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6,182,212,0.08);' : ''">
+                                <input type="radio" name="selectedRole" value="NONE" th:checked="${selectedRole == 'NONE'}" style="display: none;" />
+                                NONE
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-bottom: 16px;">
+                        Save Security Settings
+                    </button>
+                </form>
+
+                <div class="form-group">
+                    <label>Generated Secure RS256 JWT Token</label>
+                    <div class="token-preview" th:text="${jwtToken != null && !jwtToken.isEmpty()} ? ${jwtToken} : 'Generating token...'">Token preview</div>
+                </div>
+
+                <div class="form-group" style="margin-top: 12px;">
+                    <label>Target API Endpoints (Local Gateway)</label>
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);"
+                         th:text="'http://localhost:8080/api/' + ${selectedResource}">
+                        Target Gateway endpoint URI
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Column: Endpoint Tester -->
+            <main class="tester-panel glass-panel">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">Endpoint Execution Console</h3>
+                </div>
+
+                <!-- Resource tab selections -->
+                <div class="resource-tabs">
+                    <a th:each="res : ${resources}" 
+                       th:href="@{/dashboard(resource=${res.key}, op=${selectedOp}, activeNode=${activeArchNode.id})}"
+                       th:class="${selectedResource == res.key} ? 'tab active' : 'tab'"
+                       th:text="${res.key.toUpperCase()} + ' (' + ${res.value.version} + ')'">
+                       Resource Name
+                    </a>
+                </div>
+
+                <!-- Operation & Tester Panel -->
+                <div class="operations-grid" th:if="${currentResource != null}">
+                    
+                    <!-- Config column -->
+                    <div class="op-config">
+                        <div class="op-tabs">
+                            <a th:href="@{/dashboard(resource=${selectedResource}, op='GET_ALL', activeNode=${activeArchNode.id})}"
+                               th:class="${selectedOp == 'GET_ALL'} ? 'op-tab active get' : 'op-tab'">GET ALL</a>
+                            <a th:href="@{/dashboard(resource=${selectedResource}, op='GET_BY_ID', activeNode=${activeArchNode.id})}"
+                               th:class="${selectedOp == 'GET_BY_ID'} ? 'op-tab active get' : 'op-tab'">GET BY ID</a>
+                            <a th:href="@{/dashboard(resource=${selectedResource}, op='POST', activeNode=${activeArchNode.id})}"
+                               th:class="${selectedOp == 'POST'} ? 'op-tab active post' : 'op-tab'">POST</a>
+                            <a th:href="@{/dashboard(resource=${selectedResource}, op='PUT', activeNode=${activeArchNode.id})}"
+                               th:class="${selectedOp == 'PUT'} ? 'op-tab active put' : 'op-tab'">PUT</a>
+                            <a th:href="@{/dashboard(resource=${selectedResource}, op='DELETE', activeNode=${activeArchNode.id})}"
+                               th:class="${selectedOp == 'DELETE'} ? 'op-tab active delete' : 'op-tab'">DELETE</a>
+                        </div>
+
+                        <!-- Config Parameters Form -->
+                        <form th:action="@{/dashboard/execute}" method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+                            <input type="hidden" name="selectedResource" th:value="${selectedResource}" />
+                            <input type="hidden" name="selectedOp" th:value="${selectedOp}" />
+
+                            <!-- Specific Config Parameters -->
+                            <div th:if="${selectedOp == 'GET_ALL'}" style="display: flex; flex-direction: column; gap: 16px;">
+                                <div style="display: flex; gap: 12px;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Page Index</label>
+                                        <input 
+                                            type="number" 
+                                            name="page"
+                                            class="input-control" 
+                                            value="0" 
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Page Size</label>
+                                        <input 
+                                            type="number" 
+                                            name="size"
+                                            class="input-control" 
+                                            value="10" 
+                                            min="1"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 12px;">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Sort Attribute</label>
+                                        <select name="sortField" class="input-control">
+                                            <option value="id">id</option>
+                                            <option th:each="f : ${currentResource.fields}" th:value="${f.name}" th:text="${f.name}">field</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Direction</label>
+                                        <select name="sortOrder" class="input-control">
+                                            <option value="asc">Ascending</option>
+                                            <option value="desc">Descending</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Filters Builder (Static 3 Rows without JS) -->
+                                <div class="form-group">
+                                    <label>Dynamic Specifications Filters (Up to 3)</label>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Filter Row 1 -->
+                                        <div class="filter-row">
+                                            <select name="filter_field_1" class="input-control" style="flex: 3;">
+                                                <option value="">[Select Field]</option>
+                                                <option th:each="f : ${currentResource.fields}" th:value="${f.name}" th:text="${f.name}">field</option>
+                                            </select>
+                                            <select name="filter_op_1" class="input-control" style="flex: 2;">
+                                                <option value="=">Equals</option>
+                                                <option value="_like">Like</option>
+                                                <option value="_gt">Greater Than</option>
+                                                <option value="_lt">Less Than</option>
+                                                <option value="_gte">GTE</option>
+                                                <option value="_lte">LTE</option>
+                                            </select>
+                                            <input type="text" name="filter_value_1" class="input-control" style="flex: 4;" placeholder="Value..." />
+                                        </div>
+                                        <!-- Filter Row 2 -->
+                                        <div class="filter-row">
+                                            <select name="filter_field_2" class="input-control" style="flex: 3;">
+                                                <option value="">[Select Field]</option>
+                                                <option th:each="f : ${currentResource.fields}" th:value="${f.name}" th:text="${f.name}">field</option>
+                                            </select>
+                                            <select name="filter_op_2" class="input-control" style="flex: 2;">
+                                                <option value="=">Equals</option>
+                                                <option value="_like">Like</option>
+                                                <option value="_gt">Greater Than</option>
+                                                <option value="_lt">Less Than</option>
+                                                <option value="_gte">GTE</option>
+                                                <option value="_lte">LTE</option>
+                                            </select>
+                                            <input type="text" name="filter_value_2" class="input-control" style="flex: 4;" placeholder="Value..." />
+                                        </div>
+                                        <!-- Filter Row 3 -->
+                                        <div class="filter-row">
+                                            <select name="filter_field_3" class="input-control" style="flex: 3;">
+                                                <option value="">[Select Field]</option>
+                                                <option th:each="f : ${currentResource.fields}" th:value="${f.name}" th:text="${f.name}">field</option>
+                                            </select>
+                                            <select name="filter_op_3" class="input-control" style="flex: 2;">
+                                                <option value="=">Equals</option>
+                                                <option value="_like">Like</option>
+                                                <option value="_gt">Greater Than</option>
+                                                <option value="_lt">Less Than</option>
+                                                <option value="_gte">GTE</option>
+                                                <option value="_lte">LTE</option>
+                                            </select>
+                                            <input type="text" name="filter_value_3" class="input-control" style="flex: 4;" placeholder="Value..." />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${selectedOp == 'GET_BY_ID' || selectedOp == 'PUT' || selectedOp == 'DELETE'}" class="form-group">
+                                <label>Target Resource ID (Long)</label>
+                                <input
+                                    type="text"
+                                    name="singleId"
+                                    class="input-control"
+                                    placeholder="e.g. 1"
+                                />
+                            </div>
+
+                            <div th:if="${selectedOp == 'POST' || selectedOp == 'PUT'}" style="display: flex; flex-direction: column; gap: 12px;">
+                                <h4 style="margin: 8px 0 0 0; fontSize: 0.9rem; color: var(--text-secondary);">Resource Body Fields (Record DTO Schema)</h4>
+                                <div th:each="field : ${currentResource.fields}" class="form-group">
+                                    <label style="display: flex; align-items: center;">
+                                        <span th:text="${field.name}">field_name</span>&nbsp;<span th:text="'(' + ${field.type} + ')'">(type)</span>
+                                        <span th:if="${field.required}" class="constraint-badge required">Required</span>
+                                        <span th:if="${field.constraints != null && !field.constraints.isEmpty()}" class="constraint-badge">
+                                            <span th:if="${field.constraints.min != null}" th:text="'min: ' + ${field.constraints.min}">min</span>
+                                            <span th:if="${field.constraints.max != null}" th:text="'max: ' + ${field.constraints.max}">max</span>
+                                            <span th:if="${field.constraints.positive != null && field.constraints.positive}" th:text="'positive'">positive</span>
+                                        </span>
+                                    </label>
+                                    
+                                    <textarea
+                                        th:if="${field.type == 'Map'}"
+                                        th:name="'field_' + ${field.name}"
+                                        class="input-control"
+                                        style="fontFamily: monospace; fontSize: 0.8rem; resize: vertical;"
+                                        rows="3"
+                                        placeholder='{"key": "value"}'
+                                    ></textarea>
+                                    
+                                    <select
+                                        th:if="${field.type == 'Boolean'}"
+                                        th:name="'field_' + ${field.name}"
+                                        class="input-control"
+                                    >
+                                        <option value="false">false</option>
+                                        <option value="true">true</option>
+                                    </select>
+                                    
+                                    <input
+                                        th:if="${field.type != 'Map' && field.type != 'Boolean'}"
+                                        th:type="${field.type == 'Double' || field.type == 'Float' || field.type == 'Integer' || field.type == 'Long' ? 'number' : 'text'}"
+                                        th:name="'field_' + ${field.name}"
+                                        class="input-control"
+                                    />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="margin-top: 12px;">
+                                🚀 Execute Query Call
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Console/Response column -->
+                    <div class="op-console">
+                        <div class="console-header">
+                            <div class="console-title">NETWORK CONSOLE</div>
+                            <div th:if="${consoleRes != null}" 
+                                 th:class="${consoleRes.isError} ? 'status-badge error' : 'status-badge success'"
+                                 th:text="${consoleRes.status} + ' ' + ${consoleRes.statusText}">
+                                 Status Code
+                            </div>
+                        </div>
+
+                        <div class="console-request-meta" th:if="${consoleReq != null}">
+                            <div><strong>Request URI:</strong> <span th:text="${consoleReq.method} + ' ' + ${consoleReq.url}">GET /api/...</span></div>
+                            <div><strong>Headers:</strong> <span th:text="${consoleReq.headers}">Accept=...</span></div>
+                            <div th:if="${consoleReq.body != null && !consoleReq.body.isEmpty()}"><strong>Request Body:</strong><br/><pre><code th:text="${consoleReq.body}">Body</code></pre></div>
+                        </div>
+
+                        <div style="flex: 1; display: flex; flexDirection: column; gap: 8px;">
+                            <div class="console-title" style="fontSize: 0.75rem;">RESPONSE BODY</div>
+                            <div th:if="${consoleRes != null}">
+                                <pre><code th:class="${consoleRes.isError} ? 'console-response-body error-text' : 'console-response-body'" 
+                                           th:text="${consoleRes.body}">Response body</code></pre>
+                            </div>
+                            <div th:if="${consoleRes == null}" class="console-response-body empty-text">
+                                Execute a request call to see HTTP response body stream output.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+        <!-- 4. Core Technologies Section -->
+        <section class="tech-stack-section glass-panel">
+            <h3>🛠️ Core Technology Stack & Framework Blueprint</h3>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h5>Spring Boot 4.0 & WebFlux</h5>
+                    <p>High-concurrency dynamic backend engine executing on Netty's reactive loops.</p>
+                </div>
+                <div class="tech-card">
+                    <h5>Thymeleaf Templating</h5>
+                    <p>Clean HTML5 rendering engine bound to Spring's reactive controller pipelines.</p>
+                </div>
+                <div class="tech-card">
+                    <h5>Byte Buddy Gen</h5>
+                    <p>At boot-time, dynamically builds and registers RestController classes in Spring context.</p>
+                </div>
+                <div class="tech-card">
+                    <h5>PostgreSQL RLS</h5>
+                    <p>Strict multi-tenant security separation handled directly by database engine RLS filters.</p>
+                </div>
+            </div>
+            
+            <div class="hello-world-guide">
+                <h4>🚀 How to Add a New Secured CRUD Endpoint</h4>
+                <div class="hello-world-steps">
+                    <div class="step-item">
+                        <strong>1. Create a Model</strong>
+                        Create a class extending <code>BaseEntity</code> in the data packages.
+                    </div>
+                    <div class="step-item">
+                        <strong>2. Annotate Entity</strong>
+                        Add <code>@Entity</code> and <code>@CrudResource(path="...", roles={"..."})</code>.
+                    </div>
+                    <div class="step-item">
+                        <strong>3. Database Migration</strong>
+                        Add a Liquibase changeset to create the table structure in PostgreSQL.
+                    </div>
+                    <div class="step-item">
+                        <strong>4. Reload Dashboard</strong>
+                        Compile and boot. The new resource tab automatically renders with all parameters.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>

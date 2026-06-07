@@ -31,6 +31,12 @@
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
 
+		<!-- Thymeleaf template engine for 0% JS frontend -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
