@@ -38,6 +38,14 @@ Currently, we use a single `UniversalCrudController`.
 - **Idea**: Support multiple `@CrudResource` annotations on a single entity for different versions (e.g., `v1`, `v2`).
 - **Impact**: Allows the API to evolve without breaking legacy clients.
 
+### 4. Security as a Foundation (Realized)
+- **Decision**: The OIDC/JWT reactive security layer (`ReactiveJwtFilter`, `SecurityConfig`, `SecurityAuditorAware`) was moved **out of the separable `crud-engine-security-keycloak` submodule and into `crud-engine-core`**. Security is never an afterthought — it is the structural foundation, so it cannot be a pluggable, optional dependency that a downstream build might omit.
+- **Hardening shipped alongside the move**:
+  - `@CrudResource.roles()` now defaults to an **empty array (deny-by-default)**; a resource must explicitly opt into `{"ANYONE"}` to be public, so a forgotten annotation can never expose data.
+  - The static `keycloak.test.public-key` verification key is **refused when `app.mode=PRODUCTION`**, closing the JWKS-bypass backdoor; it is supplied only by tests.
+  - The sample app ships with `app.mode=PRODUCTION` and externalized datasource credentials.
+- **Impact**: Every consumer of the engine inherits authentication, deny-by-default RBAC, and tenant propagation transitively, with no way to accidentally build an unsecured deployment.
+
 ## 🛠️ Developer Experience (DX) Optimizations
 
 ### 1. Custom IDE Plugin / Annotation Processor

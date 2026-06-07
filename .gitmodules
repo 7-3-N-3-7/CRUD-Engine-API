@@ -1,9 +1,6 @@
 [submodule "crud-engine-jpa"]
 	path = crud-engine-jpa
 	url = https://github.com/7-3-N-3-7/crud-engine-jpa.git
-[submodule "crud-engine-security-keycloak"]
-	path = crud-engine-security-keycloak
-	url = https://github.com/7-3-N-3-7/crud-engine-security-keycloak.git
 [submodule "crud-engine-core"]
 	path = crud-engine-core
 	url = https://github.com/7-3-N-3-7/crud-engine-core.git

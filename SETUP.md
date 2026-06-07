@@ -8,7 +8,7 @@ This manual details how to manage the Git submodule workflow, register new resou
 
 ## 1. Git Submodule Workflow & Multi-Module Layout
 
-The project is structured as 1 parent shell repository coordinating 10 independent Git submodules. 
+The project is structured as 1 parent shell repository coordinating 8 independent Git submodules. Security is **not** among them: the OIDC/JWT layer is a foundational part of `crud-engine-core` (it was previously a separate `crud-engine-security-keycloak` submodule and has been promoted into core so it can never be omitted from a build).
 
 ### How to Clone the Project
 Because the modules are hosted in separate repositories, you must clone recursively to fetch all files:

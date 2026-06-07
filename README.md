@@ -30,10 +30,9 @@ crud-application/ (Main Shell Repository)
 ├── pom.xml (Parent POM coordinating submodules)
 ├── crud-app-sample/ (Run-time executable app with local entities/tests)
 └── [Submodules]
-    ├── crud-engine-core/ (Core abstractions, reflection registries, & SPIs)
+    ├── crud-engine-core/ (Core abstractions, reflection registries, SPIs, & foundational OIDC/JWT security)
     ├── crud-engine-webflux/ (Runtime WebFlux endpoints & dynamic controller loaders)
     ├── crud-engine-spring-boot-starter/ (Conditional auto-configuration bootstrapper)
-    ├── crud-engine-security-keycloak/ (OIDC/JWT security filter & tenant context propagation)
     │
     ├── [Pluggable Storage Adapters]
     │   ├── crud-engine-jpa/ (JPA & Row-Level Security SQL database engine)
@@ -70,7 +69,7 @@ graph TD
 
     subgraph Authentication ["Phase 3: Security & Filtering Pipeline"]
         Client["Client React App"] -->|"1. Web Request"| Limit["crud-engine-plugin-ratelimiter"]
-        Limit -->|"2. Checks Token Bucket"| Filter["crud-engine-security-keycloak"]
+        Limit -->|"2. Checks Token Bucket"| Filter["crud-engine-core (ReactiveJwtFilter)"]
         Filter -->|"3. Binds Tracing & Tenant Context"| Interceptor["CompositeCrudInterceptor"]
     end
 
@@ -81,10 +80,9 @@ graph TD
 ```
 
 ### Integrated Submodules & Plugins:
-*   **crud-engine-core**: Base annotations (`@CrudResource`, `@EntityMapping`), `BaseEntity` with tenancy, auditing & attribute maps, and the Service / Interceptor registry.
+*   **crud-engine-core**: Base annotations (`@CrudResource`, `@EntityMapping`), `BaseEntity` with tenancy, auditing & attribute maps, the Service / Interceptor registry, and the **foundational OIDC/JWT security layer** — the reactive security filter (`ReactiveJwtFilter`) that validates Keycloak tokens, extracts username/roles/tenant claims, enforces deny-by-default role-based access control, and propagates `TenantContext` across reactive thread boundaries. Security lives in core (not a separable plugin) because it is structural, never optional.
 *   **crud-engine-webflux**: Declares `UniversalCrudController` and dynamically maps routes at runtime. Uses optional autowiring to run without SQL/JPA if only NoSQL/InMemory is present.
 *   **crud-engine-spring-boot-starter**: Auto-configures engine registries and component scans based on classpath class existence.
-*   **crud-engine-security-keycloak**: OIDC/JWT reactive security filter that validates Keycloak tokens, extracts username/roles/tenant claims, and propagates `TenantContext` across reactive thread boundaries.
 *   **crud-engine-jpa**: Executes PostgreSQL criteria queries and handles Row-Level Security (RLS) policies.
 *   **crud-engine-mongodb**: Dynamic document database persistence using `MongoTemplate` and regex-based filters.
 *   **crud-engine-inmemory**: Ultra-fast Map-based storage provider, ideal for unit testing without external database infrastructure.
@@ -107,7 +105,7 @@ This codebase serves as a living laboratory for advanced Java design patterns:
 
 ## 🔒 Security Architecture: Enterprise-Hardened OIDC
 
-The API is fully secured using **OAuth 2.0 / OpenID Connect (OIDC)** via Keycloak.
+The API is fully secured using **OAuth 2.0 / OpenID Connect (OIDC)** via Keycloak. The security layer (`ReactiveJwtFilter`, `SecurityConfig`, `SecurityAuditorAware`) is a **foundational part of `crud-engine-core`**, not a separable plugin — every build of the engine is authenticated by construction.
 
 ```
 Incoming HTTP request -> Header: Authorization: Bearer <JWT>
@@ -123,7 +121,7 @@ Incoming HTTP request -> Header: Authorization: Bearer <JWT>
         Propagates TenantContext dynamically to JDBC/NoSQL boundary for RLS
 ```
 
-*   **Public vs. Private Routes**: The `/api/metadata` endpoint is public. Dynamic endpoints like `/api/products` are secured and require authentication.
+*   **Public vs. Private Routes**: Routes are **deny-by-default** — `@CrudResource.roles()` defaults to an empty set, so a resource is inaccessible unless it explicitly lists allowed roles (or opts into public access with `ANYONE`). The `/api/metadata` endpoint is public; dynamic endpoints like `/api/products` require authentication and a matching role.
 *   **PostgreSQL Row-Level Security (RLS)**: Database-level isolation restricts queries dynamically based on the active JWT tenant claim, preventing data exposure between tenants.
 *   **Token-Bucket Rate Limiter**: Limits client requests to a max capacity of 50 requests/minute per IP, returning a standard `429 Too Many Requests` problem detail when exceeded.
 *   **XSS Sanitization & Jackson Payload Restriction**: All incoming JSON payloads undergo global sanitization to strip dangerous script tags, and the deserializer is configured to strictly fail on unknown/unwhitelisted properties.
