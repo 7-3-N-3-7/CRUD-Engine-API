@@ -206,6 +206,7 @@
 				<configuration>
 					<release>${maven.compiler.release}</release>
 					<encoding>${project.build.sourceEncoding}</encoding>
+					<parameters>true</parameters>
 				</configuration>
 			</plugin>
 			<plugin>

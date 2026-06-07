@@ -83,9 +83,9 @@ public class DashboardController {
     public Mono<String> showDashboard(
             Model model,
             WebSession session,
-            @RequestParam(required = false) String resource,
-            @RequestParam(required = false) String op,
-            @RequestParam(required = false) String activeNode) {
+            @RequestParam(name = "resource", required = false) String resource,
+            @RequestParam(name = "op", required = false) String op,
+            @RequestParam(name = "activeNode", required = false) String activeNode) {
 
         // Establish Defaults in WebSession if not already set
         if (session.getAttribute("tenantId") == null) session.getAttributes().put("tenantId", "tenant-a");
@@ -137,11 +137,11 @@ public class DashboardController {
     @PostMapping("/security")
     public Mono<String> updateSecurity(
             WebSession session,
-            @RequestParam String tenantId,
-            @RequestParam String username,
-            @RequestParam String selectedRole,
-            @RequestParam String selectedResource,
-            @RequestParam String selectedOp) {
+            @RequestParam(name = "tenantId") String tenantId,
+            @RequestParam(name = "username") String username,
+            @RequestParam(name = "selectedRole") String selectedRole,
+            @RequestParam(name = "selectedResource") String selectedResource,
+            @RequestParam(name = "selectedOp") String selectedOp) {
 
         session.getAttributes().put("tenantId", tenantId);
         session.getAttributes().put("username", username);
@@ -153,13 +153,13 @@ public class DashboardController {
     @PostMapping("/execute")
     public Mono<String> executeQuery(
             WebSession session,
-            @RequestParam String selectedResource,
-            @RequestParam String selectedOp,
-            @RequestParam(required = false) String singleId,
-            @RequestParam(required = false) String sortField,
-            @RequestParam(required = false) String sortOrder,
-            @RequestParam(required = false) String page,
-            @RequestParam(required = false) String size,
+            @RequestParam(name = "selectedResource") String selectedResource,
+            @RequestParam(name = "selectedOp") String selectedOp,
+            @RequestParam(name = "singleId", required = false) String singleId,
+            @RequestParam(name = "sortField", required = false) String sortField,
+            @RequestParam(name = "sortOrder", required = false) String sortOrder,
+            @RequestParam(name = "page", required = false) String page,
+            @RequestParam(name = "size", required = false) String size,
             @RequestParam Map<String, String> allParams) {
 
         return Mono.defer(() -> {
