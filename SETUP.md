@@ -1,4 +1,4 @@
-# Developer Setup & Extension Manual: Dynamic CRUD Engine (v3.0)
+# Developer Setup & Extension Manual: Dynamic CRUD Engine (v4.0)
 
 Welcome to the **Dynamic CRUD Engine**. This project is a modular, metadata-driven REST engine combining a high-throughput **Spring WebFlux (Netty)** API layer with a pluggable **Service Provider Interface (SPI) Storage Layer** and decoupled security and filtering plugins.
 
@@ -8,7 +8,7 @@ This manual details how to manage the Git submodule workflow, register new resou
 
 ## 1. Git Submodule Workflow & Multi-Module Layout
 
-The project is structured as 1 parent shell repository coordinating 8 independent Git submodules. 
+The project is structured as 1 parent shell repository coordinating 10 independent Git submodules. 
 
 ### How to Clone the Project
 Because the modules are hosted in separate repositories, you must clone recursively to fetch all files:
@@ -42,7 +42,7 @@ When editing files inside a submodule (such as `crud-engine-core`):
 
 ## 2. Pluggable Storage Layer (SPI)
 
-The engine delegates database operations to a `CrudStorageProvider<T>` resolved at runtime by matching `CrudStorageProviderFactory` implementations. The framework supports three persistence layers out of the box:
+The engine delegates database operations to a `CrudStorageProvider<T>` resolved at runtime by matching `CrudStorageProviderFactory` implementations. The framework supports four persistence layers out of the box:
 
 ### A. SQL/JPA Storage (`crud-engine-jpa`)
 *   **Trigger**: Any entity annotated with `jakarta.persistence.Entity` is managed by `JpaStorageProviderFactory` and persists to PostgreSQL using Hibernate.
@@ -52,7 +52,20 @@ The engine delegates database operations to a `CrudStorageProvider<T>` resolved 
 *   **Trigger**: Any entity annotated with `org.springframework.data.mongodb.core.mapping.Document` is managed by `MongoStorageProviderFactory` and persists to MongoDB using `MongoTemplate`.
 *   **Tenancy & Filtering**: Filters collections dynamically in memory/queries using tenant claims and regex-based criteria.
 
-### C. In-Memory Storage (`crud-engine-inmemory`)
+### C. Weaviate Vector Database Storage (`crud-engine-weaviate`)
+*   **Trigger**: Any entity annotated with `@WeaviateEntity` (from `com.org73n37.crudapp.data.weaviate.annotation`) is managed by `WeaviateStorageProviderFactory` and persists to a Weaviate cluster.
+*   **Use Case**: Designed for AI/LLM workloads requiring semantic search, vector embeddings, and hybrid retrieval.
+*   **Client**: Uses the Weaviate Java Client v6 with gRPC + HTTP connectivity.
+*   **Auto-Configuration**: `WeaviateAutoConfiguration` creates the `WeaviateClient` bean automatically when the Weaviate client library is on the classpath. Configure connection properties via `crud.engine.weaviate.*` in `application.properties`.
+*   **Configuration Properties**:
+    | Property | Default | Description |
+    |---|---|---|
+    | `crud.engine.weaviate.scheme` | `http` | Connection scheme (`http` or `https`) |
+    | `crud.engine.weaviate.host` | `localhost:8080` | Weaviate HTTP host and port |
+    | `crud.engine.weaviate.grpc-port` | `50051` | Weaviate gRPC port |
+    | `crud.engine.weaviate.api-key` | *(none)* | Optional API key for authenticated clusters |
+
+### D. In-Memory Storage (`crud-engine-inmemory`)
 *   **Trigger**: Used as a fallback if no database annotations are detected, or for unit testing.
 *   **Mechanism**: A thread-safe, concurrent hash map segregated by tenant id.
 
@@ -105,6 +118,28 @@ public class Device extends BaseEntity {
     public void setModelName(String modelName) { this.modelName = modelName; }
 }
 ```
+
+### Option C: Creating a Weaviate Resource
+Create the entity in the sample application using the `@WeaviateEntity` annotation:
+```java
+package com.org73n37.crudapp.data;
+
+import com.org73n37.crudapp.api.records.DeviceRecord;
+import com.org73n37.crudapp.data.core.BaseEntity;
+import com.org73n37.crudapp.data.weaviate.annotation.WeaviateEntity;
+import com.org73n37.crudapp.infrastructure.annotations.CrudResource;
+
+@WeaviateEntity("Devices")
+@CrudResource(path = "devices", dto = DeviceRecord.class, roles = {"ADMIN", "USER"})
+public class Device extends BaseEntity {
+    private String modelName;
+
+    public Device() {}
+    public String getModelName() { return modelName; }
+    public void setModelName(String modelName) { this.modelName = modelName; }
+}
+```
+> **Note:** The `@WeaviateEntity` annotation's `value` specifies the Weaviate collection name. If omitted, the entity's simple class name is used. Collection names in Weaviate must start with an uppercase letter (this is handled automatically by the factory).
 
 ### Creating the DTO Record
 Create the corresponding record mapping (`src/main/java/com/org73n37/crudapp/api/records/DeviceRecord.java`):
@@ -174,14 +209,28 @@ public class AuditLoggingInterceptor implements CrudInterceptor<BaseEntity> {
 
 ## 5. Local Infrastructure Configuration Setup
 
-The application dependencies (PostgreSQL, MongoDB, Keycloak) run inside Docker containers.
+The application dependencies (PostgreSQL, MongoDB, Keycloak, and optionally Weaviate) run inside Docker containers.
 
-### Step 1: Spin up Containers
+### Step 1: Spin up Core Containers
 ```bash
 docker-compose up -d
 ```
 *   **PostgreSQL:** Runs on port `5433` (DB: `cruddb`, Username: `user`, Password: `password`).
 *   **Keycloak:** Runs on port `8081` (Admin Credentials: `admin`/`admin`).
+
+### Step 1b (Optional): Start Weaviate
+If you are developing with the `crud-engine-weaviate` module, start a local Weaviate instance:
+```bash
+docker run -d --name crud-weaviate \
+  -p 9090:8080 -p 50051:50051 \
+  cr.weaviate.io/semitechnologies/weaviate:latest
+```
+Then add the following properties to `application.properties`:
+```properties
+crud.engine.weaviate.host=localhost:9090
+crud.engine.weaviate.grpc-port=50051
+# crud.engine.weaviate.api-key=your-api-key  (only for authenticated clusters)
+```
 
 ### Step 2: Configure Keycloak Realm
 1.  Navigate to `http://localhost:8081/admin` and log in.

@@ -1,4 +1,4 @@
-# Generic Spring Boot WebFlux CRUD Engine & Frontend Dashboard (v3.0)
+# Generic Spring Boot WebFlux CRUD Engine & Frontend Dashboard (v4.0)
 
 [![Java CI](https://github.com/73N37/Crud_application/actions/workflows/ci.yml/badge.svg)](https://github.com/73N37/Crud_application/actions/workflows/ci.yml)
 [![Java Version](https://img.shields.io/badge/Java-25-orange.svg)](https://jdk.java.net/25/)
@@ -16,7 +16,7 @@ Traditional applications require developers to write repetitive controllers, ser
 
 This project implements a **Generic CRUD Engine** refactored into a **fully compartmentalized, pluggable submodule architecture**. By defining a simple database entity class and annotating it, the engine **dynamically generates** and secures HTTP endpoints at runtime using **Byte Buddy** class generation and dynamic WebFlux functional mapping.
 
-The backend is built as a **100% native Java application** running on a high-throughput, non-blocking Spring WebFlux reactive loop (Netty). The application features dynamic SPI storage selection (supporting SQL/JPA, MongoDB, or pure InMemory map-based engines) and optional plugin auto-registration.
+The backend is built as a **100% native Java application** running on a high-throughput, non-blocking Spring WebFlux reactive loop (Netty). The application features dynamic SPI storage selection (supporting SQL/JPA, MongoDB, Weaviate vector database, or pure InMemory map-based engines) and optional plugin auto-registration.
 
 ---
 
@@ -33,11 +33,13 @@ crud-application/ (Main Shell Repository)
     ├── crud-engine-core/ (Core abstractions, reflection registries, & SPIs)
     ├── crud-engine-webflux/ (Runtime WebFlux endpoints & dynamic controller loaders)
     ├── crud-engine-spring-boot-starter/ (Conditional auto-configuration bootstrapper)
+    ├── crud-engine-security-keycloak/ (OIDC/JWT security filter & tenant context propagation)
     │
     ├── [Pluggable Storage Adapters]
     │   ├── crud-engine-jpa/ (JPA & Row-Level Security SQL database engine)
     │   ├── crud-engine-mongodb/ (Document-based MongoDB database engine)
-    │   └── crud-engine-inmemory/ (Map-based testing database engine)
+    │   ├── crud-engine-inmemory/ (Map-based testing database engine)
+    │   └── crud-engine-weaviate/ (Weaviate vector database engine for LLM/AI workloads)
     │
     └── [Optional Plugins]
         ├── crud-engine-plugin-ratelimiter/ (Token-bucket reactive rate limiter filter)
@@ -62,12 +64,13 @@ graph TD
         Core -->|"Resolves storage by annotations"| SPI{"SPI Factory Registry"}
         SPI -->|"@Entity"| JPA["crud-engine-jpa"]
         SPI -->|"@Document"| Mongo["crud-engine-mongodb"]
+        SPI -->|"@WeaviateEntity"| Weaviate["crud-engine-weaviate"]
         SPI -->|"Default fallback"| InMemory["crud-engine-inmemory"]
     end
 
     subgraph Authentication ["Phase 3: Security & Filtering Pipeline"]
         Client["Client React App"] -->|"1. Web Request"| Limit["crud-engine-plugin-ratelimiter"]
-        Limit -->|"2. Checks Token Bucket"| Filter["ReactiveJwtFilter (Keycloak)"]
+        Limit -->|"2. Checks Token Bucket"| Filter["crud-engine-security-keycloak"]
         Filter -->|"3. Binds Tracing & Tenant Context"| Interceptor["CompositeCrudInterceptor"]
     end
 
@@ -81,9 +84,11 @@ graph TD
 *   **crud-engine-core**: Base annotations (`@CrudResource`, `@EntityMapping`), `BaseEntity` with tenancy, auditing & attribute maps, and the Service / Interceptor registry.
 *   **crud-engine-webflux**: Declares `UniversalCrudController` and dynamically maps routes at runtime. Uses optional autowiring to run without SQL/JPA if only NoSQL/InMemory is present.
 *   **crud-engine-spring-boot-starter**: Auto-configures engine registries and component scans based on classpath class existence.
+*   **crud-engine-security-keycloak**: OIDC/JWT reactive security filter that validates Keycloak tokens, extracts username/roles/tenant claims, and propagates `TenantContext` across reactive thread boundaries.
 *   **crud-engine-jpa**: Executes PostgreSQL criteria queries and handles Row-Level Security (RLS) policies.
 *   **crud-engine-mongodb**: Dynamic document database persistence using `MongoTemplate` and regex-based filters.
 *   **crud-engine-inmemory**: Ultra-fast Map-based storage provider, ideal for unit testing without external database infrastructure.
+*   **crud-engine-weaviate**: Vector database persistence adapter powered by the Weaviate Java Client v6. Designed for AI/LLM workloads requiring semantic search and vector embeddings. Entities are routed here when annotated with `@WeaviateEntity`. Auto-configures via `WeaviateAutoConfiguration` and uses gRPC + HTTP to communicate with the Weaviate cluster.
 *   **crud-engine-plugin-ratelimiter**: Reactive `WebFilter` implementing a thread-safe token bucket traffic limiter.
 *   **crud-engine-plugin-auditlog**: Employs `AuditLoggingInterceptor` executing on `BaseEntity` class mapping to log CRUD operations contextually.
 
@@ -143,14 +148,26 @@ Or if already cloned:
 git submodule update --init --recursive
 ```
 
-### Step 2: Start PostgreSQL & Keycloak
-Spin up the PostgreSQL and Keycloak databases inside Docker in background mode:
+### Step 2: Start Infrastructure Services
+Spin up the infrastructure containers inside Docker in background mode:
 ```bash
 docker-compose up -d
 ```
 *This starts:*
 1.  **PostgreSQL** on port `5433` (preventing conflicts with local Postgres installations on 5432).
 2.  **Keycloak** on port `8081` (Admin Credentials: `admin` / `admin`).
+
+> **Optional — Weaviate:** If you intend to use the `crud-engine-weaviate` storage adapter, start a local Weaviate instance:
+> ```bash
+> docker run -d --name crud-weaviate \
+>   -p 9090:8080 -p 50051:50051 \
+>   cr.weaviate.io/semitechnologies/weaviate:latest
+> ```
+> Then add the following to your `application.properties`:
+> ```properties
+> crud.engine.weaviate.host=localhost:9090
+> crud.engine.weaviate.grpc-port=50051
+> ```
 
 ### Step 3: Run the Backend Application
 Start the Spring Boot WebFlux server:
