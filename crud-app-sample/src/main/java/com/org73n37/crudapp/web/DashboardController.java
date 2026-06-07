@@ -147,7 +147,7 @@ public class DashboardController {
         session.getAttributes().put("username", username);
         session.getAttributes().put("selectedRole", selectedRole);
 
-        return Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp);
+        return session.save().then(Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp));
     }
 
     @PostMapping("/execute")
@@ -263,7 +263,7 @@ public class DashboardController {
                 }
 
                 return Mono.fromCompletionStage(httpClient.sendAsync(reqBuilder.build(), HttpResponse.BodyHandlers.ofString()))
-                        .map(res -> {
+                        .flatMap(res -> {
                             Map<String, Object> consoleRes = new LinkedHashMap<>();
                             consoleRes.put("status", res.statusCode());
                             consoleRes.put("statusText", getStatusText(res.statusCode()));
@@ -285,7 +285,7 @@ public class DashboardController {
                             consoleRes.put("isError", res.statusCode() >= 400);
 
                             session.getAttributes().put("consoleRes", consoleRes);
-                            return "redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp;
+                            return session.save().then(Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp));
                         });
             } catch (Exception e) {
                 log.error("Execution failed", e);
@@ -296,7 +296,7 @@ public class DashboardController {
                 consoleRes.put("body", "Failed to connect to the backend server: " + e.getMessage());
                 consoleRes.put("isError", true);
                 session.getAttributes().put("consoleRes", consoleRes);
-                return Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp);
+                return session.save().then(Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp));
             }
         });
     }

@@ -273,9 +273,9 @@
                                         <span th:text="${field.name}">field_name</span>&nbsp;<span th:text="'(' + ${field.type} + ')'">(type)</span>
                                         <span th:if="${field.required}" class="constraint-badge required">Required</span>
                                         <span th:if="${field.constraints != null && !field.constraints.isEmpty()}" class="constraint-badge">
-                                            <span th:if="${field.constraints.min != null}" th:text="'min: ' + ${field.constraints.min}">min</span>
-                                            <span th:if="${field.constraints.max != null}" th:text="'max: ' + ${field.constraints.max}">max</span>
-                                            <span th:if="${field.constraints.positive != null && field.constraints.positive}" th:text="'positive'">positive</span>
+                                            <span th:if="${field.constraints['min'] != null}" th:text="'min: ' + ${field.constraints['min']}">min</span>
+                                            <span th:if="${field.constraints['max'] != null}" th:text="'max: ' + ${field.constraints['max']}">max</span>
+                                            <span th:if="${field.constraints['positive'] != null && field.constraints['positive']}" th:text="'positive'">positive</span>
                                         </span>
                                     </label>
                                     
