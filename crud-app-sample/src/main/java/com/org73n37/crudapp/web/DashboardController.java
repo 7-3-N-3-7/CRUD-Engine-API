@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
@@ -15,7 +16,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.RSAPrivateCrtKeySpec;
@@ -135,34 +135,40 @@ public class DashboardController {
     }
 
     @PostMapping("/security")
-    public Mono<String> updateSecurity(
-            WebSession session,
-            @RequestParam(name = "tenantId") String tenantId,
-            @RequestParam(name = "username") String username,
-            @RequestParam(name = "selectedRole") String selectedRole,
-            @RequestParam(name = "selectedResource") String selectedResource,
-            @RequestParam(name = "selectedOp") String selectedOp) {
+    public Mono<String> updateSecurity(WebSession session, ServerWebExchange exchange) {
+        // In WebFlux, @RequestParam only binds query parameters, so form-encoded
+        // POST bodies must be read explicitly via ServerWebExchange.getFormData().
+        return exchange.getFormData().flatMap(form -> {
+            String tenantId = form.getFirst("tenantId");
+            String username = form.getFirst("username");
+            String selectedRole = form.getFirst("selectedRole");
+            String selectedResource = form.getFirst("selectedResource");
+            String selectedOp = form.getFirst("selectedOp");
 
-        session.getAttributes().put("tenantId", tenantId);
-        session.getAttributes().put("username", username);
-        session.getAttributes().put("selectedRole", selectedRole);
+            session.getAttributes().put("tenantId", tenantId);
+            session.getAttributes().put("username", username);
+            session.getAttributes().put("selectedRole", selectedRole);
 
-        return session.save().then(Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp));
+            return session.save().then(Mono.just("redirect:/dashboard?resource=" + selectedResource + "&op=" + selectedOp));
+        });
     }
 
     @PostMapping("/execute")
-    public Mono<String> executeQuery(
-            WebSession session,
-            @RequestParam(name = "selectedResource") String selectedResource,
-            @RequestParam(name = "selectedOp") String selectedOp,
-            @RequestParam(name = "singleId", required = false) String singleId,
-            @RequestParam(name = "sortField", required = false) String sortField,
-            @RequestParam(name = "sortOrder", required = false) String sortOrder,
-            @RequestParam(name = "page", required = false) String page,
-            @RequestParam(name = "size", required = false) String size,
-            @RequestParam Map<String, String> allParams) {
+    public Mono<String> executeQuery(WebSession session, ServerWebExchange exchange) {
+        // In WebFlux, @RequestParam only binds query parameters, so form-encoded
+        // POST bodies must be read explicitly via ServerWebExchange.getFormData().
+        return exchange.getFormData().flatMap(form -> {
+            Map<String, String> allParams = new LinkedHashMap<>();
+            form.forEach((k, v) -> allParams.put(k, (v != null && !v.isEmpty()) ? v.get(0) : null));
 
-        return Mono.defer(() -> {
+            String selectedResource = allParams.get("selectedResource");
+            String selectedOp = allParams.get("selectedOp");
+            String singleId = allParams.get("singleId");
+            String sortField = allParams.get("sortField");
+            String sortOrder = allParams.get("sortOrder");
+            String page = allParams.get("page");
+            String size = allParams.get("size");
+
             String username = session.getAttribute("username");
             String tenantId = session.getAttribute("tenantId");
             String role = session.getAttribute("selectedRole");
