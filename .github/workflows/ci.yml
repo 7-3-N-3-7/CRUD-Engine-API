@@ -39,6 +39,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Apply crud-engine-core security migration patch
+        run: |
+          if [ ! -f crud-engine-core/src/main/java/com/org73n37/crudapp/infrastructure/security/ReactiveJwtFilter.java ]; then
+            git -C crud-engine-core apply --3way --whitespace=nowarn ../migration-patches/0001-crud-engine-core-make-security-foundational.patch
+          fi
+
       - name: Apply spring-boot-starter migration patch
         run: |
           if grep -q '<artifactId>crud-engine-security-keycloak</artifactId>' crud-engine-spring-boot-starter/pom.xml; then
