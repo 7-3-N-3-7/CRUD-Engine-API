@@ -1,0 +1,63 @@
+@startuml Workspace Execution Sequence
+actor Client
+participant "WebFlux Router" as Router
+participant "Keycloak Filter" as Keycloak
+participant "Rate Limiting Filter" as RateLimiter
+participant "Universal Crud Controller" as Controller
+participant "Crud Engine" as Engine
+participant "Composite Interceptor" as Interceptor
+participant "Crud Service" as Service
+participant "Storage Provider" as Storage
+
+Client -> Router : HTTP Request (POST /api/products)
+activate Router
+Router -> Keycloak : checkAuthentication()
+activate Keycloak
+Keycloak -> Keycloak : validateJwt()
+alt Success
+  Keycloak --> Router : Authenticated
+  deactivate Keycloak
+else Unauthorized
+  Keycloak --> Client : HTTP 401 Unauthorized
+end
+
+Router -> RateLimiter : checkRateLimits()
+activate RateLimiter
+alt Rate Limit Ok
+  RateLimiter --> Router : Allowed
+  deactivate RateLimiter
+else Rate Limit Exceeded
+  RateLimiter --> Client : HTTP 429 Too Many Requests
+end
+
+Router -> Controller : handleRequest()
+activate Controller
+Controller -> Engine : getMetadata("products")
+activate Engine
+Engine --> Controller : ResourceMetadata
+deactivate Engine
+
+Controller -> Interceptor : preCreate(dto)
+activate Interceptor
+Interceptor --> Controller : DTO Verified
+deactivate Interceptor
+
+Controller -> Service : create(entity)
+activate Service
+Service -> Storage : save(entity)
+activate Storage
+Storage --> Service : Saved Entity
+deactivate Storage
+Service --> Controller : Saved Entity
+deactivate Service
+
+Controller -> Interceptor : postCreate(entity)
+activate Interceptor
+Interceptor -> Interceptor : logAuditEvent()
+Interceptor --> Controller : Done
+deactivate Interceptor
+
+Controller --> Client : HTTP 201 Created (DTO JSON)
+deactivate Controller
+deactivate Router
+@enduml

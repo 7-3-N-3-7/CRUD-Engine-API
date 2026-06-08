@@ -1,0 +1,50 @@
+@startuml Sample App Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.data {
+  class Product {
+    - String name
+    - String description
+    - Double price
+    + getName(): String
+    + setName(String): void
+    + getDescription(): String
+    + setDescription(String): void
+    + getPrice(): Double
+    + setPrice(Double): void
+    + {static} builder(): ProductBuilder
+  }
+}
+
+package com.org73n37.crudapp.api.records {
+  class ProductRecord <<record>> {
+    + name : String
+    + description : String
+    + price : Double
+    + parentId : Long
+    + grandparentId : Long
+    + attributes : Map<String, String>
+  }
+}
+
+package com.org73n37.crudapp.domain.product {
+  class ProductInterceptor implements com.org73n37.crudapp.logic.core.CrudInterceptor {
+    + beforeCreate(Product): void
+    + afterCreate(Product): void
+  }
+}
+
+package com.org73n37.crudapp.web {
+  class DashboardController {
+  }
+}
+
+package com.org73n37.crudapp {
+  class Main {
+    + {static} main(String[]): void
+  }
+}
+
+ProductRecord ..> Product : "maps to"
+ProductInterceptor ..> Product : "intercepts"
+@enduml

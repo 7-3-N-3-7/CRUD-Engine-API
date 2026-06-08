@@ -1,0 +1,64 @@
+@startuml Workspace Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.data.core {
+  abstract class BaseEntity {
+    - String id
+    - String tenantId
+    - Instant createdAt
+    - Instant updatedAt
+    + getId(): String
+    + setId(String): void
+  }
+}
+
+package com.org73n37.crudapp.logic.spi {
+  interface CrudStorageProvider<T> {
+    + save(T): T
+    + findById(String): Optional<T>
+    + findAll(): List<T>
+    + deleteById(String): void
+  }
+  interface CrudStorageProviderFactory {
+    + supports(Class<?>): boolean
+    + getStorageProvider(Class<T>): CrudStorageProvider<T>
+  }
+}
+
+package com.org73n37.crudapp.logic.core {
+  abstract class CrudService<T> {
+    # getStorageProvider(): CrudStorageProvider<T>
+    + create(T): T
+    + update(T): T
+    + delete(String): void
+  }
+  interface CrudInterceptor<T> {
+    + preCreate(T): void
+    + postCreate(T): void
+    + preUpdate(T): void
+    + postUpdate(T): void
+  }
+}
+
+package com.org73n37.crudapp.logic {
+  class CrudEngine {
+    - Map<String, ResourceMetadata<?, ?>> resources
+    + registerResource(Class<?>): void
+    + getMetadata(String): ResourceMetadata<?, ?>
+  }
+  class ResourceMetadata<T, D> {
+    - Class<T> entityClass
+    - Class<D> dtoClass
+    - String basePath
+    - CrudStorageProvider<T> repository
+    - CrudService<T> service
+    - CrudInterceptor<T> interceptor
+  }
+}
+
+CrudEngine "1" *-- "many" ResourceMetadata
+ResourceMetadata o-- CrudStorageProvider
+ResourceMetadata o-- CrudService
+ResourceMetadata o-- CrudInterceptor
+CrudService ..> CrudStorageProvider : "uses"
+@enduml

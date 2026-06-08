@@ -1,0 +1,12 @@
+@startuml Sample App Product State Machine
+[*] --> Draft : ProductRecord received
+
+Draft --> Validated : Constraint validation checks out (name & positive price)
+Draft --> ValidationFailed : Violates constraints (name blank / negative price)
+
+Validated --> UpperCased : ProductInterceptor.beforeCreate() executes
+UpperCased --> Saved : Saved to database with generated ID
+
+Saved --> [*]
+ValidationFailed --> [*]
+@enduml

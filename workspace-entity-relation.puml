@@ -1,0 +1,39 @@
+@startuml Workspace Entity Relation Diagram
+skinparam linetype ortho
+
+entity "ResourceMetadata" as metadata {
+  * basePath : text <<PK>>
+  --
+  * entityClass : class_type
+  * dtoClass : class_type
+  * version : integer
+}
+
+entity "BaseEntity" as entity {
+  * id : text <<PK>>
+  --
+  * tenantId : text
+  * createdAt : timestamp
+  * updatedAt : timestamp
+}
+
+entity "TenantContext" as tenant {
+  * tenantId : text <<PK>>
+  --
+  * active : boolean
+}
+
+entity "AuditLog" as audit {
+  * id : text <<PK>>
+  --
+  * action : text
+  * resource : text
+  * recordId : text
+  * username : text
+  * timestamp : timestamp
+}
+
+metadata ||--o{ entity : "configures"
+tenant ||--o{ entity : "isolates"
+entity ||--o{ audit : "logs changes to"
+@enduml

@@ -1,0 +1,33 @@
+@startuml Sample App Business Logic Interception Sequence
+participant "UniversalCrudController" as Controller
+participant "ProductInterceptor" as Interceptor
+participant "CrudService" as Service
+database "Database" as Db
+
+[-> Controller : create()
+activate Controller
+
+Controller -> Interceptor : beforeCreate(product)
+activate Interceptor
+Interceptor -> Interceptor : Convert product.name to uppercase
+Interceptor --> Controller : modified product
+deactivate Interceptor
+
+Controller -> Service : save(product)
+activate Service
+Service -> Db : persist / insert product
+activate Db
+Db --> Service : saved product row
+deactivate Db
+Service --> Controller : saved product
+deactivate Service
+
+Controller -> Interceptor : afterCreate(product)
+activate Interceptor
+Interceptor -> Interceptor : print success message
+Interceptor --> Controller : done
+deactivate Interceptor
+
+[<-- Controller : HTTP 201 Response
+deactivate Controller
+@enduml

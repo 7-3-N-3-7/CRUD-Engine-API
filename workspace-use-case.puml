@@ -1,0 +1,27 @@
+@startuml Workspace Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Client Application" as client
+actor "Security Admin" as secadmin
+actor "System Administrator" as sysadmin
+
+rectangle "CRUD Engine Platform" {
+  usecase "Define API Resource (Dynamic)" as UC_DefineResource
+  usecase "Authenticate & Authorize Request" as UC_Auth
+  usecase "Apply Rate Limiting" as UC_RateLimit
+  usecase "Perform CRUD Operation" as UC_Crud
+  usecase "Audit Log Execution" as UC_Audit
+  usecase "Vector Similarity Search" as UC_VectorSearch
+}
+
+client --> UC_Crud
+client --> UC_VectorSearch
+
+UC_Crud ..> UC_Auth : <<include>>
+UC_Crud ..> UC_RateLimit : <<include>>
+UC_Crud ..> UC_Audit : <<include>>
+
+secadmin --> UC_Auth
+sysadmin --> UC_DefineResource
+@enduml

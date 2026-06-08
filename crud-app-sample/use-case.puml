@@ -1,0 +1,22 @@
+@startuml Sample App Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor User
+actor Admin
+
+rectangle "crud-app-sample" {
+  usecase "View Product Dashboard" as UC_Dashboard
+  usecase "List/Query Products" as UC_List
+  usecase "Create New Product" as UC_Create
+  usecase "Modify Product Attributes" as UC_Update
+  usecase "Delete Product" as UC_Delete
+}
+
+User --> UC_Dashboard
+User --> UC_List
+User --> UC_Create
+User --> UC_Update
+
+Admin --> UC_Delete
+@enduml

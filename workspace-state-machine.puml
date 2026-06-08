@@ -1,0 +1,30 @@
+@startuml Workspace Resource State Machine
+[*] --> Unregistered : Class Loaded
+
+Unregistered --> Scanned : ClassPath Scan Found @CrudResource
+
+state Scanned {
+  [*] --> ResolvingStorage
+  ResolvingStorage --> ResolvingService : Storage Factory Found
+  ResolvingService --> ResolvingInterceptors : Service Resolved
+  ResolvingInterceptors --> ValidationSuccessful : All Interceptors Resolved & DTO Verified
+}
+
+Scanned --> Registered : doRegister() succeeds
+Scanned --> InitializationFailed : Validation/SPI Mismatch
+
+Registered --> Active : Application Context Ready
+
+state Active {
+  [*] --> Idle
+  Idle --> ExecutingInterceptor : Request Received
+  ExecutingInterceptor --> ExecutingService : Interceptors Succeeded
+  ExecutingService --> ExecutingStorage : Delegate to SPI
+  ExecutingStorage --> ExecutingService : Saved Data
+  ExecutingService --> ExecutingInterceptor : Post-processing
+  ExecutingInterceptor --> Idle : Response Returned
+}
+
+Active --> [*] : Context Closed
+InitializationFailed --> [*]
+@enduml

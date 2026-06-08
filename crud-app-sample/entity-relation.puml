@@ -1,0 +1,23 @@
+@startuml Sample App Entity Relation Diagram
+skinparam linetype ortho
+
+entity "Product" as p {
+  * id : Long <<PK>>
+  --
+  * tenantId : text
+  * name : text
+  * description : text
+  * price : Double
+}
+
+entity "ProductRecord" as pr {
+  * name : text
+  * description : text
+  * price : Double
+  * parentId : Long
+  * grandparentId : Long
+  * attributes : Map
+}
+
+pr ||--|| p : "DTO mapping"
+@enduml

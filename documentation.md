@@ -39,7 +39,7 @@ The `GenericSpecification` has been upgraded to support meta-filtering (owner, i
 | Component | Responsibility |
 | :--- | :--- |
 | **Schema Factory** | `/api/meta/schemas` - Manage Entities at runtime. |
-| **Zero-Code Proxy** | `/api/v3/{resource}` - Unified entry point for dynamic data. |
+| **Zero-Code Proxy** | `/api/{resource}` - Unified entry point for dynamic data. |
 | **Virtual Storage** | Single `virtual_documents` table using JSON blobs. |
 | **Security Tier** | Three-tier RBAC: ADMIN, USER, ANYONE. |
 
