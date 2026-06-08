@@ -44,6 +44,11 @@ public class CrudAppIntegrationTest {
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
+        // The static test public key bypasses Keycloak JWKS and is only honored
+        // when app.mode is not PRODUCTION (see ReactiveJwtFilter#getVerificationKey).
+        // The shipped application.properties defaults to PRODUCTION, so the test
+        // explicitly opts into DEVELOPMENT mode to exercise the test-key path.
+        registry.add("app.mode", () -> "DEVELOPMENT");
         registry.add("keycloak.test.public-key", () -> publicKeyPem);
         registry.add("keycloak.jwk-set-uri", () -> "http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs");
     }

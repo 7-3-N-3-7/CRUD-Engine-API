@@ -1,0 +1,472 @@
+diff --git a/pom.xml b/pom.xml
+index f35f9b6..42c3a0c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -32,11 +32,36 @@
+ 			<groupId>org.springframework.boot</groupId>
+ 			<artifactId>spring-boot-starter-security</artifactId>
+ 		</dependency>
++		<!--
++			Security is foundational: the reactive JWT authentication filter and
++			security configuration now live in core, so core depends on WebFlux
++			and JJWT directly instead of in a separable security submodule.
++		-->
++		<dependency>
++			<groupId>org.springframework.boot</groupId>
++			<artifactId>spring-boot-starter-webflux</artifactId>
++		</dependency>
+ 
+ 		<!-- Jackson -->
+ 		<dependency>
+ 			<groupId>tools.jackson.core</groupId>
+ 			<artifactId>jackson-databind</artifactId>
+ 		</dependency>
++
++		<!-- Security (JWT) -->
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-api</artifactId>
++		</dependency>
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-impl</artifactId>
++			<scope>runtime</scope>
++		</dependency>
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-jackson</artifactId>
++			<scope>runtime</scope>
++		</dependency>
+ 	</dependencies>
+ </project>
+diff --git a/src/main/java/com/org73n37/crudapp/infrastructure/annotations/CrudResource.java b/src/main/java/com/org73n37/crudapp/infrastructure/annotations/CrudResource.java
+index b6a50fb..06fa58d 100644
+--- a/src/main/java/com/org73n37/crudapp/infrastructure/annotations/CrudResource.java
++++ b/src/main/java/com/org73n37/crudapp/infrastructure/annotations/CrudResource.java
+@@ -24,8 +24,15 @@ public @interface CrudResource {
+     /**
+      * 🔒 SECURITY OPTIMIZATION: Role-Based Access Control
+      * List of roles required to access this resource.
++     *
++     * <p>Defaults to an empty array, which is <strong>deny-by-default</strong>:
++     * a resource that does not explicitly declare its roles is inaccessible
++     * to every caller. This guarantees that forgetting to configure
++     * authorization can never accidentally expose a resource. To make a
++     * resource publicly accessible, opt in explicitly with
++     * {@code roles = {"ANYONE"}}.</p>
+      */
+-    String[] roles() default {"ANYONE", "USER", "ADMIN"};
++    String[] roles() default {};
+ 
+     /**
+      * 🚀 ARCHITECTURE OPTIMIZATION: DTO Versioning
+diff --git a/src/main/java/com/org73n37/crudapp/infrastructure/security/ReactiveJwtFilter.java b/src/main/java/com/org73n37/crudapp/infrastructure/security/ReactiveJwtFilter.java
+new file mode 100644
+index 0000000..50b5a2b
+--- /dev/null
++++ b/src/main/java/com/org73n37/crudapp/infrastructure/security/ReactiveJwtFilter.java
+@@ -0,0 +1,325 @@
++package com.org73n37.crudapp.infrastructure.security;
++
++import com.org73n37.crudapp.infrastructure.annotations.CrudResource;
++import com.org73n37.crudapp.logic.CrudEngine;
++import com.org73n37.crudapp.logic.ResourceMetadata;
++import tools.jackson.databind.ObjectMapper;
++
++import io.jsonwebtoken.Claims;
++import io.jsonwebtoken.Jwts;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.stereotype.Component;
++import org.springframework.web.server.ServerWebExchange;
++import org.springframework.web.server.WebFilter;
++import org.springframework.web.server.WebFilterChain;
++import reactor.core.publisher.Mono;
++import reactor.util.context.Context;
++
++import org.springframework.security.core.context.ReactiveSecurityContextHolder;
++import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.core.authority.SimpleGrantedAuthority;
++import org.springframework.security.core.GrantedAuthority;
++
++import java.math.BigInteger;
++import java.net.URI;
++import java.net.http.HttpClient;
++import java.net.http.HttpRequest;
++import java.net.http.HttpResponse;
++import java.nio.charset.StandardCharsets;
++import java.security.KeyFactory;
++import java.security.PublicKey;
++import java.security.spec.RSAPublicKeySpec;
++import java.security.spec.X509EncodedKeySpec;
++import java.util.*;
++import java.util.concurrent.ConcurrentHashMap;
++
++/**
++ * [ARCHITECTURAL OPTIMIZATION]
++ * Reactive JWT Authentication WebFilter for Spring WebFlux.
++ * Validates OAuth2 JWT signatures, performs dynamic RBAC roles verification,
++ * and propagates tenant contexts securely across asynchronous reactive thread hops.
++ */
++@Component
++public class ReactiveJwtFilter implements WebFilter {
++    private static final Logger log = LoggerFactory.getLogger(ReactiveJwtFilter.class);
++
++    @Value("${keycloak.jwk-set-uri}")
++    private String jwkSetUri;
++
++    @Value("${keycloak.test.public-key:}")
++    private String testPublicKeyPem;
++    // ^ Static verification key intended ONLY for local development and tests.
++    //   It bypasses Keycloak JWKS retrieval, so it is refused when
++    //   app.mode=PRODUCTION (see getVerificationKey) to prevent a signing-key
++    //   backdoor from ever being honored in a production deployment.
++
++    @Autowired
++    private CrudEngine crudManager;
++
++    @Autowired
++    private ObjectMapper objectMapper;
++
++    @Autowired
++    private com.org73n37.crudapp.infrastructure.config.AppModeConfig appModeConfig;
++
++    private final Map<String, PublicKey> jwkCache = new ConcurrentHashMap<>();
++    private PublicKey parsedTestPublicKey = null;
++    private final Object testKeyLock = new Object();
++
++    @Override
++    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
++        // Skip CORS preflight OPTIONS requests
++        if (org.springframework.http.HttpMethod.OPTIONS.equals(exchange.getRequest().getMethod())) {
++            return chain.filter(exchange);
++        }
++
++        String path = exchange.getRequest().getURI().getPath();
++
++        // Skip dashboard, assets, metadata public endpoints and health checks
++        if (path.equals("/dashboard") || path.startsWith("/dashboard/") ||
++            path.startsWith("/css/") || path.startsWith("/js/") ||
++            path.equals("/favicon.ico") || path.endsWith(".css") || path.endsWith(".svg") ||
++            path.equals("/api/metadata") || path.startsWith("/health/") || path.equals("/swagger-ui") || path.equals("/api-docs")) {
++            return chain.filter(exchange);
++        }
++
++        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
++        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
++            log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason=Missing or invalid Authorization header", path);
++            exchange.getResponse().setRawStatusCode(401);
++            return exchange.getResponse().writeWith(Mono.just(
++                exchange.getResponse().bufferFactory().wrap("Missing or invalid token".getBytes(StandardCharsets.UTF_8))
++            ));
++        }
++ 
++        String token = authHeader.substring(7);
++        try {
++            PublicKey verificationKey = getVerificationKey(token);
++            if (verificationKey == null) {
++                log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason=Signing key not found for token verification", path);
++                exchange.getResponse().setRawStatusCode(401);
++                return exchange.getResponse().writeWith(Mono.just(
++                    exchange.getResponse().bufferFactory().wrap("Signing key not found for token verification".getBytes(StandardCharsets.UTF_8))
++                ));
++            }
++ 
++            Claims claims = Jwts.parser()
++                    .verifyWith(verificationKey)
++                    .build()
++                    .parseSignedClaims(token)
++                    .getPayload();
++ 
++            String username = claims.get("preferred_username", String.class);
++            if (username == null) {
++                username = claims.getSubject();
++            }
++ 
++            // Extract roles
++            List<String> userRoles = new ArrayList<>();
++            Map<String, Object> realmAccess = claims.get("realm_access", Map.class);
++            if (realmAccess != null) {
++                List<?> rolesList = (List<?>) realmAccess.get("roles");
++                if (rolesList != null) {
++                    for (Object r : rolesList) {
++                        userRoles.add(r.toString().toUpperCase());
++                    }
++                }
++            }
++ 
++            // Extract tenant ID
++            String tenant = claims.get("tenant", String.class);
++            if (tenant == null) {
++                String iss = claims.getIssuer();
++                if (iss != null && iss.contains("/realms/")) {
++                    tenant = iss.substring(iss.lastIndexOf("/realms/") + 8);
++                }
++            }
++            if (username == null || !username.matches("^[a-zA-Z0-9_\\-@\\.]+$")) {
++                username = "system";
++            }
++            if (tenant == null || !tenant.matches("^[a-zA-Z0-9_\\-]+$")) {
++                tenant = "default";
++            }
++ 
++            // Perform RBAC
++            String resource = getResourceName(path);
++            if (resource != null) {
++                ResourceMetadata<?, ?> metadata = crudManager.getMetadata(resource);
++                if (metadata != null) {
++                    Class<?> entityClass = metadata.getEntityClass();
++                    CrudResource annotation = entityClass.getAnnotation(CrudResource.class);
++                    if (annotation != null) {
++                        String[] allowedRoles = annotation.roles();
++                        boolean authorized = false;
++                        for (String allowedRole : allowedRoles) {
++                            if ("ANYONE".equalsIgnoreCase(allowedRole)) {
++                                sortedCheck: {
++                                    authorized = true;
++                                    break;
++                                }
++                            }
++                            if (userRoles.contains(allowedRole.toUpperCase())) {
++                                authorized = true;
++                                break;
++                            }
++                        }
++ 
++                        if (!authorized) {
++                            log.warn("[SECURITY EVENT] Action=ACCESS_DENIED Resource={} User={} Tenant={} Reason=Insufficient privileges", resource, username, tenant);
++                            exchange.getResponse().setRawStatusCode(403);
++                            return exchange.getResponse().writeWith(Mono.just(
++                                exchange.getResponse().bufferFactory().wrap("Forbidden: Insufficient privileges".getBytes(StandardCharsets.UTF_8))
++                            ));
++                        }
++                    }
++                }
++            }
++ 
++            // Set tenant context & authentication in Reactive Context
++            List<GrantedAuthority> authorities = new ArrayList<>();
++            for (String role : userRoles) {
++                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
++            }
++            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
++ 
++            final String finalTenant = tenant;
++            final String finalUser = username;
++            return chain.filter(exchange)
++                    .contextWrite(Context.of("tenantId", finalTenant, "username", finalUser))
++                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
++ 
++        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
++            log.warn("[SECURITY EVENT] Action=AUTHENTICATION_FAILURE Path={} Reason={}", path, e.getMessage());
++            log.debug("Token verification failure details", e);
++            exchange.getResponse().setRawStatusCode(401);
++            return exchange.getResponse().writeWith(Mono.just(
++                exchange.getResponse().bufferFactory().wrap(("Invalid token: " + e.getMessage()).getBytes(StandardCharsets.UTF_8))
++            ));
++        } catch (Exception e) {
++            log.error("Unexpected error during token filtering", e);
++            exchange.getResponse().setRawStatusCode(500);
++            return exchange.getResponse().writeWith(Mono.just(
++                exchange.getResponse().bufferFactory().wrap("Internal Server Error".getBytes(StandardCharsets.UTF_8))
++            ));
++        }
++    }
++
++    private String getResourceName(String path) {
++        if (path.startsWith("/api/")) {
++            String remaining = path.substring(5);
++            // Ignore API versions if present (e.g. v1/products -> products)
++            if (remaining.startsWith("v") && remaining.contains("/")) {
++                int nextSlash = remaining.indexOf('/');
++                if (Character.isDigit(remaining.charAt(nextSlash - 1)) || remaining.substring(0, nextSlash).matches("v\\d+")) {
++                    remaining = remaining.substring(nextSlash + 1);
++                }
++            }
++            int slashIdx = remaining.indexOf('/');
++            if (slashIdx != -1) {
++                return remaining.substring(0, slashIdx);
++            } else {
++                return remaining;
++            }
++        }
++        return null;
++    }
++
++    private PublicKey getVerificationKey(String token) throws Exception {
++        if (testPublicKeyPem != null && !testPublicKeyPem.trim().isEmpty()) {
++            // Deny-by-default in production: never honor a statically configured
++            // verification key when running in PRODUCTION mode. Fall through to
++            // the authoritative Keycloak JWKS endpoint instead.
++            if (appModeConfig != null && appModeConfig.isProduction()) {
++                log.error("[SECURITY EVENT] Action=CONFIG_REJECTED Reason=keycloak.test.public-key is set while app.mode=PRODUCTION; ignoring static test key and verifying via Keycloak JWKS");
++            } else {
++                synchronized (testKeyLock) {
++                    if (parsedTestPublicKey == null) {
++                        parsedTestPublicKey = parsePemPublicKey(testPublicKeyPem);
++                    }
++                }
++                return parsedTestPublicKey;
++            }
++        }
++
++        String kid = extractKid(token);
++        if (kid == null) {
++            return null;
++        }
++
++        if (jwkCache.containsKey(kid)) {
++            return jwkCache.get(kid);
++        }
++
++        fetchJwks();
++        return jwkCache.get(kid);
++    }
++
++    private String extractKid(String token) {
++        try {
++            String[] parts = token.split("\\.");
++            if (parts.length > 0) {
++                String headerJson = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
++                Map<String, Object> header = objectMapper.readValue(headerJson, Map.class);
++                return (String) header.get("kid");
++            }
++        } catch (Exception e) {
++            log.warn("Failed to extract kid from token header", e);
++        }
++        return null;
++    }
++
++    private PublicKey parsePemPublicKey(String pem) throws Exception {
++        String cleaned = pem.replace("-----BEGIN PUBLIC KEY-----", "")
++                .replace("-----END PUBLIC KEY-----", "")
++                .replaceAll("\\s", "");
++        byte[] decoded = Base64.getDecoder().decode(cleaned);
++        X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
++        KeyFactory kf = KeyFactory.getInstance("RSA");
++        return kf.generatePublic(spec);
++    }
++
++    @SuppressWarnings("unchecked")
++    private synchronized void fetchJwks() {
++        try {
++            log.info("Fetching Keycloak JWKS from: {}", jwkSetUri);
++            HttpClient client = HttpClient.newHttpClient();
++            HttpRequest request = HttpRequest.newBuilder()
++                    .uri(URI.create(jwkSetUri))
++                    .GET()
++                    .build();
++            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
++            if (response.statusCode() != 200) {
++                log.error("Failed to fetch JWKS: status code {}", response.statusCode());
++                return;
++            }
++
++            Map<String, Object> jwks = objectMapper.readValue(response.body(), Map.class);
++            List<Map<String, Object>> keys = (List<Map<String, Object>>) jwks.get("keys");
++            if (keys != null) {
++                for (Map<String, Object> key : keys) {
++                    String keyId = (String) key.get("kid");
++                    String kty = (String) key.get("kty");
++                    if ("RSA".equals(kty)) {
++                        String n = (String) key.get("n");
++                        String e = (String) key.get("e");
++
++                        byte[] modulusBytes = Base64.getUrlDecoder().decode(n);
++                        byte[] exponentBytes = Base64.getUrlDecoder().decode(e);
++                        BigInteger modulus = new BigInteger(1, modulusBytes);
++                        BigInteger exponent = new BigInteger(1, exponentBytes);
++                        RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
++                        KeyFactory factory = KeyFactory.getInstance("RSA");
++                        PublicKey publicKey = factory.generatePublic(spec);
++
++                        jwkCache.put(keyId, publicKey);
++                    }
++                }
++            }
++        } catch (Exception e) {
++            log.error("Error fetching or parsing JWKS from URL " + jwkSetUri, e);
++        }
++    }
++}
+diff --git a/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityAuditorAware.java b/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityAuditorAware.java
+new file mode 100644
+index 0000000..f2d6f41
+--- /dev/null
++++ b/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityAuditorAware.java
+@@ -0,0 +1,24 @@
++package com.org73n37.crudapp.infrastructure.security;
++
++import org.springframework.data.domain.AuditorAware;
++import org.springframework.security.core.Authentication;
++import org.springframework.security.core.context.SecurityContextHolder;
++import org.springframework.stereotype.Component;
++
++import java.util.Optional;
++
++/**
++ * Spring AuditorAware bean implementation to capture user details from Spring SecurityContext.
++ */
++@Component
++public class SecurityAuditorAware implements AuditorAware<String> {
++
++    @Override
++    public Optional<String> getCurrentAuditor() {
++        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
++        if (authentication == null || !authentication.isAuthenticated()) {
++            return Optional.of("system");
++        }
++        return Optional.of(authentication.getName());
++    }
++}
+diff --git a/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityConfig.java b/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityConfig.java
+new file mode 100644
+index 0000000..9811e33
+--- /dev/null
++++ b/src/main/java/com/org73n37/crudapp/infrastructure/security/SecurityConfig.java
+@@ -0,0 +1,43 @@
++package com.org73n37.crudapp.infrastructure.security;
++
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
++import org.springframework.security.config.web.server.ServerHttpSecurity;
++import org.springframework.security.web.server.SecurityWebFilterChain;
++
++/**
++ * [SECURITY CONFIGURATION]
++ * Configures Spring Security for WebFlux.
++ *
++ * <p><strong>Why CSRF is disabled and the chain permits all exchanges:</strong>
++ * this is a stateless, token-authenticated API. There are no server-side
++ * sessions or cookies to forge, so CSRF protection is not applicable; clients
++ * authenticate by presenting a bearer JWT on every request. Authentication and
++ * authorization are <em>not</em> delegated to Spring's matcher-based rules here.
++ * Instead, {@link ReactiveJwtFilter} is the single source of truth: it runs as a
++ * {@code WebFilter}, validates the JWT signature against Keycloak's JWKS,
++ * performs role-based access control, and rejects unauthenticated or
++ * unauthorized requests with 401/403 before they reach any handler.</p>
++ *
++ * <p>{@code anyExchange().permitAll()} therefore means "let
++ * {@link ReactiveJwtFilter} decide", not "no security". The filter denies by
++ * default: any request that is not on its explicit public skip-list and does not
++ * carry a valid bearer token is rejected. Keeping a single enforcement point
++ * avoids the classic pitfall of two overlapping authorization mechanisms
++ * disagreeing about which paths are protected.</p>
++ */
++@Configuration
++@EnableWebFluxSecurity
++public class SecurityConfig {
++
++    @Bean
++    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
++        return http
++                .csrf(csrf -> csrf.disable())
++                .authorizeExchange(exchanges -> exchanges
++                        .anyExchange().permitAll()
++                )
++                .build();
++    }
++}
