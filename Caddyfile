@@ -1,6 +1,13 @@
 yourdomain.com {
-    # Reverse proxy public HTTP/HTTPS traffic to the WebFlux container
-    reverse_proxy crud-api:8080
+    # Reverse proxy auth requests to the Keycloak container
+    handle /auth/* {
+        reverse_proxy keycloak:8080
+    }
+
+    # Reverse proxy all other requests to the WebFlux API container
+    handle {
+        reverse_proxy crud-api:8080
+    }
 
     # Custom security headers
     header {

@@ -27,7 +27,14 @@ public class Main {
                 .compact();
         log.info("--------------------------------------------------");
         log.info("🔑 TEST JWT TOKEN (for Postman/Browser extension):");
-        log.info("Bearer " + testToken);
+        try {
+            java.nio.file.Path targetDir = java.nio.file.Path.of("target");
+            java.nio.file.Files.createDirectories(targetDir);
+            java.nio.file.Files.writeString(targetDir.resolve("jwt.token"), testToken);
+            log.info("Written to target/jwt.token");
+        } catch (Exception e) {
+            log.warn("Failed to write test token to file: " + e.getMessage());
+        }
         log.info("--------------------------------------------------");
 
         SpringApplication app = new SpringApplication(Main.class);

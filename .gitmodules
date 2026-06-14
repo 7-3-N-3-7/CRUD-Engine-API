@@ -22,3 +22,6 @@
 [submodule "crud-engine-weaviate"]
 	path = crud-engine-weaviate
 	url = https://github.com/7-3-N-3-7/crud-engine-weaviate.git
+[submodule "crud-engine-security-keycloak"]
+	path = crud-engine-security-keycloak
+	url = https://github.com/7-3-N-3-7/crud-engine-security-keycloak.git

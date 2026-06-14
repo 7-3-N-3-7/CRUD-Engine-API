@@ -10,6 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+      - ./data/postgres-init:/docker-entrypoint-initdb.d
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.2
@@ -17,9 +18,20 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloakdb
+      - KC_DB_USERNAME=user
+      - KC_DB_PASSWORD=password
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_RELATIVE_PATH=/auth
+      - KC_LOG_LEVEL=info
+      - KC_HTTP_ENABLED=true
     ports:
       - "8081:8080"
-    command: start-dev
+    command: start
+    depends_on:
+      - postgres
 
   crud-api:
     image: ghcr.io/73n37/crud-application:latest
