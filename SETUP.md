@@ -8,7 +8,7 @@ This manual details how to manage the Git submodule workflow, register new resou
 
 ## 1. Git Submodule Workflow & Multi-Module Layout
 
-The project is structured as 1 parent shell repository coordinating 8 independent Git submodules. Security is **not** among them: the OIDC/JWT layer is a foundational part of `crud-engine-core` (it was previously a separate `crud-engine-security-keycloak` submodule and has been promoted into core so it can never be omitted from a build).
+The project is structured as 1 parent shell repository coordinating 9 independent Git submodules. OIDC/JWT security is encapsulated in the `crud-engine-security-keycloak` submodule, which is included as a core submodule and transitively required by the Spring Boot starter to guarantee deny-by-default authentication out-of-the-box.
 
 ### How to Clone the Project
 Because the modules are hosted in separate repositories, you must clone recursively to fetch all files:
@@ -215,8 +215,8 @@ The application dependencies (PostgreSQL, MongoDB, Keycloak, and optionally Weav
 ```bash
 docker-compose up -d
 ```
-*   **PostgreSQL:** Runs on port `5433` (DB: `cruddb`, Username: `user`, Password: `password`).
-*   **Keycloak:** Runs on port `8081` (Admin Credentials: `admin`/`admin`).
+*   **PostgreSQL:** Runs on port `5433` (DB: `cruddb`, Username: `user`, Password: `password`). It also automatically initializes the `keycloakdb` database needed for Keycloak using `init.sql`.
+*   **Keycloak:** Runs on port `8081` with the `/auth` path prefix (Admin Credentials: `admin`/`admin`, Admin Console: `http://localhost:8081/auth/admin`). It runs in production-ready mode (`start`) with PostgreSQL as the backend storage.
 
 ### Step 1b (Optional): Start Weaviate
 If you are developing with the `crud-engine-weaviate` module, start a local Weaviate instance:
@@ -233,7 +233,7 @@ crud.engine.weaviate.grpc-port=50051
 ```
 
 ### Step 2: Configure Keycloak Realm
-1.  Navigate to `http://localhost:8081/admin` and log in.
+1.  Navigate to `http://localhost:8081/auth/admin` and log in.
 2.  Create a realm named `crud-realm`.
 3.  Create roles: `ADMIN`, `USER`, `GUEST`.
 4.  Create user `test-user`, assign credentials and mapping roles.
@@ -273,7 +273,7 @@ Because the application runs Java 25, Keycloak, and PostgreSQL as persistent dae
     [Service]
     User=root
     WorkingDirectory=/var/www
-    ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cruddb -Dspring.datasource.username=dbuser -Dspring.datasource.password=secure_vps_password -Dkeycloak.jwk-set-uri=http://localhost:8081/realms/crud-realm/protocol/openid-connect/certs -Dkeycloak.issuer=http://localhost:8081/realms/crud-realm /var/www/crudapp.jar
+    ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cruddb -Dspring.datasource.username=dbuser -Dspring.datasource.password=secure_vps_password -Dkeycloak.jwk-set-uri=http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs -Dkeycloak.issuer=http://localhost:8081/auth/realms/crud-realm /var/www/crudapp.jar
     Restart=always
 
     [Install]
@@ -296,6 +296,16 @@ server {
     listen 80;
     server_name yourdomain.com;
 
+    # Keycloak auth routes
+    location /auth/ {
+        proxy_pass http://127.0.0.1:8081/auth/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # API endpoints
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;

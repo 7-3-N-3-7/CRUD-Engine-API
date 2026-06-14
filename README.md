@@ -4,7 +4,7 @@
 [![Java Version](https://img.shields.io/badge/Java-25-orange.svg)](https://jdk.java.net/25/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green.svg)](https://spring.io/projects/spring-boot)
 [![Spring WebFlux](https://img.shields.io/badge/Spring%20WebFlux-Reactive-blue.svg)](https://spring.io/projects/spring-framework)
-[![Keycloak](https://img.shields.io/badge/Keycloak-24.0.2-red.svg)](https://www.keycloak.org/)
+[![Keycloak](https://img.shields.io/badge/Keycloak-26.6.2-red.svg)](https://www.keycloak.org/)
 
 An educational, enterprise-ready, metadata-driven CRUD engine and frontend testing panel designed to teach students **advanced software engineering principles**, design patterns, and modern reactive security patterns.
 
@@ -30,9 +30,10 @@ crud-application/ (Main Shell Repository)
 ├── pom.xml (Parent POM coordinating submodules)
 ├── crud-app-sample/ (Run-time executable app with local entities/tests)
 └── [Submodules]
-    ├── crud-engine-core/ (Core abstractions, reflection registries, SPIs, & foundational OIDC/JWT security)
+    ├── crud-engine-core/ (Core abstractions, reflection registries, SPIs, and dynamic class/routing registries)
+    ├── crud-engine-security-keycloak/ (Keycloak OIDC reactive authentication & JWT validation filters)
     ├── crud-engine-webflux/ (Runtime WebFlux endpoints & dynamic controller loaders)
-    ├── crud-engine-spring-boot-starter/ (Conditional auto-configuration bootstrapper)
+    ├── crud-engine-spring-boot-starter/ (Conditional auto-configuration bootstrapper including OIDC security autowiring)
     │
     ├── [Pluggable Storage Adapters]
     │   ├── crud-engine-jpa/ (JPA & Row-Level Security SQL database engine)
@@ -69,7 +70,7 @@ graph TD
 
     subgraph Authentication ["Phase 3: Security & Filtering Pipeline"]
         Client["Client React App"] -->|"1. Web Request"| Limit["crud-engine-plugin-ratelimiter"]
-        Limit -->|"2. Checks Token Bucket"| Filter["crud-engine-core (ReactiveJwtFilter)"]
+        Limit -->|"2. Checks Token Bucket"| Filter["crud-engine-security-keycloak (ReactiveJwtFilter)"]
         Filter -->|"3. Binds Tracing & Tenant Context"| Interceptor["CompositeCrudInterceptor"]
     end
 
@@ -80,9 +81,10 @@ graph TD
 ```
 
 ### Integrated Submodules & Plugins:
-*   **crud-engine-core**: Base annotations (`@CrudResource`, `@EntityMapping`), `BaseEntity` with tenancy, auditing & attribute maps, the Service / Interceptor registry, and the **foundational OIDC/JWT security layer** — the reactive security filter (`ReactiveJwtFilter`) that validates Keycloak tokens, extracts username/roles/tenant claims, enforces deny-by-default role-based access control, and propagates `TenantContext` across reactive thread boundaries. Security lives in core (not a separable plugin) because it is structural, never optional.
+*   **crud-engine-core**: Base annotations (`@CrudResource`, `@EntityMapping`), `BaseEntity` with tenancy, auditing & attribute maps, and the Service / Interceptor registry.
+*   **crud-engine-security-keycloak**: Houses the enterprise-hardened Keycloak OIDC security layer — including the reactive security filter (`ReactiveJwtFilter`) that validates Keycloak tokens, extracts username/roles/tenant claims, enforces deny-by-default role-based access control, and propagates `TenantContext` across reactive thread boundaries. It is integrated as a permanent core submodule required by the starter so that security is always enabled.
 *   **crud-engine-webflux**: Declares `UniversalCrudController` and dynamically maps routes at runtime. Uses optional autowiring to run without SQL/JPA if only NoSQL/InMemory is present.
-*   **crud-engine-spring-boot-starter**: Auto-configures engine registries and component scans based on classpath class existence.
+*   **crud-engine-spring-boot-starter**: Auto-configures engine registries, security beans, and component scans based on classpath class existence.
 *   **crud-engine-jpa**: Executes PostgreSQL criteria queries and handles Row-Level Security (RLS) policies.
 *   **crud-engine-mongodb**: Dynamic document database persistence using `MongoTemplate` and regex-based filters.
 *   **crud-engine-inmemory**: Ultra-fast Map-based storage provider, ideal for unit testing without external database infrastructure.
@@ -105,7 +107,7 @@ This codebase serves as a living laboratory for advanced Java design patterns:
 
 ## 🔒 Security Architecture: Enterprise-Hardened OIDC
 
-The API is fully secured using **OAuth 2.0 / OpenID Connect (OIDC)** via Keycloak. The security layer (`ReactiveJwtFilter`, `SecurityConfig`, `SecurityAuditorAware`) is a **foundational part of `crud-engine-core`**, not a separable plugin — every build of the engine is authenticated by construction.
+The API is fully secured using **OAuth 2.0 / OpenID Connect (OIDC)** via Keycloak. The security layer (`ReactiveJwtFilter`, `SecurityConfig`, `SecurityAuditorAware`) is encapsulated in the `crud-engine-security-keycloak` submodule, integrated as a core dependency — every build of the starter is authenticated by construction.
 
 ```
 Incoming HTTP request -> Header: Authorization: Bearer <JWT>
@@ -153,7 +155,7 @@ docker-compose up -d
 ```
 *This starts:*
 1.  **PostgreSQL** on port `5433` (preventing conflicts with local Postgres installations on 5432).
-2.  **Keycloak** on port `8081` (Admin Credentials: `admin` / `admin`).
+2.  **Keycloak** on port `8081` with the `/auth` path prefix (Admin Credentials: `admin` / `admin`, Admin Console: `http://localhost:8081/auth/admin`).
 
 > **Optional — Weaviate:** If you intend to use the `crud-engine-weaviate` storage adapter, start a local Weaviate instance:
 > ```bash
