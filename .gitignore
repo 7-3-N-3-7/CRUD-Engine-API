@@ -9,3 +9,6 @@ target/
 .DS_Store
 frontend_repo/
 frontend/test-results/
+crud-frontend-hugo/
+old_frontend_temp/
+

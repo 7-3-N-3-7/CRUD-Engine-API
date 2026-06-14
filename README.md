@@ -177,25 +177,23 @@ mvn spring-boot:run -pl crud-app-sample
 The server will boot up on `http://localhost:8080`.
 
 ### Step 4: Run the Frontend (Separate Repository)
-The interactive React-TypeScript frontend is maintained in its own repository:
+The interactive Go Hugo custom dashboard frontend is maintained in its own repository:
 
-> 🎨 **[73N37/Crud_frontend](https://github.com/73N37/Crud_frontend)**
+> 🎨 **[7-3-N-3-7/crud-frontend-hugo](https://github.com/7-3-N-3-7/crud-frontend-hugo)**
 
 To run it locally:
 1. Clone the frontend repository:
    ```bash
-   git clone https://github.com/73N37/Crud_frontend.git
-   cd Crud_frontend
+   git clone https://github.com/7-3-N-3-7/crud-frontend-hugo.git
+   cd crud-frontend-hugo
    ```
-2. Install dependencies:
+2. Start the Hugo development server:
    ```bash
-   npm install
+   hugo server
    ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-The frontend will boot up on `http://localhost:5173`.
+The frontend will boot up on `http://localhost:1313`.
+Alternatively, you can access the dashboard through `/dashboard/`.
+
 
 ---
 

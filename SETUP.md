@@ -321,3 +321,34 @@ sudo ln -s /etc/nginx/sites-available/crudapp /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 sudo certbot --nginx -d yourdomain.com
 ```
+
+### Option C: Deployment via VS Code Hostinger Connector
+
+With the **Hostinger Connector** extension installed in Visual Studio Code, you can manage and deploy the entire stack directly from your IDE's sidebar.
+
+#### 1. Configuration & Authentication
+1. Open the **Hostinger Connector** tab in your VS Code sidebar.
+2. Sign in to your Hostinger Account using the secure browser-based OAuth 2.1 authentication flow.
+3. Once authenticated, select your active **VPS Instance** or **Hosting Plan** from the connector's panel.
+
+#### 2. Deploying the Backend API (VPS)
+If you are deploying the backend API stack (including Postgres, Keycloak, and Caddy) on a Hostinger VPS:
+1. Select your target VPS from the Hostinger Connector panel.
+2. Clone this repository directly onto the VPS workspace using the built-in terminal or remote workspace manager.
+3. Configure the environment variables (`SPRING_PROFILES_ACTIVE=prod`, database passwords, and domain certificates) in `docker-compose.yml` or your `.env` settings.
+4. Run `docker-compose up -d` using the Hostinger Connector terminal interface to spin up the containerized services.
+
+#### 3. Deploying the Hugo Frontend
+The static Hugo site can be deployed either to a Hostinger Web Hosting plan or the same VPS:
+*   **To a Hostinger Web Hosting Plan:**
+    1. Compile the site locally by running the `hugo` command to generate the static files in the `public/` directory.
+    2. In the Hostinger Connector sidebar, select your target domain/hosting site.
+    3. Use the File Manager upload option in the connector to publish the contents of the `public/` folder directly to the root `public_html/` directory on Hostinger.
+*   **To a Hostinger VPS (Dockerized):**
+    1. The `crud-frontend-hugo` repository includes a `Dockerfile` that uses a multi-stage build to compile the static site and serve it on port `80` using an Nginx alpine container.
+    2. Build and run the image on your VPS using the remote terminal:
+        ```bash
+        docker build -t crud-frontend-hugo .
+        docker run -d --name crud-frontend -p 80:80 crud-frontend-hugo
+        ```
+
