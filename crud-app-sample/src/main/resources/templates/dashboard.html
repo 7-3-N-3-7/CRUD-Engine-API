@@ -87,6 +87,11 @@
                                 ADMIN
                             </label>
                             <label style="flex: 1; text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);"
+                                   th:styleappend="${selectedRole == 'USER'} ? 'border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6,182,212,0.08);' : ''">
+                                <input type="radio" name="selectedRole" value="USER" th:checked="${selectedRole == 'USER'}" style="display: none;" />
+                                USER
+                            </label>
+                            <label style="flex: 1; text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);"
                                    th:styleappend="${selectedRole == 'GUEST'} ? 'border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(6,182,212,0.08);' : ''">
                                 <input type="radio" name="selectedRole" value="GUEST" th:checked="${selectedRole == 'GUEST'}" style="display: none;" />
                                 GUEST
