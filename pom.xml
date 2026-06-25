@@ -37,7 +37,7 @@
 			legacy com.fasterxml.jackson.core:jackson-annotations coordinates. jjwt-jackson
 			transitively pulls an older 2.12.x jackson-annotations that lacks classes such as
 			JsonSerializeAs, which Jackson 3 requires. Pin annotations to the version Jackson
-			3.1.4 expects so it wins dependency mediation across all modules.
+			3.x expects so it wins dependency mediation across all modules.
 		-->
 		<jackson-annotations.version>2.21</jackson-annotations.version>
 	</properties>
@@ -149,7 +149,7 @@
 			</dependency>
 			<!--
 				Jackson 3 stores its annotations under the legacy com.fasterxml.jackson.core
-				coordinates. Force the version Jackson 3.1.4 requires so the older copy pulled
+				coordinates. Force the version Jackson 3.x requires so the older copy pulled
 				in transitively by jjwt-jackson does not shadow it (missing JsonSerializeAs).
 			-->
 			<dependency>
