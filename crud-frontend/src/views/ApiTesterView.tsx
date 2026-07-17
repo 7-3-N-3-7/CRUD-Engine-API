@@ -9,7 +9,7 @@ export const ApiTesterView: React.FC = () => {
   const handleTestPublic = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/translations', {
+      const res = await fetch('http://127.0.0.1:8080/api/translations', {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
         }
@@ -26,7 +26,7 @@ export const ApiTesterView: React.FC = () => {
   const handleTestSecure = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/products', {
+      const res = await fetch('http://127.0.0.1:8080/api/products', {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
         }
