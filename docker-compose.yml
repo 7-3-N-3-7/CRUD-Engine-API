@@ -45,7 +45,7 @@ services:
       - postgres
 
   crud-api:
-    image: ghcr.io/73n37/crud-application:latest
+    image: 73n37/crud-app-sample:latest
     container_name: crud-api
     restart: always
     environment:
@@ -82,6 +82,8 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      # Uncomment the following line if your Docker Hub repository is private:
+      # - ~/.docker/config.json:/config.json
     command: --interval 300 --cleanup --label-enable
 
   minio:
