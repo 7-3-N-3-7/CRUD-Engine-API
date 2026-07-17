@@ -1,0 +1,62 @@
+{
+  "realm": "crud-realm",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "ROOT"
+      },
+      {
+        "name": "ADMIN"
+      },
+      {
+        "name": "USER"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "root-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "toor",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ROOT"
+      ]
+
+    },
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "adminpassword123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    }, 
+    {
+      "username": "regular-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "userpassword123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    }
+  ]
+}

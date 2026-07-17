@@ -1,1 +1,1 @@
-CREATE DATABASE keycloakdb;
+CREATE DATABASE crudapp_keycloak_db;

@@ -1,122 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import { I18nProvider, useI18n } from './providers/I18nProvider';
+import { ArchitectureView } from './views/ArchitectureView';
+import { ApiTesterView } from './views/ApiTesterView';
+import { MinioIcon } from './components/MinioIcon';
+import './index.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const DashboardContent: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'architecture' | 'apiTester'>('architecture');
+  const { t } = useI18n();
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 glass-panel border-r border-slate-800 m-4 rounded-xl flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-slate-700">
+          <MinioIcon name="logo" className="w-8 h-8 text-blue-400" />
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+            CRUD Engine
+          </h1>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+        <nav className="flex-1 p-4 space-y-2">
+          <button
+            onClick={() => setActiveTab('architecture')}
+            className={`w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center gap-3 ${
+              activeTab === 'architecture' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'hover:bg-slate-800 text-slate-400'
+            }`}
+          >
+            <MinioIcon name="architecture" className="w-5 h-5" />
+            {t('nav.architecture') || 'Architecture'}
+          </button>
+          <button
+            onClick={() => setActiveTab('apiTester')}
+            className={`w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center gap-3 ${
+              activeTab === 'apiTester' ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'hover:bg-slate-800 text-slate-400'
+            }`}
+          >
+            <MinioIcon name="api" className="w-5 h-5" />
+            {t('nav.apitester') || 'API Tester'}
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <header className="mb-8 flex justify-between items-center glass-panel py-4 px-6 rounded-xl">
+          <h2 className="text-2xl font-semibold text-slate-200">
+            {activeTab === 'architecture' ? 'Architecture Overview' : 'API Tester Dashboard'}
+          </h2>
+          <div className="flex items-center gap-4">
+             <div className="w-8 h-8 rounded-full bg-slate-700 border border-slate-600"></div>
+          </div>
+        </header>
+
+        <div className="transition-all duration-300">
+          {activeTab === 'architecture' && <ArchitectureView />}
+          {activeTab === 'apiTester' && <ApiTesterView />}
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </main>
+    </div>
+  );
+};
 
-      <div className="ticks"></div>
+const App: React.FC = () => {
+  return (
+    <I18nProvider>
+      <DashboardContent />
+    </I18nProvider>
+  );
+};
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+export default App;

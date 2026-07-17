@@ -215,7 +215,7 @@ The application dependencies (PostgreSQL, MongoDB, Keycloak, and optionally Weav
 ```bash
 docker-compose up -d
 ```
-*   **PostgreSQL:** Runs on port `5433` (DB: `cruddb`, Username: `user`, Password: `password`). It also automatically initializes the `keycloakdb` database needed for Keycloak using `init.sql`.
+*   **PostgreSQL:** Runs on port `5433` (DB: `crudapp_db`, Username: `user`, Password: `password`). It also automatically initializes the `crudapp_keycloak_db` database needed for Keycloak using `init.sql`.
 *   **Keycloak:** Runs on port `8081` with the `/auth` path prefix (Admin Credentials: `admin`/`admin`, Admin Console: `http://localhost:8081/auth/admin`). It runs in production-ready mode (`start`) with PostgreSQL as the backend storage.
 
 ### Step 1b (Optional): Start Weaviate
@@ -273,7 +273,7 @@ Because the application runs Java 25, Keycloak, and PostgreSQL as persistent dae
     [Service]
     User=root
     WorkingDirectory=/var/www
-    ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cruddb -Dspring.datasource.username=dbuser -Dspring.datasource.password=secure_vps_password -Dkeycloak.jwk-set-uri=http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs -Dkeycloak.issuer=http://localhost:8081/auth/realms/crud-realm /var/www/crudapp.jar
+    ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8080 -Dspring.datasource.url=jdbc:postgresql://localhost:5432/crudapp_db -Dspring.datasource.username=dbuser -Dspring.datasource.password=secure_vps_password -Dkeycloak.jwk-set-uri=http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs -Dkeycloak.issuer=http://localhost:8081/auth/realms/crud-realm /var/www/crudapp.jar
     Restart=always
 
     [Install]
