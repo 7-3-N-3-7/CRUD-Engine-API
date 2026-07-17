@@ -1,0 +1,10 @@
+{
+  "nav.architecture": "Architecture",
+  "nav.apitester": "Testeur d'API",
+  "dashboard.title": "Tableau de bord interactif",
+  "dashboard.welcome": "Bienvenue sur le tableau de bord !",
+  "architecture.title": "Vue d'ensemble de l'architecture",
+  "architecture.description": "Cette plateforme s'appuie sur une architecture inspirée des microservices avec un frontend React et plusieurs services backend.",
+  "api.tester.title": "Testeur d'API",
+  "api.tester.description": "Testez la connectivité aux services backend."
+}

@@ -1,0 +1,10 @@
+{
+  "nav.architecture": "Architecture",
+  "nav.apitester": "API Tester",
+  "dashboard.title": "Interactive Dashboard",
+  "dashboard.welcome": "Welcome to the dashboard!",
+  "architecture.title": "Architecture Overview",
+  "architecture.description": "This platform leverages a microservices-inspired architecture with a React frontend and multiple backend services.",
+  "api.tester.title": "API Tester",
+  "api.tester.description": "Test connectivity to the backend services."
+}
