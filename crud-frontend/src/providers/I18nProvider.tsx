@@ -26,17 +26,22 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchTranslations = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8080/api/translations', {
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
-          }
-        });
+        // Relative URL — Vite proxy forwards this to http://127.0.0.1:8080/api/translations
+        // No Authorization header needed; /api/translations is a public endpoint.
+        const response = await fetch('/api/translations');
         if (!response.ok) {
           throw new Error('Failed to fetch translations');
         }
         const data = await response.json();
-        // Assume data is { translations: { ... } } or just { ... }
-        const trans = data.translations || data;
+        // data is an array of { key, value } objects from MongoDB
+        const trans: Translations = {};
+        if (Array.isArray(data)) {
+          data.forEach((item: { key: string; value: string }) => {
+            trans[item.key] = item.value;
+          });
+        } else {
+          Object.assign(trans, data.translations || data);
+        }
         setTranslations(trans);
       } catch (err: any) {
         setError(err.message || 'Unknown error');

@@ -9,11 +9,8 @@ export const ApiTesterView: React.FC = () => {
   const handleTestPublic = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8080/api/translations', {
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
-        }
-      });
+      // Relative URL — Vite proxy forwards this to http://127.0.0.1:8080/api/translations
+      const res = await fetch('/api/translations');
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
     } catch (err: any) {
@@ -26,17 +23,17 @@ export const ApiTesterView: React.FC = () => {
   const handleTestSecure = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8080/api/products', {
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
-        }
-      });
+      // Relative URL — Vite proxy forwards this to http://127.0.0.1:8080/api/products
+      // The Authorization header is sent through the proxy to the backend.
+      const token = import.meta.env.VITE_API_TOKEN;
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const res = await fetch('/api/products', { headers });
       if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
-           setResponse(`Error ${res.status}: Unauthorized. Please login.`);
-        } else {
-           setResponse(`Error ${res.status}: Failed to fetch products.`);
-        }
+        const body = await res.text();
+        setResponse(`Error ${res.status}: ${body || 'Failed to fetch products.'}`);
       } else {
         const data = await res.json();
         setResponse(JSON.stringify(data, null, 2));
