@@ -1,0 +1,1 @@
+import java.util.Base64; public class Test { public static void main(String[] args) { try { System.out.println(new String(Base64.getUrlDecoder().decode(\" "undefined\))); } catch (Exception e) { e.printStackTrace(); } } }  
