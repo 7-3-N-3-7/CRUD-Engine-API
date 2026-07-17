@@ -9,7 +9,11 @@ export const ApiTesterView: React.FC = () => {
   const handleTestPublic = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/translations');
+      const res = await fetch('http://localhost:8080/api/translations', {
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
+        }
+      });
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
     } catch (err: any) {
@@ -22,8 +26,11 @@ export const ApiTesterView: React.FC = () => {
   const handleTestSecure = async () => {
     setLoading(true);
     try {
-      // Typically we'd pass Authorization header here
-      const res = await fetch('http://localhost:8080/api/products');
+      const res = await fetch('http://localhost:8080/api/products', {
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
+        }
+      });
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
            setResponse(`Error ${res.status}: Unauthorized. Please login.`);

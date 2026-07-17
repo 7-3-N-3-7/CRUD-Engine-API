@@ -50,10 +50,12 @@ services:
     restart: always
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - APP_MODE=DEVELOPMENT
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/crudapp_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/crudapp_db
+      - KEYCLOAK_JWK_SET_URI=http://keycloak:8080/auth/realms/crud-realm/protocol/openid-connect/certs
     ports:
       - "8080:8080"
     depends_on:

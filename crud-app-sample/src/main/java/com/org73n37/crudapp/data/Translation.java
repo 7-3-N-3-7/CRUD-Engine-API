@@ -1,6 +1,5 @@
 package com.org73n37.crudapp.data;
 
-import com.org73n37.crudapp.infrastructure.annotations.CrudResource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Database representation of a Translation.
  */
 @Document(collection = "translations")
-@CrudResource(path = "translations", roles = {"ANYONE"}, dto = Translation.class)
 public class Translation {
     
     @Id

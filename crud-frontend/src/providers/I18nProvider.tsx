@@ -26,7 +26,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchTranslations = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/translations');
+        const response = await fetch('http://localhost:8080/api/translations', {
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`
+          }
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch translations');
         }
