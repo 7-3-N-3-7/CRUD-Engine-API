@@ -5,7 +5,6 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green.svg)](https://spring.io/projects/spring-boot)
 [![Spring WebFlux](https://img.shields.io/badge/Spring%20WebFlux-Reactive-blue.svg)](https://spring.io/projects/spring-framework)
 [![Keycloak](https://img.shields.io/badge/Keycloak-26.6.2-red.svg)](https://www.keycloak.org/)
-
 An educational, enterprise-ready, metadata-driven CRUD engine and frontend testing panel designed to teach students **advanced software engineering principles**, design patterns, and modern reactive security patterns.
 
 ---
@@ -176,22 +175,23 @@ mvn spring-boot:run -pl crud-app-sample
 ```
 The server will boot up on `http://localhost:8080`.
 
-### Step 4: Run the Frontend (Separate Repository)
-The interactive Go Hugo custom dashboard frontend is maintained in its own repository:
-
-> 🎨 **[7-3-N-3-7/crud-frontend-hugo](https://github.com/7-3-N-3-7/crud-frontend-hugo)**
+### Step 4: Run the Frontend (Included Repository)
+The interactive React TypeScript custom dashboard frontend is maintained in the `crud-frontend` directory:
 
 To run it locally:
-1. Clone the frontend repository:
+1. Navigate to the frontend directory:
    ```bash
-   git clone https://github.com/7-3-N-3-7/crud-frontend-hugo.git
-   cd crud-frontend-hugo
+   cd crud-frontend
    ```
-2. Start the Hugo development server:
+2. Install dependencies:
    ```bash
-   hugo server
+   npm install
    ```
-The frontend will boot up on `http://localhost:1313`.
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+The frontend will boot up on `http://localhost:5173`.
 Alternatively, you can access the dashboard through `/dashboard/`.
 
 

@@ -338,17 +338,18 @@ If you are deploying the backend API stack (including Postgres, Keycloak, and Ca
 3. Configure the environment variables (`SPRING_PROFILES_ACTIVE=prod`, database passwords, and domain certificates) in `docker-compose.yml` or your `.env` settings.
 4. Run `docker-compose up -d` using the Hostinger Connector terminal interface to spin up the containerized services.
 
-#### 3. Deploying the Hugo Frontend
-The static Hugo site can be deployed either to a Hostinger Web Hosting plan or the same VPS:
+#### 3. Deploying the React TypeScript Frontend
+The static React site can be deployed either to a Hostinger Web Hosting plan or the same VPS:
 *   **To a Hostinger Web Hosting Plan:**
-    1. Compile the site locally by running the `hugo` command to generate the static files in the `public/` directory.
+    1. Compile the site locally by running the `npm run build` command to generate the static files in the `dist/` directory.
     2. In the Hostinger Connector sidebar, select your target domain/hosting site.
-    3. Use the File Manager upload option in the connector to publish the contents of the `public/` folder directly to the root `public_html/` directory on Hostinger.
+    3. Use the File Manager upload option in the connector to publish the contents of the `dist/` folder directly to the root `public_html/` directory on Hostinger.
 *   **To a Hostinger VPS (Dockerized):**
-    1. The `crud-frontend-hugo` repository includes a `Dockerfile` that uses a multi-stage build to compile the static site and serve it on port `80` using an Nginx alpine container.
+    1. The `crud-frontend` directory includes a `Dockerfile` that uses a multi-stage build to compile the static site and serve it on port `80` using an Nginx alpine container.
     2. Build and run the image on your VPS using the remote terminal:
         ```bash
-        docker build -t crud-frontend-hugo .
-        docker run -d --name crud-frontend -p 80:80 crud-frontend-hugo
+        cd crud-frontend
+        docker build -t crud-frontend-react .
+        docker run -d --name crud-frontend -p 80:80 crud-frontend-react
         ```
 
