@@ -22,4 +22,4 @@ docker push "$IMAGE_NAME"
 echo "✅ Image pushed successfully to $IMAGE_NAME"
 
 # This is meant for development and not deployment
-docker-compose up -d crud-api
+docker-compose up crud-api
