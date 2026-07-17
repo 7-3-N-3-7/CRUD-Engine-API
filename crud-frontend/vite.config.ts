@@ -9,11 +9,11 @@ export default defineConfig({
       // Proxy all /api and /health requests to the Spring Boot backend.
       // The browser sees localhost:5173 — no CORS headers needed.
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://127.0.0.1:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },
