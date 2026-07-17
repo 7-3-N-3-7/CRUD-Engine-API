@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Database representation of a Translation.
  */
 @Document(collection = "translations")
-@CrudResource(path = "translations", roles = {"ANYONE"})
+@CrudResource(path = "translations", roles = {"ANYONE"}, dto = Translation.class)
 public class Translation {
     
     @Id
