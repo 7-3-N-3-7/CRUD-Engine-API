@@ -51,9 +51,14 @@ IMAGE_NAME="${DOCKER_USERNAME}/crud-app-sample:latest"
 # Docker daemon running?
 docker info > /dev/null 2>&1 || fail "Docker is not running. Start Docker Desktop / Docker daemon first."
 
-# docker login check (warns but doesn't abort — push will fail later if not logged in)
-if ! docker info 2>/dev/null | grep -q "Username"; then
-  warn "Not logged in to Docker Hub. Run 'docker login' before pushing."
+# Docker login check — Docker Desktop on Windows stores creds in Windows
+# Credential Manager, so `docker info` never shows a "Username" field.
+# Instead check the config file for a credStore or stored auth entry.
+DOCKER_CONFIG="${DOCKER_CONFIG:-$HOME/.docker}"
+if [ -f "${DOCKER_CONFIG}/config.json" ]; then
+  if ! grep -qE '"credsStore"|"credStore"|"auths"' "${DOCKER_CONFIG}/config.json" 2>/dev/null; then
+    warn "Could not verify Docker Hub login. If the push fails, run 'docker login' first."
+  fi
 fi
 
 ok "Preflight passed  (image: ${IMAGE_NAME})"
