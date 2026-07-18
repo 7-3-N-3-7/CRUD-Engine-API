@@ -28,6 +28,13 @@
 			<version>${spring-boot.version}</version>
 		</dependency>
 
+		<!-- Actuator for Health Checks -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+
 		<!-- JWT (JSON Web Token) support used directly by sample app -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
