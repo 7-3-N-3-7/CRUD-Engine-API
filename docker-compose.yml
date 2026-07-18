@@ -121,6 +121,24 @@ services:
       - ./data/minio-provision:/provision
 
 
+
+  crud-frontend:
+    build:
+      context: ./crud-frontend
+      dockerfile: Dockerfile
+    container_name: crud-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Tell the Next.js server where to forward /api/* rewrites.
+      # Inside Docker the backend is reachable via its service name.
+      - NEXT_PUBLIC_API_URL=http://crud-api:8080
+    depends_on:
+      - crud-api
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
 volumes:
   postgres_data:
   mongo_data:
