@@ -17,12 +17,12 @@ import type { AuthProviderProps } from 'react-oidc-context';
 const oidcConfig: AuthProviderProps = {
   authority: 'http://localhost:8081/auth/realms/crud-realm',
   client_id: 'crud-frontend',
-  redirect_uri: window.location.origin + '/',
-  post_logout_redirect_uri: window.location.origin + '/',
+  // window.location.origin automatically resolves to whatever port the app is
+  // running on (3000 for Next.js, 5173 for Vite legacy mode).
+  redirect_uri: typeof window !== 'undefined' ? window.location.origin + '/' : 'http://localhost:3000/',
+  post_logout_redirect_uri: typeof window !== 'undefined' ? window.location.origin + '/' : 'http://localhost:3000/',
   scope: 'openid profile email',
-  // Automatically renew tokens before they expire (silent refresh via iframe)
   automaticSilentRenew: true,
-  // Remove the `code` and `state` query params from the URL after login
   onSigninCallback: () => {
     window.history.replaceState({}, document.title, window.location.pathname);
   },

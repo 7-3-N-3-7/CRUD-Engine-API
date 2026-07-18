@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface Translations {
@@ -12,50 +14,68 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType>({
   t: (key) => key,
-  loading: true,
+  loading: false,
   error: null,
 });
 
 export const useI18n = () => useContext(I18nContext);
 
-export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [translations, setTranslations] = useState<Translations>({});
-  const [loading, setLoading] = useState(true);
+interface I18nProviderProps {
+  children: React.ReactNode;
+  /**
+   * Pre-fetched translations supplied by the Server Component (layout.tsx).
+   * When provided, no client-side fetch is made on first render — the page
+   * is already translated in the initial HTML (SSR).
+   * Falls back to a client-side fetch if this prop is empty or undefined
+   * (e.g. when the provider is used outside the Next.js app directory).
+   */
+  initialTranslations?: Translations;
+}
+
+export const I18nProvider: React.FC<I18nProviderProps> = ({
+  children,
+  initialTranslations,
+}) => {
+  const [translations, setTranslations] = useState<Translations>(
+    initialTranslations ?? {},
+  );
+  const [loading, setLoading] = useState(!initialTranslations || Object.keys(initialTranslations).length === 0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // If we already have translations from SSR, skip the client-side fetch.
+    if (initialTranslations && Object.keys(initialTranslations).length > 0) {
+      setLoading(false);
+      return;
+    }
+
+    // Fallback: client-side fetch (used when running the old Vite SPA or in tests).
     const fetchTranslations = async () => {
       try {
-        // Relative URL — Vite proxy forwards this to http://127.0.0.1:8080/api/translations
-        // No Authorization header needed; /api/translations is a public endpoint.
         const response = await fetch('/api/translations');
-        if (!response.ok) {
-          throw new Error('Failed to fetch translations');
-        }
+        if (!response.ok) throw new Error('Failed to fetch translations');
         const data = await response.json();
-        // data is an array of { key, value } objects from MongoDB
         const trans: Translations = {};
         if (Array.isArray(data)) {
           data.forEach((item: { key: string; value: string }) => {
             trans[item.key] = item.value;
           });
         } else {
-          Object.assign(trans, data.translations || data);
+          Object.assign(trans, data.translations ?? data);
         }
         setTranslations(trans);
       } catch (err: any) {
-        setError(err.message || 'Unknown error');
+        setError(err.message ?? 'Unknown error');
       } finally {
         setLoading(false);
       }
     };
 
     fetchTranslations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const t = (key: string): string => {
-    return translations[key] || key;
-  };
+  const t = (key: string): string => translations[key] ?? key;
 
   return (
     <I18nContext.Provider value={{ t, loading, error }}>

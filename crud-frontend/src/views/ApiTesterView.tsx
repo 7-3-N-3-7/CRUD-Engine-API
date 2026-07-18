@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { useI18n } from '../providers/I18nProvider';

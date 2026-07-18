@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 
 interface MinioIconProps extends React.SVGProps<SVGSVGElement> {
@@ -10,7 +12,7 @@ export const MinioIcon: React.FC<MinioIconProps> = ({ name, className, ...props 
   useEffect(() => {
     const fetchIcon = async () => {
       try {
-        const url = `http://127.0.0.1:9000/frontend-assets/icons/${name}.svg`;
+        const url = `/minio-assets/icons/${name}.svg`;
         const response = await fetch(url);
         if (response.ok) {
           const text = await response.text();
