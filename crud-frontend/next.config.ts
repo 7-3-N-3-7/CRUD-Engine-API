@@ -14,23 +14,18 @@ const nextConfig: NextConfig = {
 
   // Server-side rewrites (handled by Next.js Node server, not the browser)
   async rewrites() {
-    // In Docker: NEXT_PUBLIC_API_URL=http://crud-api:8080
-    // Locally:   falls back to http://localhost:8080
+    // NOTE: /api/* and /minio-assets/icons/* are handled by Next.js API
+    // Route Handlers (app/api/**) which have proper error handling and never
+    // propagate 500s to the browser.
+    //
+    // Only /health/* uses a raw rewrite since it doesn't need error shielding.
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-    const minioBase = process.env.NEXT_PUBLIC_MINIO_URL ?? 'http://localhost:9000';
 
     return [
       {
-        source: '/api/:path*',
-        destination: `${apiBase}/api/:path*`,
-      },
-      {
+        // Spring Boot actuator health endpoint — used by monitoring tools
         source: '/health/:path*',
         destination: `${apiBase}/health/:path*`,
-      },
-      {
-        source: '/minio-assets/:path*',
-        destination: `${minioBase}/frontend-assets/:path*`,
       },
     ];
   },

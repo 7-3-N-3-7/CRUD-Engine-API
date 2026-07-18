@@ -12,7 +12,9 @@ export const MinioIcon: React.FC<MinioIconProps> = ({ name, className, ...props 
   useEffect(() => {
     const fetchIcon = async () => {
       try {
-        const url = `/minio-assets/icons/${name}.svg`;
+        // Uses our Next.js API route which proxies to MinIO and
+        // returns a fallback SVG when MinIO is unavailable — never 500s.
+        const url = `/api/icons/${name}`;
         const response = await fetch(url);
         if (response.ok) {
           const text = await response.text();

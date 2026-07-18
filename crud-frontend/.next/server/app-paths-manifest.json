@@ -1,3 +1,5 @@
 {
+  "/api/translations/route": "app/api/translations/route.js",
+  "/api/icons/[name]/route": "app/api/icons/[name]/route.js",
   "/page": "app/page.js"
 }

@@ -52,8 +52,14 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
     // Fallback: client-side fetch (used when running the old Vite SPA or in tests).
     const fetchTranslations = async () => {
       try {
+        // /api/translations is now handled by our Next.js API route handler
+        // which never returns 500 — it returns [] when the backend is down.
         const response = await fetch('/api/translations');
-        if (!response.ok) throw new Error('Failed to fetch translations');
+        if (!response.ok) {
+          // Graceful fallback — will show hardcoded English strings
+          setLoading(false);
+          return;
+        }
         const data = await response.json();
         const trans: Translations = {};
         if (Array.isArray(data)) {
@@ -65,6 +71,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         }
         setTranslations(trans);
       } catch (err: any) {
+        // Network completely unavailable — fail silently, show fallbacks
         setError(err.message ?? 'Unknown error');
       } finally {
         setLoading(false);
