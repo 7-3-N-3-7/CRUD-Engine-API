@@ -1,0 +1,25 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules
+npm-debug.log*
+
+# ── Next.js build artifacts (rebuilt inside Docker) ───────────────────────────
+.next
+dist
+out
+
+# ── Local environment files (must NOT leak into the image) ────────────────────
+.env
+.env.local
+.env*.local
+
+# ── Dev tooling ───────────────────────────────────────────────────────────────
+.git
+.gitignore
+README.md
+docs
+*.md
+
+# ── Editor / OS ───────────────────────────────────────────────────────────────
+.DS_Store
+.vscode
+*.log
