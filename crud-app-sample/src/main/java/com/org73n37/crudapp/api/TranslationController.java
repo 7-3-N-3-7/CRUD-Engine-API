@@ -17,7 +17,7 @@ public class TranslationController {
     private TranslationRepository repository;
 
     @GetMapping
-    public Flux<Translation> getAll() {
-        return Flux.fromIterable(repository.findAll());
+    public Flux<Translation> getAll(@RequestParam(defaultValue = "en") String lang) {
+        return Flux.fromIterable(repository.findByLang(lang));
     }
 }

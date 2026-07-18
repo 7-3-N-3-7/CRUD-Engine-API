@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TranslationRepository extends MongoRepository<Translation, String> {
+    java.util.List<Translation> findByLang(String lang);
 }
