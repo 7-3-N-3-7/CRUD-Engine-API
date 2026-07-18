@@ -25,3 +25,6 @@
 [submodule "crud-engine-security-keycloak"]
 	path = crud-engine-security-keycloak
 	url = https://github.com/7-3-N-3-7/crud-engine-security-keycloak.git
+[submodule "crud-frontend"]
+	path = crud-frontend
+	url = ./crud-frontend
