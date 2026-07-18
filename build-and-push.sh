@@ -64,17 +64,38 @@ fi
 ok "Preflight passed  (image: ${IMAGE_NAME})"
 
 # ── Helper: wait_for_http ─────────────────────────────────────────────────────
+# Polls an HTTP endpoint until it returns a non-error response.
 # Usage: wait_for_http <label> <url> <max_seconds>
 wait_for_http() {
   local label="$1" url="$2" max="$3" elapsed=0
   info "Waiting for ${label} to be ready..."
   until curl -sf --max-time 2 "$url" > /dev/null 2>&1; do
     sleep 2; elapsed=$((elapsed + 2))
-    [ $elapsed -ge "$max" ] && fail "${label} did not respond after ${max}s. Check: docker compose logs"
+    if [ $elapsed -ge "$max" ]; then
+      fail "${label} did not respond after ${max}s. Check: docker compose logs"
+    fi
     printf "."
   done
   echo ""
   ok "${label} is ready"
+}
+
+# ── Helper: wait_for_postgres ─────────────────────────────────────────────────
+# Uses pg_isready inside the container — works regardless of network setup.
+# Usage: wait_for_postgres <max_seconds>
+wait_for_postgres() {
+  local max="$1" elapsed=0
+  info "Waiting for PostgreSQL to be ready..."
+  until docker compose exec -T postgres \
+        pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" > /dev/null 2>&1; do
+    sleep 2; elapsed=$((elapsed + 2))
+    if [ $elapsed -ge "$max" ]; then
+      fail "PostgreSQL did not respond after ${max}s. Check: docker compose logs postgres"
+    fi
+    printf "."
+  done
+  echo ""
+  ok "PostgreSQL is ready"
 }
 
 # ── 1. Build Java backend ─────────────────────────────────────────────────────
@@ -108,33 +129,35 @@ echo -e "${BOLD}🏗️   Step 4/5 — Starting services...${RESET}"
 info "Starting PostgreSQL, MongoDB, MinIO..."
 docker compose up -d postgres mongodb minio
 
-wait_for_http "PostgreSQL" "http://localhost:5433" 60   || true   # TCP only, no HTTP — just give it time
-sleep 8   # postgres needs a moment for initdb scripts
+# PostgreSQL: use pg_isready inside the container (TCP, not HTTP)
+wait_for_postgres 60
 
-wait_for_http "MinIO"     "http://localhost:9000/minio/health/live" 60
+# Extra pause for initdb scripts (create keycloak DB, seed products)
+info "Letting PostgreSQL run init scripts..."
+sleep 8
+
+# MinIO: has a proper HTTP health endpoint
+wait_for_http "MinIO" "http://localhost:9000/minio/health/live" 60
 
 # 4b. MinIO bucket setup
 info "Provisioning MinIO buckets..."
 docker compose up minio-setup
 ok "MinIO buckets ready"
 
-# 4c. Keycloak
+# 4c. Keycloak (imports realm on first start — needs extra time)
 info "Starting Keycloak..."
 docker compose up -d keycloak
 wait_for_http "Keycloak" "http://localhost:8081/auth/realms/master" 120
-ok "Keycloak ready"
 
 # 4d. Spring Boot API
 info "Starting crud-api..."
 docker compose up -d crud-api
 wait_for_http "crud-api" "http://localhost:8080/actuator/health" 90
-ok "crud-api ready"
 
-# 4e. Next.js frontend (builds the Docker image if needed)
+# 4e. Next.js frontend (builds image if not already built)
 info "Building & starting Next.js frontend..."
 docker compose up -d --build crud-frontend
-wait_for_http "Frontend" "http://localhost:3000" 120
-ok "Frontend ready"
+wait_for_http "Frontend" "http://localhost:3000" 180
 
 # 4f. Reverse proxy & Watchtower
 info "Starting Caddy proxy and Watchtower..."
