@@ -18,7 +18,7 @@ async function handler(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
-  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+  const apiBase = process.env.API_URL ?? 'http://localhost:8080';
   const targetPath = path.join('/');
   const search = request.nextUrl.search;
   const targetUrl = `${apiBase}/api/${targetPath}${search}`;

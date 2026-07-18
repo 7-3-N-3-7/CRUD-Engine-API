@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 async function getTranslations(lang = 'en'): Promise<Record<string, string>> {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+  const apiBase = process.env.API_URL ?? 'http://localhost:8080';
 
   // Use a 3-second timeout so a starting/slow backend never hangs the SSR
   // render and causes a 500. On timeout or any error we return {} and the

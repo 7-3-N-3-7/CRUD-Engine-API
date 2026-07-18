@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     // propagate 500s to the browser.
     //
     // Only /health/* uses a raw rewrite since it doesn't need error shielding.
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+    const apiBase = process.env.API_URL ?? 'http://localhost:8080';
 
     return [
       {

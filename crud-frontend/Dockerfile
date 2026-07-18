@@ -25,7 +25,7 @@ COPY . .
 
 # Build-time env — placeholder values so `next build` doesn't error.
 # The real values are injected at RUNTIME by docker-compose.
-ENV NEXT_PUBLIC_API_URL=http://localhost:8080
+ENV API_URL=http://localhost:8080
 ENV NEXT_PUBLIC_MINIO_URL=http://localhost:9000
 ENV NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8081/auth
 

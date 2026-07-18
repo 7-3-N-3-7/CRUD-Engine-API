@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+  const apiBase = process.env.API_URL ?? 'http://localhost:8080';
 
   // Forward the ?lang= query param if present
   const lang = request.nextUrl.searchParams.get('lang') ?? 'en';

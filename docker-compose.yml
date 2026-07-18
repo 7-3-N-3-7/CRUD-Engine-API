@@ -148,6 +148,7 @@ services:
       - "3000:3000"
     environment:
       # Inside Docker the backend is reachable via the service name
+      - API_URL=http://crud-api:8080
       - NEXT_PUBLIC_API_URL=http://crud-api:8080
       - NEXT_PUBLIC_MINIO_URL=http://minio:9000
       - NEXT_PUBLIC_KEYCLOAK_URL=http://keycloak:8080/auth
