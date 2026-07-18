@@ -1,62 +1,73 @@
 {
   "realm": "crud-realm",
   "enabled": true,
+  "accessTokenLifespan": 3600,
+  "ssoSessionMaxLifespan": 36000,
   "roles": {
     "realm": [
-      {
-        "name": "ROOT"
-      },
-      {
-        "name": "ADMIN"
-      },
-      {
-        "name": "USER"
-      }
+      { "name": "ROOT" },
+      { "name": "ADMIN" },
+      { "name": "USER" }
     ]
   },
+  "clients": [
+    {
+      "clientId": "crud-frontend",
+      "name": "CRUD Frontend (React/Next.js)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:5173"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "test-client",
+      "name": "Test Client (CI / scripts)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "secret": "test-client-secret",
+      "protocol": "openid-connect"
+    }
+  ],
   "users": [
     {
       "username": "root-user",
       "enabled": true,
       "credentials": [
-        {
-          "type": "password",
-          "value": "toor",
-          "temporary": false
-        }
+        { "type": "password", "value": "toor", "temporary": false }
       ],
-      "realmRoles": [
-        "ROOT"
-      ]
-
+      "realmRoles": ["ROOT"]
     },
     {
       "username": "admin-user",
       "enabled": true,
       "credentials": [
-        {
-          "type": "password",
-          "value": "adminpassword123",
-          "temporary": false
-        }
+        { "type": "password", "value": "adminpassword123", "temporary": false }
       ],
-      "realmRoles": [
-        "ADMIN"
-      ]
-    }, 
+      "realmRoles": ["ADMIN"]
+    },
     {
       "username": "regular-user",
       "enabled": true,
       "credentials": [
-        {
-          "type": "password",
-          "value": "userpassword123",
-          "temporary": false
-        }
+        { "type": "password", "value": "userpassword123", "temporary": false }
       ],
-      "realmRoles": [
-        "USER"
-      ]
+      "realmRoles": ["USER"]
     }
   ]
 }
