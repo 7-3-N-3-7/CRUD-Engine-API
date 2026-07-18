@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { I18nProvider, useI18n } from './providers/I18nProvider';
+import { useAuth } from 'react-oidc-context';
+import { useI18n } from './providers/I18nProvider';
 import { ArchitectureView } from './views/ArchitectureView';
 import { ApiTesterView } from './views/ApiTesterView';
 import { MinioIcon } from './components/MinioIcon';
@@ -8,6 +9,19 @@ import './index.css';
 const DashboardContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'architecture' | 'apiTester'>('architecture');
   const { t } = useI18n();
+  const auth = useAuth();
+
+  const handleLogin = () => auth.signinRedirect();
+  const handleLogout = () => auth.signoutRedirect();
+
+  // While the OIDC library is initialising, show nothing to avoid a flash
+  if (auth.isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-slate-400 animate-pulse text-xl">Initialising…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row">
@@ -39,6 +53,41 @@ const DashboardContent: React.FC = () => {
             {t('nav.apitester') || 'API Tester'}
           </button>
         </nav>
+
+        {/* Auth section at the bottom of the sidebar */}
+        <div className="p-4 border-t border-slate-700">
+          {auth.isAuthenticated ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 px-2">
+                {/* Avatar bubble */}
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                  {auth.user?.profile.preferred_username?.[0]?.toUpperCase() ?? '?'}
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-sm font-medium text-slate-200 truncate">
+                    {auth.user?.profile.preferred_username}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">
+                    {(auth.user?.profile.realm_access as any)?.roles?.filter((r: string) => !['default-roles-crud-realm','offline_access','uma_authorization'].includes(r)).join(', ')}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-900/20 transition-colors"
+              >
+                ↩ Sign out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleLogin}
+              className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-colors"
+            >
+              🔑 Sign in with Keycloak
+            </button>
+          )}
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -48,7 +97,16 @@ const DashboardContent: React.FC = () => {
             {activeTab === 'architecture' ? 'Architecture Overview' : 'API Tester Dashboard'}
           </h2>
           <div className="flex items-center gap-4">
-             <div className="w-8 h-8 rounded-full bg-slate-700 border border-slate-600"></div>
+            {/* Auth status badge */}
+            {auth.isAuthenticated ? (
+              <span className="text-xs px-3 py-1 rounded-full bg-emerald-900/40 text-emerald-400 border border-emerald-500/30">
+                ● Authenticated
+              </span>
+            ) : (
+              <span className="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-500 border border-slate-700">
+                ○ Not signed in
+              </span>
+            )}
           </div>
         </header>
 
@@ -62,11 +120,7 @@ const DashboardContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  return (
-    <I18nProvider>
-      <DashboardContent />
-    </I18nProvider>
-  );
+  return <DashboardContent />;
 };
 
 export default App;
