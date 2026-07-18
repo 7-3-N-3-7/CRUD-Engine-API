@@ -19,18 +19,31 @@ export const metadata: Metadata = {
 };
 
 async function getTranslations(lang = 'en'): Promise<Record<string, string>> {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+
+  // Use a 3-second timeout so a starting/slow backend never hangs the SSR
+  // render and causes a 500. On timeout or any error we return {} and the
+  // page renders with the inline fallback strings — perfectly usable.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 3000);
+
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
     const res = await fetch(`${apiBase}/api/translations?lang=${lang}`, {
       cache: 'no-store',
+      signal: controller.signal,
     });
     if (!res.ok) return {};
     const data: Array<{ key: string; value: string }> = await res.json();
     return Object.fromEntries(data.map((d) => [d.key, d.value]));
   } catch {
+    // Backend not yet reachable (ECONNREFUSED, ECONNRESET, timeout, etc.)
+    // Return empty map — fallbacks in the JSX will display instead.
     return {};
+  } finally {
+    clearTimeout(timeout);
   }
 }
+
 
 export default async function RootLayout({
   children,

@@ -1,17 +1,30 @@
+# =============================================================================
+#  CRUD Engine — Docker Compose
+#
+#  All credentials and configuration are read from the root .env file.
+#  Copy .env.example → .env and fill in your values before running.
+#
+#  Start everything:  docker-compose up -d
+#  Or use the script: bash build-and-push.sh
+# =============================================================================
+
 services:
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
   postgres:
     image: postgres:18-alpine
     container_name: crud-postgres
     environment:
-      POSTGRES_DB: crudapp_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB:       ${POSTGRES_DB}
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./data/postgres-init:/docker-entrypoint-initdb.d
 
+  # ── MongoDB ────────────────────────────────────────────────────────────────
   mongodb:
     image: mongo:7.0
     container_name: crud-mongo
@@ -21,16 +34,17 @@ services:
       - mongo_data:/data/db
       - ./data/mongo-init:/docker-entrypoint-initdb.d
 
+  # ── Keycloak ───────────────────────────────────────────────────────────────
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.2
     container_name: crud-keycloak
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5432/crudapp_keycloak_db
-      - KC_DB_USERNAME=user
-      - KC_DB_PASSWORD=password
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_KEYCLOAK_DB}
+      - KC_DB_USERNAME=${POSTGRES_USER}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
       - KC_PROXY_HEADERS=xforwarded
       - KC_HOSTNAME_STRICT=false
       - KC_HTTP_RELATIVE_PATH=/auth
@@ -44,18 +58,19 @@ services:
     depends_on:
       - postgres
 
+  # ── Spring Boot API ────────────────────────────────────────────────────────
   crud-api:
-    image: 73n37/crud-app-sample:latest
+    image: ${DOCKER_USERNAME}/crud-app-sample:latest
     container_name: crud-api
     restart: always
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - APP_MODE=DEVELOPMENT
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/crudapp_db
-      - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/crudapp_db
-      - KEYCLOAK_JWK_SET_URI=http://keycloak:8080/auth/realms/crud-realm/protocol/openid-connect/certs
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/${MONGO_DB}
+      - KEYCLOAK_JWK_SET_URI=http://keycloak:8080/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
     ports:
       - "8080:8080"
     depends_on:
@@ -64,6 +79,7 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  # ── Caddy (reverse proxy) ──────────────────────────────────────────────────
   caddy:
     image: caddy:2
     container_name: caddy-proxy
@@ -78,6 +94,7 @@ services:
     depends_on:
       - crud-api
 
+  # ── Watchtower (auto-update CD) ────────────────────────────────────────────
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower-cd
@@ -86,10 +103,9 @@ services:
       - DOCKER_API_VERSION=1.41
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      # Uncomment the following line if your Docker Hub repository is private:
-      # - ~/.docker/config.json:/config.json
     command: --interval 300 --cleanup --label-enable
 
+  # ── MinIO (S3-compatible object storage) ───────────────────────────────────
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -97,12 +113,13 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
 
+  # ── MinIO bucket setup (runs once then exits) ───────────────────────────────
   minio-setup:
     image: minio/mc:latest
     container_name: minio-setup
@@ -111,7 +128,7 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      /usr/bin/mc alias set myminio http://minio:9000 admin password;
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb myminio/frontend-assets --ignore-existing;
       /usr/bin/mc anonymous set public myminio/frontend-assets;
       /usr/bin/mc cp -r /provision/ myminio/frontend-assets/;
@@ -120,8 +137,7 @@ services:
     volumes:
       - ./data/minio-provision:/provision
 
-
-
+  # ── Next.js Frontend (SSR) ─────────────────────────────────────────────────
   crud-frontend:
     build:
       context: ./crud-frontend
@@ -131,9 +147,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Tell the Next.js server where to forward /api/* rewrites.
-      # Inside Docker the backend is reachable via its service name.
+      # Inside Docker the backend is reachable via the service name
       - NEXT_PUBLIC_API_URL=http://crud-api:8080
+      - NEXT_PUBLIC_MINIO_URL=http://minio:9000
+      - NEXT_PUBLIC_KEYCLOAK_URL=http://keycloak:8080/auth
     depends_on:
       - crud-api
     labels:
