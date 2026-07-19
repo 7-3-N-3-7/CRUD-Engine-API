@@ -5,7 +5,7 @@
 	
 	<groupId>com.org73n37</groupId>
 	<artifactId>crudapp-parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>pom</packaging>
 	<name>crudapp-parent</name>
 	<description>Generic CRUD application - Parent POM</description>
@@ -24,7 +24,7 @@
 	</modules>
 
 	<properties>
-		<java.version>25</java.version>
+		<java.version>22</java.version>
 		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>4.0.6</spring-boot.version>
@@ -42,6 +42,7 @@
 		<jackson-annotations.version>2.21</jackson-annotations.version>
 		<springdoc.version>2.5.0</springdoc.version>
 		<cucumber.version>7.18.0</cucumber.version>
+		<jacoco.version>0.8.12</jacoco.version>
 	</properties>
 
 	<dependencyManagement>
@@ -287,6 +288,25 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
