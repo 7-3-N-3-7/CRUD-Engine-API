@@ -157,6 +157,18 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  # ── OpenAPI Swagger UI ─────────────────────────────────────────────────────
+  swagger-ui:
+    image: swaggerapi/swagger-ui:latest
+    container_name: swagger-ui
+    restart: always
+    ports:
+      - "${SWAGGER_UI_PORT:-8082}:8080"
+    environment:
+      - SWAGGER_JSON_URL=http://localhost:8080/v3/api-docs
+    depends_on:
+      - crud-api
+
 volumes:
   postgres_data:
   mongo_data:

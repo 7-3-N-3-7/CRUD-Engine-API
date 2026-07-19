@@ -141,7 +141,7 @@ wait_for_http "MinIO" "http://localhost:9000/minio/health/live" 60
 
 # 4b. MinIO bucket setup
 info "Provisioning MinIO buckets..."
-docker compose up minio-setup
+docker compose up -d minio-setup
 ok "MinIO buckets ready"
 
 # 4c. Keycloak (imports realm on first start — needs extra time)
@@ -159,10 +159,10 @@ info "Building & starting Next.js frontend..."
 docker compose up -d --build crud-frontend
 wait_for_http "Frontend" "http://localhost:3000" 180
 
-# 4f. Reverse proxy & Watchtower
-info "Starting Caddy proxy and Watchtower..."
-docker compose up -d caddy watchtower
-ok "Caddy & Watchtower started"
+# 4f. Reverse proxy, Swagger UI, & Watchtower
+info "Starting Caddy proxy, Swagger UI, and Watchtower..."
+docker compose up -d caddy swagger-ui watchtower
+ok "Caddy, Swagger UI, & Watchtower started"
 
 # ── 5. Status summary ─────────────────────────────────────────────────────────
 echo ""
@@ -174,6 +174,7 @@ docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 echo ""
 echo -e "  🖥️   Frontend   → ${CYAN}http://localhost:3000${RESET}"
 echo -e "  📡  API        → ${CYAN}http://localhost:8080${RESET}"
+echo -e "  📖  Swagger UI → ${CYAN}http://localhost:${SWAGGER_UI_PORT:-8082}${RESET}"
 echo -e "  🔐  Keycloak   → ${CYAN}http://localhost:8081/auth${RESET}  (admin: ${KEYCLOAK_ADMIN})"
 echo -e "  🪣  MinIO UI   → ${CYAN}http://localhost:9001${RESET}"
 echo -e "  🌍  Caddy      → ${CYAN}http://localhost:80${RESET}"
