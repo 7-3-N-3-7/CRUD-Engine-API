@@ -127,7 +127,7 @@ echo -e "${BOLD}🏗️   Step 4/5 — Starting services...${RESET}"
 
 # 4a. Databases & object storage
 info "Starting PostgreSQL, MongoDB, MinIO..."
-docker compose up -d postgres mongodb minio
+docker compose up -d postgres mongodb minio < /dev/null
 
 # PostgreSQL: use pg_isready inside the container (TCP, not HTTP)
 wait_for_postgres 60
@@ -141,27 +141,27 @@ wait_for_http "MinIO" "http://localhost:9000/minio/health/live" 60
 
 # 4b. MinIO bucket setup
 info "Provisioning MinIO buckets..."
-docker compose up -d minio-setup
+docker compose up -d minio-setup < /dev/null
 ok "MinIO buckets ready"
 
 # 4c. Keycloak (imports realm on first start — needs extra time)
 info "Starting Keycloak..."
-docker compose up -d keycloak
+docker compose up -d keycloak < /dev/null
 wait_for_http "Keycloak" "http://localhost:8081/auth/realms/master" 120
 
 # 4d. Spring Boot API
 info "Starting crud-api..."
-docker compose up -d crud-api
+docker compose up -d crud-api < /dev/null
 wait_for_http "crud-api" "http://localhost:8080/actuator/health" 90
 
 # 4e. Next.js frontend (builds image if not already built)
 info "Building & starting Next.js frontend..."
-docker compose up -d --build crud-frontend
+docker compose up -d --build crud-frontend < /dev/null
 wait_for_http "Frontend" "http://localhost:3000" 180
 
 # 4f. Reverse proxy, Swagger UI, & Watchtower
 info "Starting Caddy proxy, Swagger UI, and Watchtower..."
-docker compose up -d caddy swagger-ui watchtower
+docker compose up -d caddy swagger-ui watchtower < /dev/null
 ok "Caddy, Swagger UI, & Watchtower started"
 
 # ── 5. Status summary ─────────────────────────────────────────────────────────
