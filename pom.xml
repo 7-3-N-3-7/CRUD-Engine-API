@@ -40,6 +40,8 @@
 			3.x expects so it wins dependency mediation across all modules.
 		-->
 		<jackson-annotations.version>2.21</jackson-annotations.version>
+		<springdoc.version>2.5.0</springdoc.version>
+		<cucumber.version>7.18.0</cucumber.version>
 	</properties>
 
 	<dependencyManagement>
@@ -216,6 +218,44 @@
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit-jupiter.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- OpenAPI / Swagger -->
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>${springdoc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+				<version>${springdoc.version}</version>
+			</dependency>
+
+			<!-- Cucumber BDD -->
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-java</artifactId>
+				<version>${cucumber.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-spring</artifactId>
+				<version>${cucumber.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.cucumber</groupId>
+				<artifactId>cucumber-junit-platform-engine</artifactId>
+				<version>${cucumber.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.platform</groupId>
+				<artifactId>junit-platform-suite</artifactId>
 				<version>${junit-jupiter.version}</version>
 				<scope>test</scope>
 			</dependency>
