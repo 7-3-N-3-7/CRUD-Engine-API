@@ -11,6 +11,7 @@ import java.security.KeyPairGenerator;
 import java.util.Base64;
 
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 
 @CucumberContextConfiguration
 @SpringBootTest(
@@ -18,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
     properties = "spring.autoconfigure.exclude=com.org73n37.crudapp.data.weaviate.config.WeaviateAutoConfiguration"
 )
 @ActiveProfiles("test")
+@AutoConfigureWebTestClient
 public class CucumberSpringConfiguration {
 
     public static final KeyPair keyPair;
@@ -49,5 +51,9 @@ public class CucumberSpringConfiguration {
 
     public int getPort() {
         return port;
+    }
+
+    public static String setConfig(String name, String value, boolean isLocal) {
+        return value;
     }
 }
