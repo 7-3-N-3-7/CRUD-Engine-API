@@ -10,11 +10,14 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Base64;
 
+import org.springframework.test.context.ActiveProfiles;
+
 @CucumberContextConfiguration
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = "spring.autoconfigure.exclude=com.org73n37.crudapp.data.weaviate.config.WeaviateAutoConfiguration"
 )
+@ActiveProfiles("test")
 public class CucumberSpringConfiguration {
 
     public static final KeyPair keyPair;
