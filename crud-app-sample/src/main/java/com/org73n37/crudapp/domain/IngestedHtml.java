@@ -22,7 +22,7 @@ public class IngestedHtml {
     @Column(name = "html_content", columnDefinition = "TEXT", nullable = false)
     private String htmlContent;
 
-    @Column(name = "status", length = 20, nullable = false)
+    @Column(name = "status", length = 255, nullable = false)
     private String status;
 
     public IngestedHtml() {
