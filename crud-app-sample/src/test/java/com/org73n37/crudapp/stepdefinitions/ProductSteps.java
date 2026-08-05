@@ -62,10 +62,10 @@ public class ProductSteps {
         if (lastResponse.statusCode() == 201) {
             // Extract ID
             String body = lastResponse.body();
-            int idIndex = body.indexOf("\"id\":\"");
+            int idIndex = body.indexOf("\"id\":");
             if (idIndex != -1) {
-                int idEndIndex = body.indexOf("\"", idIndex + 6);
-                lastCreatedProductId = body.substring(idIndex + 6, idEndIndex);
+                int idEndIndex = body.indexOf(",", idIndex + 5);
+                lastCreatedProductId = body.substring(idIndex + 5, idEndIndex);
             }
         }
     }
@@ -105,7 +105,7 @@ public class ProductSteps {
                 .uri(URI.create("http://localhost:" + config.getPort() + "/api/products/" + lastCreatedProductId))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + currentUserToken)
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonPayload))
+                .method("PUT", HttpRequest.BodyPublishers.ofString(jsonPayload))
                 .build();
                 
         lastResponse = client.send(request, HttpResponse.BodyHandlers.ofString());

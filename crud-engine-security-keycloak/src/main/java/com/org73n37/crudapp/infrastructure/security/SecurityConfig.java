@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .pathMatchers("/health/**", "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                         .pathMatchers("/ws-connect").permitAll() // Authenticated via raw frame internally
                         .pathMatchers("/pages/**").permitAll()
+                        .pathMatchers(org.springframework.http.HttpMethod.GET, "/api/**").authenticated()
+                        .pathMatchers("/api/**").hasRole("ADMIN")
                         // All other endpoints require authentication
                         .anyExchange().authenticated()
                 )
