@@ -12,6 +12,8 @@ logging:
     com.org73n37.crudapp: DEBUG
 
 spring:
+  main:
+    web-application-type: reactive
   application:
     name: crud-engine
   profiles:
