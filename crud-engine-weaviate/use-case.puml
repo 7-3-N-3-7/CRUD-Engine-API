@@ -1,0 +1,25 @@
+@startuml Weaviate Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Engine Context" as engine
+actor "Weaviate Cluster" as cluster
+
+rectangle "crud-engine-weaviate" {
+  usecase "Ensure Weaviate Collection Exists" as UC_EnsureCollection
+  usecase "Initialize Entity ID Sequence from Collection Data" as UC_InitSeq
+  usecase "Convert Numeric ID to Deterministic UUID" as UC_IdToUuid
+  usecase "Insert or Update Vector Object" as UC_SaveVector
+  usecase "Fetch Objects and filter by Tenant ID" as UC_FetchTenant
+}
+
+engine --> UC_EnsureCollection
+engine --> UC_InitSeq
+engine --> UC_IdToUuid
+engine --> UC_SaveVector
+engine --> UC_FetchTenant
+
+UC_EnsureCollection --> cluster
+UC_FetchTenant --> cluster
+UC_SaveVector --> cluster
+@enduml

@@ -1,0 +1,24 @@
+@startuml Core Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "System Developer / Engine" as dev
+actor "Tenant System" as tenant
+
+rectangle "crud-engine-core" {
+  usecase "Register Entity Classes via Classpath Scanning" as UC_Scan
+  usecase "Validate DTO-to-Entity Mappings" as UC_Map
+  usecase "Resolve Storage Provider using SPI" as UC_ResolveStorage
+  usecase "Wrap Interceptors in Composite Chain" as UC_WrapInterceptors
+  usecase "Enforce Multi-Tenant Isolation" as UC_TenantIsolation
+  usecase "Fire Plugin Lifecycle Events" as UC_PluginLifecycle
+}
+
+dev --> UC_Scan
+dev --> UC_Map
+dev --> UC_ResolveStorage
+dev --> UC_WrapInterceptors
+dev --> UC_PluginLifecycle
+
+tenant --> UC_TenantIsolation
+@enduml

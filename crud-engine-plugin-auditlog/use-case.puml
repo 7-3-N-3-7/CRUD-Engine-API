@@ -1,0 +1,27 @@
+@startuml AuditLog Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Engine Execution Flow" as engine
+actor "Security/Compliance Auditor" as auditor
+
+rectangle "crud-engine-plugin-auditlog" {
+  usecase "Log before creation details" as UC_BeforeCreate
+  usecase "Log after creation details with generated ID" as UC_AfterCreate
+  usecase "Log updates before database merge" as UC_BeforeUpdate
+  usecase "Log updates after database merge" as UC_AfterUpdate
+  usecase "Log before deletion execution" as UC_BeforeDelete
+  usecase "Log after deletion completes" as UC_AfterDelete
+}
+
+engine --> UC_BeforeCreate
+engine --> UC_AfterCreate
+engine --> UC_BeforeUpdate
+engine --> UC_AfterUpdate
+engine --> UC_BeforeDelete
+engine --> UC_AfterDelete
+
+UC_AfterCreate --> auditor
+UC_AfterUpdate --> auditor
+UC_AfterDelete --> auditor
+@enduml

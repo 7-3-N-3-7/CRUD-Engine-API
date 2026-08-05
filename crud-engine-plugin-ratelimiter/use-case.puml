@@ -1,0 +1,20 @@
+@startuml RateLimiter Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Client Device" as client
+actor "Security Administrator" as admin
+
+rectangle "crud-engine-plugin-ratelimiter" {
+  usecase "Limit Request Rate by Remote IP Address" as UC_IpLimit
+  usecase "Bypass Rate Limiting in Development Mode" as UC_DevBypass
+  usecase "Force Rate Limiting (Hardening)" as UC_ForceLimit
+  usecase "Reset Rate Limiter Buckets" as UC_Reset
+}
+
+client --> UC_IpLimit
+client --> UC_DevBypass
+
+admin --> UC_ForceLimit
+admin --> UC_Reset
+@enduml

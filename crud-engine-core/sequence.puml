@@ -1,0 +1,44 @@
+@startuml Core Engine Discovery Sequence
+participant "CrudEngine" as Engine
+participant "ClassPathScanner" as Scanner
+participant "ServiceRegistry" as Registry
+participant "CrudStorageProviderFactory" as SPIFactory
+participant "CompositeCrudInterceptor" as Interceptor
+
+[-> Engine : init()
+activate Engine
+Engine -> Scanner : findCandidateComponents(scanPackage)
+activate Scanner
+Scanner --> Engine : List of BeanDefinitions
+deactivate Scanner
+
+loop for each candidate
+  Engine -> Engine : registerResource(entityClass)
+  activate Engine
+  Engine -> Engine : validate Bidirectional Mapping (dto <-> entity)
+  
+  Engine -> SPIFactory : supports(entityClass)
+  activate SPIFactory
+  SPIFactory --> Engine : boolean
+  deactivate SPIFactory
+  
+  Engine -> SPIFactory : getStorageProvider(entityClass)
+  activate SPIFactory
+  SPIFactory --> Engine : CrudStorageProvider
+  deactivate SPIFactory
+  
+  Engine -> Registry : getService(entityClass, defaultService)
+  activate Registry
+  Registry --> Engine : CrudService
+  deactivate Registry
+  
+  Engine -> Interceptor : Build Composite Chain
+  activate Interceptor
+  Interceptor --> Engine : CompositeCrudInterceptor
+  deactivate Interceptor
+  
+  Engine -> Engine : Build ResourceMetadata & add to resources map
+  deactivate Engine
+end
+deactivate Engine
+@enduml

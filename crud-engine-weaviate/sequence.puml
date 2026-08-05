@@ -1,0 +1,43 @@
+@startuml Weaviate Save Sequence
+participant "WeaviateStorageProvider" as Provider
+participant "TenantContext" as Tenant
+participant "Jackson ObjectMapper" as Mapper
+participant "WeaviateClient" as Client
+
+[-> Provider : save(entity)
+activate Provider
+
+Provider -> Tenant : getTenantId()
+activate Tenant
+Tenant --> Provider : tenantId
+deactivate Tenant
+
+Provider -> Provider : entity.setTenantId(tenantId)
+alt entity.id == null
+  Provider -> Provider : generate and set next ID
+end
+
+Provider -> Provider : getUuidFromLong(id) (calculates deterministic UUID)
+Provider -> Mapper : convertValue(entity, Map.class)
+activate Mapper
+Mapper --> Provider : propertiesMap
+deactivate Mapper
+
+Provider -> Provider : Remove "id", put "entityId" into propertiesMap
+
+Provider -> Provider : existsById(id)
+alt Exists
+  Provider -> Client : collections.use(name).data.update(uuid, properties)
+  activate Client
+  Client --> Provider : success
+  deactivate Client
+else New Object
+  Provider -> Client : collections.use(name).data.insert(properties, uuid)
+  activate Client
+  Client --> Provider : success
+  deactivate Client
+end
+
+[<-- Provider : entity
+deactivate Provider
+@enduml

@@ -1,0 +1,28 @@
+@startuml AuditLog State Machine
+[*] --> Inactive : Application start
+
+Inactive --> Active : Scanned & loaded into Composite Interceptor chain
+
+state Active {
+  [*] --> Waiting
+  Waiting --> LoggingBeforeCreate : beforeCreate() event triggered
+  LoggingBeforeCreate --> Waiting : returns control
+  
+  Waiting --> LoggingAfterCreate : afterCreate() event triggered
+  LoggingAfterCreate --> Waiting : returns control
+  
+  Waiting --> LoggingBeforeUpdate : beforeUpdate() event triggered
+  LoggingBeforeUpdate --> Waiting : returns control
+  
+  Waiting --> LoggingAfterUpdate : afterUpdate() event triggered
+  LoggingAfterUpdate --> Waiting : returns control
+  
+  Waiting --> LoggingBeforeDelete : beforeDelete() event triggered
+  LoggingBeforeDelete --> Waiting : returns control
+  
+  Waiting --> LoggingAfterDelete : afterDelete() event triggered
+  LoggingAfterDelete --> Waiting : returns control
+}
+
+Active --> [*] : Context shutdown
+@enduml

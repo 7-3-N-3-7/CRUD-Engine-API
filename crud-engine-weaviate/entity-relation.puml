@@ -1,0 +1,24 @@
+@startuml Weaviate Entity Relation Diagram
+skinparam linetype ortho
+
+entity "Weaviate Client" as client {
+  * collections
+}
+
+entity "Weaviate Collection" as col {
+  * collectionName : text <<PK>>
+  --
+  * description : text
+}
+
+entity "Weaviate Object" as obj {
+  * uuid : text <<PK>>
+  --
+  * properties : Map<String, Object>
+  * entityId : Long
+  * tenantId : text
+}
+
+client ||--o{ col : "manages"
+col ||--o{ obj : "contains"
+@enduml

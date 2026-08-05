@@ -1,0 +1,13 @@
+@startuml Starter Entity Relation Diagram
+skinparam linetype ortho
+
+entity "AutoConfiguration Metadata" as meta {
+  * factoryClassName : text <<PK>>
+}
+
+entity "ComponentScan Targets" as targets {
+  * packageName : text
+}
+
+meta ||--o{ targets : "registers scanning of"
+@enduml

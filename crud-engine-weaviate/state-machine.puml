@@ -1,0 +1,17 @@
+@startuml Weaviate Schema Creation State Machine
+[*] --> CollectionUnchecked : Provider Instantiated
+
+CollectionUnchecked --> CheckingCollection : ensureCollectionExists() called
+
+CheckingCollection --> CollectionExists : collections.exists(collectionName) == true
+CheckingCollection --> CreatingCollection : collections.exists(collectionName) == false
+
+CreatingCollection --> CollectionExists : collections.create() succeeds
+CreatingCollection --> SchemaError : throws Exception
+
+CollectionExists --> InitializingSequence : fetchObjects() to find max ID
+InitializingSequence --> ProviderReady : sequence initialized
+
+SchemaError --> [*]
+ProviderReady --> [*]
+@enduml

@@ -1,0 +1,16 @@
+@startuml Starter Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.infrastructure.config {
+  class CrudEngineAutoConfiguration {
+  }
+}
+
+note bottom of CrudEngineAutoConfiguration
+  Scans packages:
+  - com.org73n37.crudapp.logic
+  - com.org73n37.crudapp.api
+  - com.org73n37.crudapp.infrastructure.security
+  - com.org73n37.crudapp.infrastructure.web
+end note
+@enduml

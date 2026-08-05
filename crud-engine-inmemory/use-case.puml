@@ -1,0 +1,19 @@
+@startuml InMemory Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Engine Context" as engine
+actor "Developer/Tester" as tester
+
+rectangle "crud-engine-inmemory" {
+  usecase "Instantiate In-Memory Storage via SPI Factory" as UC_FactoryCreate
+  usecase "Perform Mock CRUD Actions without Database" as UC_MockCrud
+  usecase "Auto-isolate memory map by Tenant ID" as UC_InMemoryTenant
+  usecase "Simulate Auto-incrementing IDs" as UC_SeqGen
+}
+
+engine --> UC_FactoryCreate
+tester --> UC_MockCrud
+UC_MockCrud ..> UC_InMemoryTenant : <<include>>
+UC_MockCrud ..> UC_SeqGen : <<include>>
+@enduml

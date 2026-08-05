@@ -75,13 +75,16 @@ public class HtmlIngestionWorker {
                 
                 try {
                     String processedHtml = processHtml(rawHtml);
-                    repository.save(new IngestedHtml(trackingId, userId, slug, processedHtml, "SUCCESS"));
-                    crudSpace.put("HTML_PROCESSED", trackingId, "SUCCESS");
-                    log.info("Successfully processed task trackingId={}", trackingId);
+                    String status = "SUCCESS";
+                    repository.save(new IngestedHtml(trackingId, userId, slug, processedHtml, status));
+                    crudSpace.put("HTML_PROCESSED", trackingId, status);
+                    crudSpace.put("BROADCAST", trackingId, userId, status);
+                    log.info("Finished processing {} - Status: {}", trackingId, status);
                 } catch (Exception e) {
                     log.error("Failed to process HTML for trackingId={}", trackingId, e);
                     repository.save(new IngestedHtml(trackingId, userId, slug, "", "FAILED: " + e.getMessage()));
                     crudSpace.put("HTML_PROCESSED", trackingId, "FAILED");
+                    crudSpace.put("BROADCAST", trackingId, userId, "FAILED");
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

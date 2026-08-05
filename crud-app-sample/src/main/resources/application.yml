@@ -55,10 +55,12 @@ spring:
   codec:
     max-in-memory-size: 2MB
 
-# Keycloak Configuration
-keycloak:
-  jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs}
-  issuer: ${KEYCLOAK_ISSUER:http://localhost:8081/auth/realms/crud-realm}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/auth/realms/crud-realm}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs}
 
 # MinIO Object Storage
 minio:

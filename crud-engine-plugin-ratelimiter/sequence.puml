@@ -1,0 +1,35 @@
+@startuml RateLimiter Validation Sequence
+participant "ReactiveRateLimiterFilter" as Filter
+participant "TokenBucket" as Bucket
+participant "AppModeConfig" as Config
+
+[-> Filter : filter(exchange, chain)
+activate Filter
+
+Filter -> Filter : Extract Remote IP address
+Filter -> Filter : ipBuckets.computeIfAbsent(ip)
+
+Filter -> Config : isDevelopment()
+activate Config
+Config --> Filter : isDev
+deactivate Config
+
+alt isDev == true AND forceRateLimit == false
+  Filter -> [ : pass request (chain.filter)
+else check token bucket
+  Filter -> Bucket : tryConsume()
+  activate Bucket
+  Bucket -> Bucket : refill() tokens based on elapsedTime
+  alt tokens >= 1
+    Bucket -> Bucket : tokens = tokens - 1
+    Bucket --> Filter : true
+    Filter -> [ : pass request (chain.filter)
+  else bucket empty
+    Bucket --> Filter : false
+    deactivate Bucket
+    Filter -> Filter : Write HTTP 429 Too Many Requests response
+    Filter --> [ : Terminate chain
+  end
+end
+deactivate Filter
+@enduml

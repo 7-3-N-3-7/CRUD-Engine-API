@@ -1,0 +1,12 @@
+@startuml Starter State Machine
+[*] --> Uninitialized : Spring Context loading
+
+Uninitialized --> AutoConfigured : CrudEngineAutoConfiguration matching condition checks out
+
+AutoConfigured --> ComponentsScanned : Component scan completes (classes found)
+AutoConfigured --> InitializationError : Scanning / instantiation fails
+
+ComponentsScanned --> StarterReady : All starter beans registered in Context
+StarterReady --> [*]
+InitializationError --> [*]
+@enduml

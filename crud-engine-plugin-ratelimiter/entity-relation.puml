@@ -1,0 +1,17 @@
+@startuml RateLimiter Entity Relation Diagram
+skinparam linetype ortho
+
+entity "IP Address Map" as ipmap {
+  * ipAddress : text <<PK>>
+}
+
+entity "TokenBucket" as bucket {
+  * capacity : integer
+  * refillDurationMs : Long
+  --
+  * tokens : double
+  * lastRefillTime : Long
+}
+
+ipmap ||--|| bucket : "owns bucket for"
+@enduml

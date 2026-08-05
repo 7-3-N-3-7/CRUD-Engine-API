@@ -1,0 +1,26 @@
+@startuml Core Entity Relation Diagram
+skinparam linetype ortho
+
+entity "CrudResource" as annot {
+  * path : text
+  --
+  * dto : class
+  * service : class
+  * version : integer
+}
+
+entity "EntityMapping" as mapping {
+  * entity : class
+}
+
+entity "ResourceMetadata" as metadata {
+  * basePath : text <<PK>>
+  --
+  * entityClass : class
+  * dtoClass : class
+  * version : integer
+}
+
+annot ||--|| mapping : "links Entity to DTO"
+metadata ||--|| annot : "describes dynamic endpoint"
+@enduml

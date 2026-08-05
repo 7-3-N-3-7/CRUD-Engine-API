@@ -1,0 +1,34 @@
+@startuml InMemory CRUD Sequence
+participant "InMemoryStorageProvider" as Provider
+participant "TenantContext" as TenantContext
+participant "AtomicLong" as Sequence
+database "ConcurrentHashMap" as Map
+
+[-> Provider : save(entity)
+activate Provider
+Provider -> TenantContext : getTenantId()
+activate TenantContext
+TenantContext --> Provider : tenantId
+deactivate TenantContext
+
+alt entity.id == null
+  Provider -> Sequence : getAndIncrement()
+  activate Sequence
+  Sequence --> Provider : newId
+  deactivate Sequence
+  Provider -> Provider : entity.setId(newId)
+end
+
+Provider -> Map : computeIfAbsent(tenantId)
+activate Map
+Map --> Provider : tenantMap
+deactivate Map
+
+Provider -> Map : tenantMap.put(id, entity)
+activate Map
+Map --> Provider : success
+deactivate Map
+
+[<-- Provider : entity
+deactivate Provider
+@enduml

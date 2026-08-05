@@ -1,0 +1,10 @@
+@startuml InMemory Entity Lifecycle State Machine
+[*] --> Transient : Entity instantiated in memory (id is null)
+
+Transient --> Persisted : save() called (id generated, stored in Tenant map)
+
+Persisted --> Persisted : save() called again (updates fields)
+
+Persisted --> Deleted : deleteById() called (removed from Tenant map)
+Deleted --> [*]
+@enduml

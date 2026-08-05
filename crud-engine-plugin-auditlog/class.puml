@@ -1,0 +1,26 @@
+@startuml AuditLog Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.logic.core {
+  interface CrudInterceptor<T> {
+    + preCreate(T): void
+    + postCreate(T): void
+    + preUpdate(T): void
+    + postUpdate(T): void
+    + preDelete(Long): void
+    + postDelete(Long): void
+  }
+}
+
+package com.org73n37.crudapp.logic.auditlog {
+  class AuditLoggingInterceptor implements CrudInterceptor {
+    - {static} log : Logger
+    + beforeCreate(BaseEntity): void
+    + afterCreate(BaseEntity): void
+    + beforeUpdate(BaseEntity): void
+    + afterUpdate(BaseEntity): void
+    + beforeDelete(Long): void
+    + afterDelete(Long): void
+  }
+}
+@enduml

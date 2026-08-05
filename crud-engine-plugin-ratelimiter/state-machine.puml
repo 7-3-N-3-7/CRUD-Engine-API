@@ -1,0 +1,25 @@
+@startuml RateLimiter Token Bucket State Machine
+[*] --> Full : Bucket initialized (tokens = MAX_TOKENS)
+
+state Full {
+}
+
+Full --> PartiallyEmpty : tryConsume() succeeds (tokens = capacity - 1)
+
+state PartiallyEmpty {
+  [*] --> EvaluatingRefill
+  EvaluatingRefill --> Refilling : elapsed time > 0
+  Refilling --> TokensAvailable : tokens added (up to capacity)
+  TokensAvailable --> EvaluatingRefill : Idle
+}
+
+PartiallyEmpty --> Full : tokens refilled to maximum capacity
+PartiallyEmpty --> Empty : tryConsume() consumes last remaining token (tokens < 1)
+
+state Empty {
+  [*] --> Blocked
+  Blocked --> RefilledSome : elapsed time refills tokens >= 1
+}
+
+Empty --> PartiallyEmpty : RefilledSome (tokens >= 1)
+@enduml

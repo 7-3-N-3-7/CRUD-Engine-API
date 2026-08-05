@@ -1,0 +1,16 @@
+@startuml Starter Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Spring Boot Context" as context
+actor "Application Developer" as developer
+
+rectangle "crud-engine-spring-boot-starter" {
+  usecase "Bootstrap CRUD Engine automatically on startup" as UC_Bootstrap
+  usecase "Perform Component Scan across modular packages" as UC_Scan
+}
+
+context --> UC_Bootstrap
+developer --> UC_Bootstrap
+UC_Bootstrap ..> UC_Scan : <<include>>
+@enduml

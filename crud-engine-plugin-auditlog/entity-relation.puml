@@ -1,0 +1,22 @@
+@startuml AuditLog Entity Relation Diagram
+skinparam linetype ortho
+
+entity "BaseEntity" as entity {
+  * id : Long <<PK>>
+  --
+  * tenantId : text
+  * createdBy : text
+  * lastModifiedBy : text
+}
+
+entity "Audit Log Event" as log {
+  * timestamp : Time
+  * action : text
+  * entityClass : text
+  * entityId : Long
+  * tenantId : text
+  * operator : text
+}
+
+entity ||--o{ log : "triggers creation of"
+@enduml

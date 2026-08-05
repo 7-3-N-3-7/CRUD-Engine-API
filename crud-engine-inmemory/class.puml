@@ -1,0 +1,43 @@
+@startuml InMemory Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.logic.spi {
+  interface CrudStorageProvider<T> {
+    + save(T): T
+    + findById(Long): Optional<T>
+    + findAll(): List<T>
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+  }
+  
+  interface CrudStorageProviderFactory {
+    + supports(Class<?>): boolean
+    + getStorageProvider(Class<T>): CrudStorageProvider<T>
+  }
+}
+
+package com.org73n37.crudapp.data.inmemory {
+  class InMemoryStorageProvider<T extends BaseEntity> implements CrudStorageProvider {
+    - Map<String, Map<Long, T>> db
+    - AtomicLong idSequence
+    - getActiveTenantId(): String
+    - getTenantStorage(): Map<Long, T>
+    + findAll(): List<T>
+    + findAll(int, int, Map, String, Class): Page<T>
+    + findById(Long): Optional<T>
+    + save(T): T
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+  }
+  
+  class InMemoryStorageProviderFactory implements CrudStorageProviderFactory {
+    - Map<Class<?>, CrudStorageProvider<?>> providers
+    + supports(Class<?>): boolean
+    + getStorageProvider(Class<T>): CrudStorageProvider<T>
+  }
+}
+
+InMemoryStorageProviderFactory --> InMemoryStorageProvider : "creates and caches"
+@enduml

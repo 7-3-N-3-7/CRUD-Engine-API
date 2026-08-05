@@ -1,0 +1,16 @@
+@startuml Core Tenant Context State Machine
+[*] --> TenantUnset : Thread Starts
+
+state TenantUnset {
+  [*] --> EmptyContext
+}
+
+TenantUnset --> TenantSet : TenantContext.setCurrentTenant(tenantId)
+
+state TenantSet {
+  [*] --> ActiveTenant
+  ActiveTenant --> ActiveTenant : Perform CRUD operations isolated to tenantId
+}
+
+TenantSet --> TenantUnset : TenantContext.clear()
+@enduml

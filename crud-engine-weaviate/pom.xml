@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.org73n37</groupId>
+		<artifactId>crudapp-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	
+	<artifactId>crud-engine-weaviate</artifactId>
+	<name>crud-engine-weaviate</name>
+	<description>Weaviate Vector Storage Provider Module</description>
+
+	<dependencies>
+		<!-- Core module dependency -->
+		<dependency>
+			<groupId>com.org73n37</groupId>
+			<artifactId>crud-engine-core</artifactId>
+		</dependency>
+
+		<!-- Weaviate Client -->
+		<dependency>
+			<groupId>io.weaviate</groupId>
+			<artifactId>client6</artifactId>
+			<version>6.2.0</version>
+		</dependency>
+
+		<!-- Jackson Databind -->
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+	</dependencies>
+</project>

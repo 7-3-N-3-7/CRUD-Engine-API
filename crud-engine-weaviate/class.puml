@@ -1,0 +1,48 @@
+@startuml Weaviate Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.logic.spi {
+  interface CrudStorageProvider<T> {
+    + save(T): T
+    + findById(Long): Optional<T>
+    + findAll(): List<T>
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+  }
+}
+
+package com.org73n37.crudapp.data.weaviate {
+  class WeaviateStorageProvider<T extends BaseEntity> implements CrudStorageProvider {
+    - Class<T> entityClass
+    - WeaviateClient client
+    - String collectionName
+    - JsonMapper objectMapper
+    - AtomicLong idSequence
+    + save(T): T
+    + findById(Long): Optional<T>
+    + findAll(): List<T>
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+    - ensureCollectionExists(): void
+    - initializeSequence(): void
+    - getActiveTenantId(): String
+    - getUuidFromLong(Long): UUID
+  }
+  
+  class WeaviateStorageProviderFactory implements CrudStorageProviderFactory {
+    - WeaviateClient client
+    + supports(Class<?>): boolean
+    + getStorageProvider(Class<T>): CrudStorageProvider<T>
+  }
+}
+
+package com.org73n37.crudapp.data.weaviate.annotation {
+  annotation WeaviateEntity {
+    + collectionName(): String
+  }
+}
+
+WeaviateStorageProviderFactory --> WeaviateStorageProvider : "creates"
+@enduml

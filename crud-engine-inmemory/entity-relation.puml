@@ -1,0 +1,19 @@
+@startuml InMemory Entity Relation Diagram
+skinparam linetype ortho
+
+entity "InMemoryStorageMap" as db {
+  * tenantId : text <<PK>>
+  --
+  * records : Map<Long, BaseEntity>
+}
+
+entity "BaseEntity" as record {
+  * id : Long <<PK>>
+  --
+  * tenantId : text
+  * createdAt : timestamp
+  * updatedAt : timestamp
+}
+
+db ||--o{ record : "stores"
+@enduml

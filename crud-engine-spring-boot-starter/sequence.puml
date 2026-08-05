@@ -1,0 +1,18 @@
+@startuml Starter Bootstrapping Sequence
+participant "Spring Application" as App
+participant "CrudEngineAutoConfiguration" as Config
+participant "Spring Context" as Context
+
+[-> App : run()
+activate App
+App -> Config : Load Configuration Class
+activate Config
+Config -> Context : ComponentScan (packages com.org73n37.crudapp)
+activate Context
+Context --> Config : Beans scanned (Engine, Security, WebFlux, etc.)
+deactivate Context
+Config --> App : Beans instantiated and loaded
+deactivate Config
+[<-- App : Application Started Successfully
+deactivate App
+@enduml

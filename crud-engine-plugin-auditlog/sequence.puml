@@ -1,0 +1,18 @@
+@startuml AuditLog Callback Sequence
+participant "CompositeCrudInterceptor" as Interceptor
+participant "AuditLoggingInterceptor" as Audit
+participant "Logger" as Log
+
+[-> Interceptor : preCreate(entity)
+activate Interceptor
+Interceptor -> Audit : beforeCreate(entity)
+activate Audit
+Audit -> Log : info("[AUDIT LOG - BEFORE_CREATE] ...")
+activate Log
+Log --> Audit : printed
+deactivate Log
+Audit --> Interceptor : done
+deactivate Audit
+[<-- Interceptor : done
+deactivate Interceptor
+@enduml
