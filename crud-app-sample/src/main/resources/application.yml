@@ -1,0 +1,81 @@
+server:
+  port: 8080
+  max-http-header-size: 8KB
+  forward-headers-strategy: FRAMEWORK
+  netty:
+    connection-timeout: 10s
+    idle-timeout: 30s
+    max-keep-alive-requests: 100
+
+logging:
+  level:
+    com.org73n37.crudapp: DEBUG
+
+spring:
+  application:
+    name: crud-engine
+  profiles:
+    active: DEVELOPMENT
+
+  # Business Database (PostgreSQL)
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/${BUSINESS_DB_NAME:crudapp_business_db}}
+    username: ${SPRING_DATASOURCE_USERNAME:${BUSINESS_DB_USER:business_user}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${BUSINESS_DB_PASSWORD:business_password}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  # Localization Database (MongoDB)
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://${MONGO_INITDB_ROOT_USERNAME:mongo_admin}:${MONGO_INITDB_ROOT_PASSWORD:mongo_password}@localhost:27017/${MONGO_DB:crudapp_db}?authSource=admin}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+  webflux:
+    problemdetails:
+      enabled: true
+
+  codec:
+    max-in-memory-size: 2MB
+
+# Keycloak Configuration
+keycloak:
+  jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8081/auth/realms/crud-realm/protocol/openid-connect/certs}
+  issuer: ${KEYCLOAK_ISSUER:http://localhost:8081/auth/realms/crud-realm}
+
+# MinIO Object Storage
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ROOT_USER:admin}
+  secret-key: ${MINIO_ROOT_PASSWORD:password}
+  bucket: frontend-assets
+
+# jSpace Configuration (Embedded within the Gateway)
+jspace:
+  uri: ${JSPACE_URI:tcp://localhost:9002/crud-space?keep}
+  mode: embedded
+  port: 9002
+  name: crud-space
+
+app:
+  mode: DEVELOPMENT
+  security:
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,https://73n37.github.io,http://45.9.191.167,http://localhost:8082}
