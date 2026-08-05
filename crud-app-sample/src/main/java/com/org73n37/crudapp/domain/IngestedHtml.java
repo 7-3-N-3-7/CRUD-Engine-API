@@ -16,6 +16,9 @@ public class IngestedHtml {
     @Column(name = "user_id", length = 36, nullable = false)
     private String userId;
 
+    @Column(name = "slug", length = 255, unique = true, nullable = false)
+    private String slug;
+
     @Column(name = "html_content", columnDefinition = "TEXT", nullable = false)
     private String htmlContent;
 
@@ -25,9 +28,10 @@ public class IngestedHtml {
     public IngestedHtml() {
     }
 
-    public IngestedHtml(String trackingId, String userId, String htmlContent, String status) {
+    public IngestedHtml(String trackingId, String userId, String slug, String htmlContent, String status) {
         this.trackingId = trackingId;
         this.userId = userId;
+        this.slug = slug;
         this.htmlContent = htmlContent;
         this.status = status;
     }
@@ -46,6 +50,14 @@ public class IngestedHtml {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public String getHtmlContent() {

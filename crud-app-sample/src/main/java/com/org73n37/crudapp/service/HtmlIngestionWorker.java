@@ -57,9 +57,10 @@ public class HtmlIngestionWorker {
     private void processLoop() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                // ("PROCESS_HTML", trackingId, userId, rawHtmlPayload)
+                // ("PROCESS_HTML", trackingId, userId, slug, rawHtmlPayload)
                 Object[] tuple = crudSpace.get(
                         new ActualField("PROCESS_HTML"),
+                        new FormalField(String.class),
                         new FormalField(String.class),
                         new FormalField(String.class),
                         new FormalField(String.class)
@@ -67,18 +68,19 @@ public class HtmlIngestionWorker {
 
                 String trackingId = (String) tuple[1];
                 String userId = (String) tuple[2];
-                String rawHtml = (String) tuple[3];
+                String slug = (String) tuple[3];
+                String rawHtml = (String) tuple[4];
 
                 log.info("Worker picked up task trackingId={}", trackingId);
                 
                 try {
                     String processedHtml = processHtml(rawHtml);
-                    repository.save(new IngestedHtml(trackingId, userId, processedHtml, "SUCCESS"));
+                    repository.save(new IngestedHtml(trackingId, userId, slug, processedHtml, "SUCCESS"));
                     crudSpace.put("HTML_PROCESSED", trackingId, "SUCCESS");
                     log.info("Successfully processed task trackingId={}", trackingId);
                 } catch (Exception e) {
                     log.error("Failed to process HTML for trackingId={}", trackingId, e);
-                    repository.save(new IngestedHtml(trackingId, userId, "", "FAILED: " + e.getMessage()));
+                    repository.save(new IngestedHtml(trackingId, userId, slug, "", "FAILED: " + e.getMessage()));
                     crudSpace.put("HTML_PROCESSED", trackingId, "FAILED");
                 }
             } catch (InterruptedException e) {

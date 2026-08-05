@@ -69,9 +69,9 @@
 
 		<!-- Asynchronous Pipeline Dependencies -->
 		<dependency>
-			<groupId>io.github.pspaces.jspace</groupId>
-			<artifactId>common</artifactId>
-			<version>1.0.3</version>
+			<groupId>com.github.pSpaces</groupId>
+			<artifactId>jSpace</artifactId>
+			<version>master-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.minio</groupId>
@@ -87,6 +87,13 @@
 			<groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
 			<artifactId>owasp-java-html-sanitizer</artifactId>
 			<version>20240325.1</version>
+		</dependency>
+
+		<!-- Template Engine (Handlebars) -->
+		<dependency>
+			<groupId>com.github.jknack</groupId>
+			<artifactId>handlebars</artifactId>
+			<version>4.3.1</version>
 		</dependency>
 
 		<!-- Test dependencies -->

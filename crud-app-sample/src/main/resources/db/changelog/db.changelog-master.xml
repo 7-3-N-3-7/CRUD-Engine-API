@@ -111,5 +111,29 @@
             END $$;
         </sql>
     </changeSet>
+    <changeSet id="7" author="team">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ingested_html"/>
+            </not>
+        </preConditions>
+        <createTable tableName="ingested_html">
+            <column name="tracking_id" type="varchar(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="html_content" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>
