@@ -57,15 +57,7 @@ public class WebFluxConfig {
         return module;
     }
 
-    @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        return http
-            // codeql[java/spring-disabled-csrf-protection]
-            // CSRF is disabled because this is a stateless REST API using JWT (without session cookies)
-            .csrf(csrf -> csrf.disable())
-            .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
-            .build();
-    }
+    // SecurityWebFilterChain been removed to allow crud-engine-security-keycloak to define security.
 
     @Bean
     public RouterFunction<ServerResponse> routes(UniversalCrudController controller, 

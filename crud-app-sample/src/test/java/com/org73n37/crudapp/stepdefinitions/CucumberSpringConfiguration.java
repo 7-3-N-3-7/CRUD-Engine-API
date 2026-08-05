@@ -11,6 +11,10 @@ import java.security.KeyPairGenerator;
 import java.util.Base64;
 
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.org73n37.crudapp.data.IngestedHtmlRepository;
+import com.org73n37.crudapp.data.TranslationDocumentRepository;
 
 @CucumberContextConfiguration
 @SpringBootTest(
@@ -22,6 +26,13 @@ public class CucumberSpringConfiguration {
 
     public static final KeyPair keyPair;
     public static final String publicKeyPem;
+
+    @Autowired
+    private IngestedHtmlRepository ingestedHtmlRepository;
+
+    @MockitoBean
+    private TranslationDocumentRepository translationRepository;
+
 
     static {
         try {
@@ -53,5 +64,15 @@ public class CucumberSpringConfiguration {
 
     public static String setConfig(String name, String value, boolean isLocal) {
         return value;
+    }
+
+    @org.springframework.boot.test.context.TestConfiguration
+    public static class TestSecurityConfig {
+        @org.springframework.context.annotation.Bean
+        public org.springframework.security.oauth2.jwt.ReactiveJwtDecoder reactiveJwtDecoder() {
+            return org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
+                    .withPublicKey((java.security.interfaces.RSAPublicKey) CucumberSpringConfiguration.keyPair.getPublic())
+                    .build();
+        }
     }
 }

@@ -4,6 +4,6 @@ Feature: Application Health Check
   I want to check the health status of the application
 
   Scenario: Health endpoint returns OK
-    When I request the health endpoint "/health"
+    When I request the health endpoint "/health/liveness"
     Then the response status should be 200
     And the response body should contain "UP"

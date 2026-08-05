@@ -15,7 +15,9 @@ public class HealthCheckSteps {
     @Autowired
     private CucumberSpringConfiguration config;
 
-    private HttpResponse<String> lastResponse;
+    @Autowired
+    private TestContext testContext;
+
     private final HttpClient client = HttpClient.newHttpClient();
 
     @When("I request the health endpoint {string}")
@@ -25,11 +27,11 @@ public class HealthCheckSteps {
                 .GET()
                 .build();
                 
-        lastResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+        testContext.lastResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     @Then("the response body should contain {string}")
     public void the_response_body_should_contain(String expectedBody) {
-        assertTrue(lastResponse.body().contains(expectedBody));
+        assertTrue(testContext.lastResponse.body().contains(expectedBody));
     }
 }
